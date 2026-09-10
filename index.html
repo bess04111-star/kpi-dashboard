@@ -27,6 +27,10 @@
             scroll-behavior: smooth;
         }
 
+        /* 自訂特定灰色背景色類別 */
+        .bg-f2 { background-color: rgb(242, 242, 242) !important; }
+        .border-f2 { border-color: rgb(220, 220, 220) !important; }
+
         .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
@@ -52,10 +56,10 @@
         
         .tag-fail { background-color: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 2px; display: inline-block; white-space: normal; word-break: break-all; }
         
-        .tag-center { background-color: #f1f5f9; color: #334155; font-weight: 700; border: 1px solid #cbd5e1; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; display: inline-block; }
-        .tag-plant { background-color: #f8fafc; color: #475569; font-weight: 700; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; display: inline-block; }
+        .tag-center { background-color: rgb(242, 242, 242); color: #334155; font-weight: 700; border: 1px solid #d1d5db; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; display: inline-block; }
+        .tag-plant { background-color: #ffffff; color: #475569; font-weight: 700; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; display: inline-block; }
 
-        .filter-active { background-color: #334155 !important; color: white !important; }
+        .filter-active { background-color: rgb(242, 242, 242) !important; color: #1f2937 !important; border: 1px solid #d1d5db; }
 
         .custom-select {
             appearance: none;
@@ -80,11 +84,11 @@
     <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm backdrop-blur-md w-full py-3 md:py-0">
         <div class="max-w-[1900px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 h-auto md:h-16">
             <div class="flex items-center space-x-3 w-full md:w-auto self-start md:self-auto">
-                <div class="bg-zinc-800 p-2.5 rounded-lg text-white shadow-sm flex-shrink-0">
+                <div class="bg-f2 border border-gray-300 p-2.5 rounded-lg text-gray-800 shadow-sm flex-shrink-0">
                     <i data-lucide="cloud-lightning" class="w-5 h-5 md:w-6 md:h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight text-zinc-900 flex flex-wrap items-center gap-1.5 leading-snug">
+                    <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight text-gray-900 flex flex-wrap items-center gap-1.5 leading-snug">
                         集團 KPI 智慧互動總資料庫系統
                         <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-2 py-0.5 rounded font-bold">雲端同步版 v36.0</span>
                     </h1>
@@ -98,14 +102,14 @@
                     <span class="truncate">手動雲端同步</span>
                 </button>
 
-                <label class="col-span-1 flex items-center space-x-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition cursor-pointer shadow-sm justify-center">
+                <label class="col-span-1 flex items-center space-x-2 px-3 py-1.5 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 rounded-lg text-xs font-semibold transition cursor-pointer shadow-sm justify-center">
                     <i data-lucide="upload-cloud" class="w-3.5 h-3.5 flex-shrink-0"></i>
                     <span class="truncate">增量匯入 XLSX</span>
                     <input type="file" id="fileInput" class="hidden" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)">
                 </label>
                 
-                <button onclick="openFormModal(false)" class="col-span-1 flex items-center space-x-2 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition shadow-sm justify-center">
-                    <i data-lucide="plus" class="w-3.5 h-3.5 text-zinc-400 flex-shrink-0"></i>
+                <button onclick="openFormModal(false)" class="col-span-1 flex items-center space-x-2 px-3 py-1.5 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 rounded-lg text-xs font-semibold transition shadow-sm justify-center">
+                    <i data-lucide="plus" class="w-3.5 h-3.5 text-gray-600 flex-shrink-0"></i>
                     <span class="truncate">手動新增指標</span>
                 </button>
 
@@ -141,43 +145,43 @@
 
     <main class="max-w-[1900px] mx-auto p-4 sm:p-6 space-y-6">
 
-        <div class="dashboard-card p-4 sm:p-5 bg-zinc-800 text-white flex flex-col lg:flex-row justify-between items-center gap-6 shadow-sm border-zinc-700">
+        <div class="dashboard-card p-4 sm:p-5 bg-f2 text-gray-800 flex flex-col lg:flex-row justify-between items-center gap-6 shadow-sm border-gray-300">
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
-                <div class="bg-zinc-700 p-3 rounded-lg border border-zinc-600">
-                    <i data-lucide="calendar-range" class="w-5 h-5 text-zinc-300"></i>
+                <div class="bg-white p-3 rounded-lg border border-gray-300 shadow-sm">
+                    <i data-lucide="calendar-range" class="w-5 h-5 text-gray-600"></i>
                 </div>
                 <div>
-                    <span class="text-[10px] font-bold text-zinc-400 tracking-wider uppercase block">主資料庫全域篩選面板</span>
+                    <span class="text-[10px] font-bold text-gray-500 tracking-wider uppercase block">主資料庫全域篩選面板</span>
                     <div class="flex flex-wrap items-center gap-3 mt-1">
-                        <span class="text-sm font-bold text-zinc-200">切換檢視日期：</span>
+                        <span class="text-sm font-bold text-gray-800">切換檢視日期：</span>
                         <div class="relative">
-                            <select id="globalMonthSelector" onchange="handleGlobalMonthChange(this.value)" class="custom-select block w-56 pl-3 pr-10 py-1.5 text-xs border border-zinc-600 focus:ring-1 focus:ring-zinc-400 rounded-lg bg-zinc-900 text-white font-bold cursor-pointer transition hover:bg-zinc-950"></select>
+                            <select id="globalMonthSelector" onchange="handleGlobalMonthChange(this.value)" class="custom-select block w-56 pl-3 pr-10 py-1.5 text-xs border border-gray-300 focus:ring-1 focus:ring-gray-400 rounded-lg bg-white text-gray-800 font-bold cursor-pointer transition hover:bg-gray-50 shadow-sm"></select>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="flex flex-wrap items-center gap-4 sm:gap-6 bg-zinc-900/60 px-5 py-2.5 rounded-lg border border-zinc-700 text-xs w-full lg:w-auto justify-between lg:justify-start">
+            <div class="flex flex-wrap items-center gap-4 sm:gap-6 bg-white/80 px-5 py-2.5 rounded-lg border border-gray-300 text-xs w-full lg:w-auto justify-between lg:justify-start shadow-sm">
                 <div>
-                    <span class="text-zinc-400 block mb-0.5">資料庫總筆數</span>
-                    <span class="text-base font-bold text-white" id="dbTotalRecords">0 筆</span>
+                    <span class="text-gray-500 block mb-0.5">資料庫總筆數</span>
+                    <span class="text-base font-bold text-gray-900" id="dbTotalRecords">0 筆</span>
                 </div>
-                <div class="hidden sm:block border-l border-zinc-700 h-6"></div>
+                <div class="hidden sm:block border-l border-gray-300 h-6"></div>
                 <div>
-                    <span class="text-zinc-400 block mb-0.5">覆蓋歷史月數</span>
-                    <span class="text-base font-bold text-amber-400" id="dbTotalMonths">0 個</span>
+                    <span class="text-gray-500 block mb-0.5">覆蓋歷史月數</span>
+                    <span class="text-base font-bold text-amber-600" id="dbTotalMonths">0 個</span>
                 </div>
-                <div class="hidden sm:block border-l border-zinc-700 h-6"></div>
+                <div class="hidden sm:block border-l border-gray-300 h-6"></div>
                 <div>
-                    <span class="text-zinc-400 block mb-0.5">目前檢視日期</span>
-                    <span class="text-base font-bold text-emerald-400" id="dbCurrentView">全部日期</span>
+                    <span class="text-gray-500 block mb-0.5">目前檢視日期</span>
+                    <span class="text-base font-bold text-emerald-700" id="dbCurrentView">全部日期</span>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <div class="dashboard-card p-5 border-l-4 border-l-slate-600 relative overflow-hidden">
-                <div class="absolute right-4 top-4 text-slate-200"><i data-lucide="layers" class="w-7 h-7"></i></div>
+            <div class="dashboard-card p-5 border-l-4 border-l-slate-500 relative overflow-hidden">
+                <div class="absolute right-4 top-4 text-slate-300"><i data-lucide="layers" class="w-7 h-7"></i></div>
                 <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">總執行指標項數</p>
                 <h3 class="text-2xl font-black mt-1 text-slate-800" id="statTotal">0</h3>
                 <span class="text-[10px] text-slate-400 mt-1 block">當前選取日期範圍內合計</span>
@@ -188,11 +192,11 @@
                 <h3 class="text-2xl font-black mt-1 text-emerald-700" id="statPass">0</h3>
                 <span class="text-[10px] text-emerald-600 font-semibold mt-1 block">達成率高於 100% 之項目</span>
             </div>
-            <div class="dashboard-card p-5 border-l-4 border-l-zinc-600 relative overflow-hidden">
-                <div class="absolute right-4 top-4 text-zinc-200"><i data-lucide="line-chart" class="w-7 h-7"></i></div>
-                <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">集團平均指標達成率</p>
-                <h3 class="text-2xl font-black mt-1 text-zinc-800" id="statAvgRate">0%</h3>
-                <span class="text-[10px] text-zinc-400 mt-1 block">達標項數 / 總指標項數</span>
+            <div class="dashboard-card p-5 border-l-4 border-l-gray-500 relative overflow-hidden">
+                <div class="absolute right-4 top-4 text-gray-300"><i data-lucide="line-chart" class="w-7 h-7"></i></div>
+                <p class="text-[10px] font-bold text-gray-600 uppercase tracking-wider">集團平均指標達成率</p>
+                <h3 class="text-2xl font-black mt-1 text-gray-800" id="statAvgRate">0%</h3>
+                <span class="text-[10px] text-gray-400 mt-1 block">達標項數 / 總指標項數</span>
             </div>
             <div class="dashboard-card p-5 border-l-4 border-l-rose-600 relative overflow-hidden">
                 <div class="absolute right-4 top-4 text-rose-200"><i data-lucide="alert-octagon" class="w-7 h-7"></i></div>
@@ -206,13 +210,13 @@
             <div class="lg:col-span-8 dashboard-card p-4 sm:p-5">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3 border-b border-gray-100 pb-3">
                     <div>
-                        <h2 class="text-base font-bold flex items-center gap-2 text-zinc-800"><i data-lucide="bar-chart-3" class="w-4 h-4 text-zinc-600"></i> 各中心指標與達成率綜效分析</h2>
+                        <h2 class="text-base font-bold flex items-center gap-2 text-gray-800"><i data-lucide="bar-chart-3" class="w-4 h-4 text-gray-600"></i> 各中心指標與達成率綜效分析</h2>
                         <p class="text-xs text-gray-400 mt-0.5">統計當前檢視月份各中心的達標比例與指標總量</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3 text-[10px] font-semibold text-gray-600 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
-                        <span class="flex items-center"><span class="w-2.5 h-2.5 bg-zinc-700 rounded-sm mr-1"></span>達標項數</span>
+                        <span class="flex items-center"><span class="w-2.5 h-2.5 bg-gray-600 rounded-sm mr-1"></span>達標項數</span>
                         <span class="flex items-center"><span class="w-2.5 h-2.5 bg-gray-300 rounded-sm mr-1"></span>指標總項數</span>
-                        <span class="flex items-center"><span class="w-3 h-0.5 bg-zinc-900 mr-1"></span>達成比例</span>
+                        <span class="flex items-center"><span class="w-3 h-0.5 bg-gray-800 mr-1"></span>達成比例</span>
                         <span class="flex items-center"><span class="w-3 h-0.5 border-t border-dashed border-rose-500 mr-1"></span>目標線</span>
                     </div>
                 </div>
@@ -221,7 +225,7 @@
 
             <div class="lg:col-span-4 dashboard-card p-4 sm:p-5 flex flex-col h-[380px] sm:h-[430px]">
                 <div class="border-b border-gray-100 pb-3 mb-3">
-                    <h2 class="text-base font-bold uppercase text-zinc-800 flex items-center gap-2">
+                    <h2 class="text-base font-bold uppercase text-gray-800 flex items-center gap-2">
                         <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
                         達成率單位排行
                     </h2>
@@ -247,8 +251,8 @@
                 <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-100 pb-3">
                     <div>
                         <div class="flex flex-wrap items-center gap-3">
-                            <h2 class="text-base font-bold flex items-center gap-2 text-zinc-800">
-                                <i data-lucide="layout-grid" class="w-4 h-4 text-zinc-600"></i> 
+                            <h2 class="text-base font-bold flex items-center gap-2 text-gray-800">
+                                <i data-lucide="layout-grid" class="w-4 h-4 text-gray-600"></i> 
                                 部門矩陣總覽
                             </h2>
                             <div class="flex flex-wrap gap-2">
@@ -279,21 +283,21 @@
 
                 <div class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg h-[360px] w-full bg-white">
                     <table class="w-full text-xs text-left border-collapse min-w-[1000px]">
-                        <thead class="bg-zinc-800 text-zinc-100 font-semibold uppercase sticky top-0 z-20 shadow-sm">
+                        <thead class="bg-f2 text-gray-800 font-bold border-b border-gray-300 uppercase sticky top-0 z-20 shadow-sm">
                             <tr>
-                                <th id="th-center" class="p-2.5 border-r border-zinc-700 xl:w-[15%]" rowspan="2">中心單位</th>
-                                <th class="p-2.5 border-r border-zinc-700 xl:w-[15%]" rowspan="2">執行部門 (廠部)</th>
-                                <th class="p-2 border-r border-zinc-700 text-center bg-zinc-900 xl:w-[25%]" colspan="3">達標比例 (%)</th>
-                                <th class="p-2 text-center bg-zinc-800/80 xl:w-[15%]" colspan="3">警示燈號指標</th>
-                                <th class="p-2.5 text-left bg-zinc-900 xl:w-[30%]" rowspan="2">未達標明細 (異常清單)</th>
+                                <th id="th-center" class="p-2.5 border-r border-gray-300 xl:w-[15%]" rowspan="2">中心單位</th>
+                                <th class="p-2.5 border-r border-gray-300 xl:w-[15%]" rowspan="2">執行部門 (廠部)</th>
+                                <th class="p-2 border-r border-gray-300 text-center bg-gray-200 xl:w-[25%]" colspan="3">達標比例 (%)</th>
+                                <th class="p-2 text-center bg-f2 xl:w-[15%]" colspan="3">警示燈號指標</th>
+                                <th class="p-2.5 text-left bg-gray-200 xl:w-[30%]" rowspan="2">未達標明細 (異常清單)</th>
                             </tr>
-                            <tr class="bg-zinc-900 text-[11px]">
-                                <th class="p-1.5 border-r border-zinc-700 text-center">中心</th>
-                                <th class="p-1.5 border-r border-zinc-700 text-center">廠部</th>
-                                <th class="p-1.5 border-r border-zinc-700 text-center text-white font-bold">綜合</th>
-                                <th class="p-1.5 border-r border-zinc-700 text-center">中心</th>
-                                <th class="p-1.5 border-r border-zinc-700 text-center">廠部</th>
-                                <th class="p-1.5 text-center text-white font-bold">綜合</th>
+                            <tr class="bg-gray-200 text-[11px] text-gray-800">
+                                <th class="p-1.5 border-r border-gray-300 text-center">中心</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center">廠部</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center text-gray-900 font-bold">綜合</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center">中心</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center">廠部</th>
+                                <th class="p-1.5 text-center text-gray-900 font-bold">綜合</th>
                             </tr>
                         </thead>
                         <tbody id="deptMatrixBody" class="divide-y divide-gray-100"></tbody>
@@ -305,12 +309,12 @@
                 </div>
             </div>
 
-            <div class="xl:col-span-12 dashboard-card p-4 sm:p-5 flex flex-col space-y-5 border-t-2 border-t-zinc-700 bg-white w-full max-w-full overflow-hidden">
+            <div class="xl:col-span-12 dashboard-card p-4 sm:p-5 flex flex-col space-y-5 border-t-2 border-t-gray-400 bg-white w-full max-w-full overflow-hidden">
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div class="flex items-center gap-2.5">
                         <div class="bg-gray-100 p-2 rounded-lg text-gray-700 border border-gray-200 flex-shrink-0"><i data-lucide="clipboard-check" class="w-4 h-4"></i></div>
                         <div>
-                            <h2 class="text-base font-bold text-zinc-800">施策追蹤明細項目庫</h2>
+                            <h2 class="text-base font-bold text-gray-800">施策追蹤明細項目庫</h2>
                             <p class="text-xs text-gray-400 mt-0.5">即時追蹤各施策項目進度與達成評價，開啟編輯模式可進行多選與批量處理</p>
                         </div>
                     </div>
@@ -319,19 +323,19 @@
                         <button onclick="resetDetailsFilter()" class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded transition flex items-center gap-1 border border-gray-200">
                             <i data-lucide="refresh-cw" class="w-3 h-3"></i>重設
                         </button>
-                        <button onclick="toggleEditMode()" id="editModeBtn" class="px-3 py-1 bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm">
+                        <button onclick="toggleEditMode()" id="editModeBtn" class="px-3 py-1 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm">
                             <i data-lucide="edit" class="w-3 h-3"></i>編輯模式
                         </button>
                     </div>
                 </div>
 
-                <div id="bulkActionBar" class="hidden bg-zinc-800 text-white p-3 rounded-lg shadow-sm flex-wrap items-center justify-between gap-3 animate-fadeIn">
+                <div id="bulkActionBar" class="hidden bg-f2 border border-gray-300 text-gray-800 p-3 rounded-lg shadow-sm flex-wrap items-center justify-between gap-3 animate-fadeIn">
                     <div class="flex items-center space-x-3">
-                        <span class="text-xs font-semibold bg-zinc-700 px-2.5 py-1 rounded border border-zinc-600">
-                            已選取 <span id="selectedCountText" class="text-amber-300 font-bold text-sm">0</span> 筆項目
+                        <span class="text-xs font-semibold bg-white px-2.5 py-1 rounded border border-gray-300">
+                            已選取 <span id="selectedCountText" class="text-amber-600 font-bold text-sm">0</span> 筆項目
                         </span>
-                        <button onclick="toggleSelectAllVisible(true)" class="text-xs text-zinc-300 hover:text-white underline font-medium">全選當前</button>
-                        <button onclick="clearAllSelections()" class="text-xs text-zinc-300 hover:text-white underline font-medium">取消勾選</button>
+                        <button onclick="toggleSelectAllVisible(true)" class="text-xs text-gray-600 hover:text-gray-900 underline font-medium">全選當前</button>
+                        <button onclick="clearAllSelections()" class="text-xs text-gray-600 hover:text-gray-900 underline font-medium">取消勾選</button>
                     </div>
                     <div class="flex items-center space-x-2">
                         <button onclick="askBulkDelete()" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm">
@@ -372,32 +376,32 @@
                         <input type="text" id="searchInput" onkeyup="applySearch()" placeholder="關鍵字檢索 (中心、部門、課別、計畫項目)..." class="w-full pl-9 pr-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs outline-none focus:ring-1 focus:ring-gray-400 transition">
                     </div>
                     <span class="text-[11px] font-bold text-gray-500 text-center whitespace-nowrap bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
-                        顯示筆數: <span id="visibleCount" class="text-zinc-800 font-black">0</span>
+                        顯示筆數: <span id="visibleCount" class="text-gray-900 font-black">0</span>
                     </span>
                 </div>
 
                 <div id="desktopTableContainer" class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg h-[480px] bg-white w-full">
                     <table class="w-full text-xs text-left border-separate border-spacing-0 lg:min-w-[1500px] min-w-[1200px]">
-                        <thead class="sticky top-0 bg-zinc-800 text-zinc-100 z-20 shadow-sm font-semibold">
+                        <thead class="sticky top-0 bg-f2 text-gray-800 font-bold border-b border-gray-300 z-20 shadow-sm">
                             <tr>
-                                <th id="th-checkbox" class="p-2.5 text-center border-r border-zinc-700 xl:w-[3%] hidden">
-                                    <input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllChange(this.checked)" class="w-3.5 h-3.5 text-zinc-700 rounded border-gray-300 focus:ring-zinc-500 cursor-pointer">
+                                <th id="th-checkbox" class="p-2.5 text-center border-r border-gray-300 xl:w-[3%] hidden">
+                                    <input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllChange(this.checked)" class="w-3.5 h-3.5 text-gray-700 rounded border-gray-300 focus:ring-gray-500 cursor-pointer">
                                 </th>
-                                <th class="p-2.5 border-r border-zinc-700 xl:w-[6%]">年月份</th>
-                                <th class="p-2.5 border-r border-zinc-700 xl:w-[8%]">中心單位</th>
-                                <th class="p-2.5 border-r border-zinc-700 xl:w-[8%]">廠部 (部門)</th>
-                                <th class="p-2.5 border-r border-zinc-700 xl:w-[7%]">課別</th>
-                                <th class="p-2.5 border-r border-zinc-700 text-center whitespace-nowrap xl:w-[6%]">類別</th>
-                                <th class="p-2.5 border-r border-zinc-700 xl:w-[22%]">具體施策計畫項目</th>
-                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[5%]">單位</th>
-                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">2025實績</th>
-                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">2026目標</th>
-                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">累計目標</th>
-                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">累計實績</th>
-                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">去年同期</th>
-                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[5%]">方向</th>
-                                <th class="p-2.5 border-r border-zinc-700 text-center font-bold text-white xl:w-[6%]">達成率</th>
-                                <th class="p-2.5 text-center border-r border-zinc-700 xl:w-[4%]">評價</th>
+                                <th class="p-2.5 border-r border-gray-300 xl:w-[6%]">年月份</th>
+                                <th class="p-2.5 border-r border-gray-300 xl:w-[8%]">中心單位</th>
+                                <th class="p-2.5 border-r border-gray-300 xl:w-[8%]">廠部 (部門)</th>
+                                <th class="p-2.5 border-r border-gray-300 xl:w-[7%]">課別</th>
+                                <th class="p-2.5 border-r border-gray-300 text-center whitespace-nowrap xl:w-[6%]">類別</th>
+                                <th class="p-2.5 border-r border-gray-300 xl:w-[22%]">具體施策計畫項目</th>
+                                <th class="p-2.5 border-r border-gray-300 text-center xl:w-[5%]">單位</th>
+                                <th class="p-2.5 border-r border-gray-300 text-center xl:w-[6%]">2025實績</th>
+                                <th class="p-2.5 border-r border-gray-300 text-center xl:w-[6%]">2026目標</th>
+                                <th class="p-2.5 border-r border-gray-300 text-center xl:w-[6%]">累計目標</th>
+                                <th class="p-2.5 border-r border-gray-300 text-center xl:w-[6%]">累計實績</th>
+                                <th class="p-2.5 border-r border-gray-300 text-center xl:w-[6%]">去年同期</th>
+                                <th class="p-2.5 border-r border-gray-300 text-center xl:w-[5%]">方向</th>
+                                <th class="p-2.5 border-r border-gray-300 text-center font-bold text-gray-900 xl:w-[6%]">達成率</th>
+                                <th class="p-2.5 text-center border-r border-gray-300 xl:w-[4%]">評價</th>
                                 <th id="th-edit-op" class="p-2.5 text-center xl:w-[6%] hidden">操作</th>
                             </tr>
                         </thead>
@@ -413,14 +417,14 @@
         </div>
     </main>
 
-    <div id="formModal" class="fixed inset-0 bg-zinc-900/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+    <div id="formModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-2xl w-full shadow-xl border border-gray-200 flex flex-col max-h-[90vh]">
-            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-zinc-800 text-white rounded-t-xl">
+            <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-f2 text-gray-800 rounded-t-xl">
                 <div class="flex items-center space-x-2">
-                    <div class="p-1.5 bg-zinc-700 text-zinc-200 rounded"><i data-lucide="edit-3" class="w-4 h-4"></i></div>
-                    <h3 class="text-base font-bold text-white" id="modalTitle">手動新增 KPI 指標</h3>
+                    <div class="p-1.5 bg-white border border-gray-300 text-gray-700 rounded"><i data-lucide="edit-3" class="w-4 h-4"></i></div>
+                    <h3 class="text-base font-bold text-gray-900" id="modalTitle">手動新增 KPI 指標</h3>
                 </div>
-                <button onclick="closeFormModal()" class="text-zinc-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeFormModal()" class="text-gray-500 hover:text-gray-800 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             
             <div class="p-5 overflow-y-auto custom-scroll space-y-3 text-xs">
@@ -504,14 +508,14 @@
                 <button onclick="closeFormModal()" class="px-4 py-1.5 border border-gray-300 text-gray-700 hover:bg-gray-100 text-xs font-semibold rounded transition">
                     取消返回
                 </button>
-                <button onclick="saveIndicator()" class="px-4 py-1.5 bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-semibold rounded transition shadow-sm">
+                <button onclick="saveIndicator()" class="px-4 py-1.5 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded transition shadow-sm">
                     確認儲存指標
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="deleteConfirmModal" class="fixed inset-0 bg-zinc-900/50 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-4">
+    <div id="deleteConfirmModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full shadow-xl border border-gray-200 p-5 space-y-3">
             <div class="flex items-center space-x-2 text-rose-600">
                 <div class="p-2 bg-rose-50 rounded border border-rose-100"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
@@ -530,14 +534,14 @@
         </div>
     </div>
 
-    <div id="guideModal" class="fixed inset-0 bg-zinc-900/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+    <div id="guideModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-3xl w-full shadow-xl border border-gray-200 flex flex-col max-h-[85vh]">
-            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-zinc-800 text-white rounded-t-xl">
+            <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-f2 text-gray-800 rounded-t-xl">
                 <div class="flex items-center space-x-2">
-                    <div class="p-1.5 bg-zinc-700 text-zinc-200 rounded"><i data-lucide="book-open" class="w-4 h-4"></i></div>
-                    <h3 class="text-base font-bold">KPI 系統資料結構與 Excel 7 行群組規範</h3>
+                    <div class="p-1.5 bg-white border border-gray-300 text-gray-700 rounded"><i data-lucide="book-open" class="w-4 h-4"></i></div>
+                    <h3 class="text-base font-bold text-gray-900">KPI 系統資料結構與 Excel 7 行群組規範</h3>
                 </div>
-                <button onclick="closeGuideModal()" class="text-zinc-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeGuideModal()" class="text-gray-500 hover:text-gray-800 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             
             <div class="p-5 overflow-y-auto custom-scroll space-y-4 text-xs text-gray-700 leading-relaxed">
@@ -605,7 +609,7 @@
                 </div>
             </div>
             <div class="p-4 border-t border-gray-100 flex justify-end bg-gray-50/50 rounded-b-xl">
-                <button onclick="closeGuideModal()" class="px-4 py-1.5 bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-semibold rounded transition">
+                <button onclick="closeGuideModal()" class="px-4 py-1.5 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded transition">
                     我已瞭解結構
                 </button>
             </div>
@@ -810,7 +814,7 @@
                 showToast("✍️ 已進入編輯模式，可勾選單筆/多筆指標進行批量刪除或編輯。");
             } else {
                 btn.innerHTML = `<i data-lucide="edit" class="w-3 h-3"></i>編輯模式`;
-                btn.className = "px-3 py-1 bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
+                btn.className = "px-3 py-1 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
                 bulkBar.classList.add('hidden');
                 bulkBar.classList.remove('flex');
                 clearAllSelections();
@@ -1164,10 +1168,10 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { type: 'line', label: '達成比例', data: rateData, borderColor: '#18181b', borderWidth: 2, pointBackgroundColor: '#18181b', pointRadius: 3, yAxisID: 'yR', order: 0, tension: 0.1 },
+                        { type: 'line', label: '達成比例', data: rateData, borderColor: '#374151', borderWidth: 2, pointBackgroundColor: '#374151', pointRadius: 3, yAxisID: 'yR', order: 0, tension: 0.1 },
                         { type: 'line', label: '目標線', data: labels.map(()=>100), borderColor: '#ef4444', borderDash: [4, 4], pointRadius: 0, yAxisID: 'yR', order: 1 },
-                        { type: 'bar', label: '達標項數', data: labels.map(l => summaryData[l].pass), backgroundColor: '#52525b', borderRadius: 3, yAxisID: 'yC', order: 2 },
-                        { type: 'bar', label: '指標總項數', data: labels.map(l => summaryData[l].total), backgroundColor: '#e4e4e7', borderRadius: 3, yAxisID: 'yC', order: 3 }
+                        { type: 'bar', label: '達標項數', data: labels.map(l => summaryData[l].pass), backgroundColor: '#6b7280', borderRadius: 3, yAxisID: 'yC', order: 2 },
+                        { type: 'bar', label: '指標總項數', data: labels.map(l => summaryData[l].total), backgroundColor: '#e5e7eb', borderRadius: 3, yAxisID: 'yC', order: 3 }
                     ]
                 },
                 options: { 
@@ -1390,7 +1394,7 @@
 
                 const checkboxCellHtml = isEditMode ? `
                     <td class="p-2.5 text-center border-r border-gray-100">
-                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-3.5 h-3.5 text-zinc-700 rounded border-gray-300 focus:ring-zinc-500 cursor-pointer">
+                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-3.5 h-3.5 text-gray-700 rounded border-gray-300 focus:ring-gray-500 cursor-pointer">
                     </td>` : '';
 
                 const actionCellHtml = isEditMode ? `
@@ -1425,7 +1429,7 @@
 
                 const cardCheckboxHtml = isEditMode ? `
                     <div class="flex items-center space-x-2 pb-1.5 border-b border-gray-100">
-                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-3.5 h-3.5 text-zinc-700 rounded border-gray-300 focus:ring-zinc-500 cursor-pointer">
+                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-3.5 h-3.5 text-gray-700 rounded border-gray-300 focus:ring-gray-500 cursor-pointer">
                         <span class="text-xs font-semibold text-gray-700">勾選此項目</span>
                     </div>` : '';
 
@@ -1687,17 +1691,17 @@
             }
             
             const toast = document.createElement('div');
-            let bgColor = 'bg-zinc-800';
+            let bgColor = 'bg-f2 text-gray-800 border border-gray-300';
             let icon = 'info';
             if (type === 'success') {
-                bgColor = 'bg-emerald-700';
+                bgColor = 'bg-emerald-700 text-white';
                 icon = 'check-circle';
             } else if (type === 'error') {
-                bgColor = 'bg-rose-700';
+                bgColor = 'bg-rose-700 text-white';
                 icon = 'alert-triangle';
             }
             
-            toast.className = `px-4 py-2.5 rounded-lg shadow-lg text-white text-xs font-medium transition-all duration-300 transform translate-y-5 opacity-0 flex items-center gap-2 pointer-events-auto ${bgColor}`;
+            toast.className = `px-4 py-2.5 rounded-lg shadow-lg text-xs font-medium transition-all duration-300 transform translate-y-5 opacity-0 flex items-center gap-2 pointer-events-auto ${bgColor}`;
             toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i><span>${message}</span>`;
             toastContainer.appendChild(toast);
             lucide.createIcons();
