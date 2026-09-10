@@ -20,47 +20,46 @@
         
         body { 
             font-family: 'Inter', 'Noto Sans TC', sans-serif; 
-            background-color: #f0f9ff;
-            color: #0c4a6e;
+            background-color: #f8fafc;
+            color: #334155;
             margin: 0;
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
 
-        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #7dd3fc; }
-        .custom-scroll::-webkit-scrollbar-track { background: #f0f9ff; }
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
 
         .dashboard-card {
             background: #ffffff;
-            border-radius: 1rem;
-            border: 1px solid #e0f2fe;
-            box-shadow: 0 4px 12px -2px rgba(14, 165, 233, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
             transition: all 0.2s ease-in-out;
         }
         .dashboard-card:hover {
-            box-shadow: 0 10px 20px -3px rgba(14, 165, 233, 0.1);
-            border-color: #bae6fd;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+            border-color: #cbd5e1;
         }
 
-        .status-light { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .row-active { background-color: #e0f2fe !important; border-left: 4px solid #0284c7; }
+        .status-light { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .row-active { background-color: #f1f5f9 !important; border-left: 3px solid #475569; }
         
         .bg-o { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
         .bg-x { background-color: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; }
         
-        .tag-fail { background-color: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; padding: 2px 8px; border-radius: 6px; font-size: 11px; margin-bottom: 2px; display: inline-block; white-space: normal; word-break: break-all; transition: background-color 0.15s; }
-        .tag-fail:hover { background-color: #ffe4e6; }
+        .tag-fail { background-color: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-bottom: 2px; display: inline-block; white-space: normal; word-break: break-all; }
         
-        .tag-center { background-color: #e0f2fe; color: #0369a1; font-weight: 700; border: 1px solid #bae6fd; padding: 2px 7px; border-radius: 6px; font-size: 11px; white-space: nowrap; display: inline-block; }
-        .tag-plant { background-color: #f0fdf4; color: #166534; font-weight: 700; border: 1px solid #bbf7d0; padding: 2px 7px; border-radius: 6px; font-size: 11px; white-space: nowrap; display: inline-block; }
+        .tag-center { background-color: #f1f5f9; color: #334155; font-weight: 700; border: 1px solid #cbd5e1; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; display: inline-block; }
+        .tag-plant { background-color: #f8fafc; color: #475569; font-weight: 700; border: 1px solid #e2e8f0; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; display: inline-block; }
 
-        .filter-active { background-color: #0284c7 !important; color: white !important; }
+        .filter-active { background-color: #334155 !important; color: white !important; }
 
         .custom-select {
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230284c7'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 0.75rem center;
             background-size: 1rem;
@@ -78,59 +77,59 @@
 </head>
 <body class="min-h-screen pb-16">
 
-    <nav class="bg-white/90 border-b border-sky-100 sticky top-0 z-50 shadow-sm backdrop-blur-md w-full py-3 md:py-0">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm backdrop-blur-md w-full py-3 md:py-0">
         <div class="max-w-[1900px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 h-auto md:h-16">
             <div class="flex items-center space-x-3 w-full md:w-auto self-start md:self-auto">
-                <div class="bg-sky-700 p-2.5 rounded-xl text-white shadow-sm flex-shrink-0">
+                <div class="bg-zinc-800 p-2.5 rounded-lg text-white shadow-sm flex-shrink-0">
                     <i data-lucide="cloud-lightning" class="w-5 h-5 md:w-6 md:h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg md:text-xl font-black tracking-tight text-sky-950 flex flex-wrap items-center gap-1.5 leading-snug">
+                    <h1 class="text-base sm:text-lg md:text-xl font-bold tracking-tight text-zinc-900 flex flex-wrap items-center gap-1.5 leading-snug">
                         集團 KPI 智慧互動總資料庫系統
-                        <span class="bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] px-2 py-0.5 rounded-md font-bold">雲端同步版 v36.0</span>
+                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-2 py-0.5 rounded font-bold">雲端同步版 v36.0</span>
                     </h1>
-                    <p class="text-[9px] text-sky-500 font-bold uppercase tracking-widest leading-none mt-0.5">Enterprise Cloud Sync Master Platform</p>
+                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-0.5">Enterprise Cloud Sync Master Platform</p>
                 </div>
             </div>
             
             <div class="grid grid-cols-2 sm:flex sm:items-center justify-end gap-2 sm:gap-3 w-full md:w-auto">
-                <button onclick="syncFromCloud()" class="col-span-1 flex items-center space-x-2 px-3.5 py-2 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-sm justify-center">
-                    <i data-lucide="refresh-cw" class="w-4 h-4 flex-shrink-0"></i>
+                <button onclick="syncFromCloud()" class="col-span-1 flex items-center space-x-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition shadow-sm justify-center">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5 flex-shrink-0"></i>
                     <span class="truncate">手動雲端同步</span>
                 </button>
 
-                <label class="col-span-1 flex items-center space-x-2 px-3.5 py-2 sm:py-2 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-xs font-bold transition cursor-pointer shadow-sm justify-center">
-                    <i data-lucide="upload-cloud" class="w-4 h-4 flex-shrink-0"></i>
+                <label class="col-span-1 flex items-center space-x-2 px-3 py-1.5 bg-zinc-700 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition cursor-pointer shadow-sm justify-center">
+                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5 flex-shrink-0"></i>
                     <span class="truncate">增量匯入 XLSX</span>
                     <input type="file" id="fileInput" class="hidden" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)">
                 </label>
                 
-                <button onclick="openFormModal(false)" class="col-span-1 flex items-center space-x-2 px-3.5 py-2 bg-sky-950 hover:bg-sky-900 text-white rounded-lg text-xs font-bold transition shadow-sm justify-center">
-                    <i data-lucide="plus" class="w-4 h-4 text-sky-400 flex-shrink-0"></i>
+                <button onclick="openFormModal(false)" class="col-span-1 flex items-center space-x-2 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-semibold transition shadow-sm justify-center">
+                    <i data-lucide="plus" class="w-3.5 h-3.5 text-zinc-400 flex-shrink-0"></i>
                     <span class="truncate">手動新增指標</span>
                 </button>
 
                 <div class="col-span-2 relative w-full sm:w-auto text-left">
-                    <button id="toolsDropdownBtn" onclick="toggleToolsDropdown()" class="flex items-center justify-center space-x-2 w-full sm:w-auto px-3 py-2 border border-sky-200 bg-sky-50/50 hover:bg-sky-100/60 rounded-lg text-xs font-bold transition text-sky-800 shadow-sm">
-                        <i data-lucide="sliders" class="w-4 h-4 text-sky-600 flex-shrink-0"></i>
+                    <button id="toolsDropdownBtn" onclick="toggleToolsDropdown()" class="flex items-center justify-center space-x-2 w-full sm:w-auto px-3 py-1.5 border border-gray-300 bg-white hover:bg-gray-50 rounded-lg text-xs font-semibold transition text-gray-700 shadow-sm">
+                        <i data-lucide="sliders" class="w-3.5 h-3.5 text-gray-500 flex-shrink-0"></i>
                         <span>系統工具箱</span>
                         <i data-lucide="chevron-down" class="w-3.5 h-3.5 ml-1 flex-shrink-0"></i>
                     </button>
                     
-                    <div id="toolsDropdownMenu" class="dropdown-menu absolute right-0 mt-2 w-full sm:w-56 bg-white border border-sky-100 rounded-xl shadow-xl z-50 py-1.5">
-                        <button onclick="openGuideModal(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-medium text-sky-900 hover:bg-sky-50 transition">
-                            <i data-lucide="help-circle" class="w-4 h-4 text-sky-600"></i>
+                    <div id="toolsDropdownMenu" class="dropdown-menu absolute right-0 mt-2 w-full sm:w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50 py-1.5">
+                        <button onclick="openGuideModal(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-medium text-gray-700 hover:bg-gray-100 transition">
+                            <i data-lucide="book-open" class="w-4 h-4 text-gray-500"></i>
                             <span>結構說明書</span>
                         </button>
-                        <button onclick="downloadTemplate(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-medium text-sky-900 hover:bg-sky-50 transition">
-                            <i data-lucide="download" class="w-4 h-4 text-sky-600"></i>
+                        <button onclick="downloadTemplate(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-medium text-gray-700 hover:bg-gray-100 transition">
+                            <i data-lucide="download" class="w-4 h-4 text-gray-500"></i>
                             <span>下載標準範本</span>
                         </button>
-                        <button onclick="exportMasterDatabase(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-medium text-emerald-800 hover:bg-emerald-50 transition">
+                        <button onclick="exportMasterDatabase(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-medium text-emerald-800 hover:bg-emerald-50 transition">
                             <i data-lucide="download-cloud" class="w-4 h-4 text-emerald-600"></i>
                             <span>匯出總資料庫</span>
                         </button>
-                        <button onclick="confirmClearDatabase(); closeToolsDropdown();" id="clearBtn" class="flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-sky-100">
+                        <button onclick="confirmClearDatabase(); closeToolsDropdown();" id="clearBtn" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100">
                             <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>
                             <span id="clearBtnText">清空雲端與地端資料庫</span>
                         </button>
@@ -142,124 +141,124 @@
 
     <main class="max-w-[1900px] mx-auto p-4 sm:p-6 space-y-6">
 
-        <div class="dashboard-card p-4 sm:p-5 bg-sky-900 text-white flex flex-col lg:flex-row justify-between items-center gap-6 shadow-md border-sky-800">
+        <div class="dashboard-card p-4 sm:p-5 bg-zinc-800 text-white flex flex-col lg:flex-row justify-between items-center gap-6 shadow-sm border-zinc-700">
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
-                <div class="bg-sky-800/80 p-3 rounded-xl border border-sky-700">
-                    <i data-lucide="calendar-range" class="w-6 h-6 text-sky-200"></i>
+                <div class="bg-zinc-700 p-3 rounded-lg border border-zinc-600">
+                    <i data-lucide="calendar-range" class="w-5 h-5 text-zinc-300"></i>
                 </div>
                 <div>
-                    <span class="text-[10px] font-bold text-sky-300 tracking-wider uppercase block">主資料庫全域篩選面板</span>
+                    <span class="text-[10px] font-bold text-zinc-400 tracking-wider uppercase block">主資料庫全域篩選面板</span>
                     <div class="flex flex-wrap items-center gap-3 mt-1">
-                        <span class="text-base font-black text-sky-50">切換檢視日期：</span>
+                        <span class="text-sm font-bold text-zinc-200">切換檢視日期：</span>
                         <div class="relative">
-                            <select id="globalMonthSelector" onchange="handleGlobalMonthChange(this.value)" class="custom-select block w-56 pl-3 pr-10 py-1.5 text-sm border border-sky-700 focus:ring-2 focus:ring-sky-400 rounded-lg bg-sky-800 text-white font-black cursor-pointer shadow-sm transition duration-200 hover:bg-sky-750"></select>
+                            <select id="globalMonthSelector" onchange="handleGlobalMonthChange(this.value)" class="custom-select block w-56 pl-3 pr-10 py-1.5 text-xs border border-zinc-600 focus:ring-1 focus:ring-zinc-400 rounded-lg bg-zinc-900 text-white font-bold cursor-pointer transition hover:bg-zinc-950"></select>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="flex flex-wrap items-center gap-4 sm:gap-6 bg-sky-800/60 px-6 py-3 rounded-xl border border-sky-700 text-xs w-full lg:w-auto justify-between lg:justify-start">
+            <div class="flex flex-wrap items-center gap-4 sm:gap-6 bg-zinc-900/60 px-5 py-2.5 rounded-lg border border-zinc-700 text-xs w-full lg:w-auto justify-between lg:justify-start">
                 <div>
-                    <span class="text-sky-300 block mb-0.5">資料庫總筆數</span>
-                    <span class="text-lg font-black text-white" id="dbTotalRecords">0 筆</span>
+                    <span class="text-zinc-400 block mb-0.5">資料庫總筆數</span>
+                    <span class="text-base font-bold text-white" id="dbTotalRecords">0 筆</span>
                 </div>
-                <div class="hidden sm:block border-l border-sky-700 h-8"></div>
+                <div class="hidden sm:block border-l border-zinc-700 h-6"></div>
                 <div>
-                    <span class="text-sky-300 block mb-0.5">覆蓋歷史月數</span>
-                    <span class="text-lg font-black text-amber-300" id="dbTotalMonths">0 個</span>
+                    <span class="text-zinc-400 block mb-0.5">覆蓋歷史月數</span>
+                    <span class="text-base font-bold text-amber-400" id="dbTotalMonths">0 個</span>
                 </div>
-                <div class="hidden sm:block border-l border-sky-700 h-8"></div>
+                <div class="hidden sm:block border-l border-zinc-700 h-6"></div>
                 <div>
-                    <span class="text-sky-300 block mb-0.5">目前檢視日期</span>
-                    <span class="text-lg font-black text-emerald-300" id="dbCurrentView">全部日期</span>
+                    <span class="text-zinc-400 block mb-0.5">目前檢視日期</span>
+                    <span class="text-base font-bold text-emerald-400" id="dbCurrentView">全部日期</span>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <div class="dashboard-card p-6 border-l-4 border-l-sky-600 relative overflow-hidden group">
-                <div class="absolute right-4 top-4 text-sky-200"><i data-lucide="layers" class="w-8 h-8"></i></div>
-                <p class="text-[10px] font-black text-sky-600 uppercase tracking-wider">總執行指標項數</p>
-                <h3 class="text-3xl font-black mt-2 text-sky-950" id="statTotal">0</h3>
-                <span class="text-[10px] text-sky-500 mt-2 block">當前選取日期範圍內合計</span>
+            <div class="dashboard-card p-5 border-l-4 border-l-slate-600 relative overflow-hidden">
+                <div class="absolute right-4 top-4 text-slate-200"><i data-lucide="layers" class="w-7 h-7"></i></div>
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">總執行指標項數</p>
+                <h3 class="text-2xl font-black mt-1 text-slate-800" id="statTotal">0</h3>
+                <span class="text-[10px] text-slate-400 mt-1 block">當前選取日期範圍內合計</span>
             </div>
-            <div class="dashboard-card p-6 border-l-4 border-l-emerald-600 relative overflow-hidden group">
-                <div class="absolute right-4 top-4 text-emerald-200"><i data-lucide="check-circle-2" class="w-8 h-8"></i></div>
-                <p class="text-[10px] font-black text-emerald-700 uppercase tracking-wider">準時達標指標數 (O)</p>
-                <h3 class="text-3xl font-black mt-2 text-emerald-700" id="statPass">0</h3>
-                <span class="text-[10px] text-emerald-600 font-semibold mt-2 block">達成率高於 100% 之項目</span>
+            <div class="dashboard-card p-5 border-l-4 border-l-emerald-600 relative overflow-hidden">
+                <div class="absolute right-4 top-4 text-emerald-200"><i data-lucide="check-circle-2" class="w-7 h-7"></i></div>
+                <p class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">準時達標指標數 (O)</p>
+                <h3 class="text-2xl font-black mt-1 text-emerald-700" id="statPass">0</h3>
+                <span class="text-[10px] text-emerald-600 font-semibold mt-1 block">達成率高於 100% 之項目</span>
             </div>
-            <div class="dashboard-card p-6 border-l-4 border-l-blue-600 relative overflow-hidden group">
-                <div class="absolute right-4 top-4 text-blue-200"><i data-lucide="line-chart" class="w-8 h-8"></i></div>
-                <p class="text-[10px] font-black text-blue-700 uppercase tracking-wider">集團平均指標達成率</p>
-                <h3 class="text-3xl font-black mt-2 text-blue-800" id="statAvgRate">0%</h3>
-                <span class="text-[10px] text-sky-500 mt-2 block">達標項數 / 總指標項數</span>
+            <div class="dashboard-card p-5 border-l-4 border-l-zinc-600 relative overflow-hidden">
+                <div class="absolute right-4 top-4 text-zinc-200"><i data-lucide="line-chart" class="w-7 h-7"></i></div>
+                <p class="text-[10px] font-bold text-zinc-600 uppercase tracking-wider">集團平均指標達成率</p>
+                <h3 class="text-2xl font-black mt-1 text-zinc-800" id="statAvgRate">0%</h3>
+                <span class="text-[10px] text-zinc-400 mt-1 block">達標項數 / 總指標項數</span>
             </div>
-            <div class="dashboard-card p-6 border-l-4 border-l-rose-600 relative overflow-hidden group">
-                <div class="absolute right-4 top-4 text-rose-200"><i data-lucide="alert-octagon" class="w-8 h-8"></i></div>
-                <p class="text-[10px] font-black text-rose-600 uppercase tracking-wider">異常監控指標數 (X)</p>
-                <h3 class="text-3xl font-black mt-2 text-rose-600" id="statFail">0</h3>
-                <span class="text-[10px] text-rose-500 font-semibold mt-2 block">亟待施策改善之警示項目</span>
+            <div class="dashboard-card p-5 border-l-4 border-l-rose-600 relative overflow-hidden">
+                <div class="absolute right-4 top-4 text-rose-200"><i data-lucide="alert-octagon" class="w-7 h-7"></i></div>
+                <p class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">異常監控指標數 (X)</p>
+                <h3 class="text-2xl font-black mt-1 text-rose-600" id="statFail">0</h3>
+                <span class="text-[10px] text-rose-500 font-semibold mt-1 block">亟待施策改善之警示項目</span>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-8 dashboard-card p-4 sm:p-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-sky-100 pb-4">
+            <div class="lg:col-span-8 dashboard-card p-4 sm:p-5">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3 border-b border-gray-100 pb-3">
                     <div>
-                        <h2 class="text-lg font-black flex items-center gap-2 text-sky-950"><i data-lucide="bar-chart-3" class="w-5 h-5 text-sky-700"></i> 各中心指標與達成率綜效分析</h2>
-                        <p class="text-xs text-sky-600 mt-0.5">統計當前檢視月份各中心的達標比例與指標總量</p>
+                        <h2 class="text-base font-bold flex items-center gap-2 text-zinc-800"><i data-lucide="bar-chart-3" class="w-4 h-4 text-zinc-600"></i> 各中心指標與達成率綜效分析</h2>
+                        <p class="text-xs text-gray-400 mt-0.5">統計當前檢視月份各中心的達標比例與指標總量</p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3 text-[10px] font-bold text-sky-700 bg-sky-50 px-4 py-2 rounded-full border border-sky-100">
-                        <span class="flex items-center"><span class="w-3 h-3 bg-sky-600 rounded-sm mr-1.5"></span>達標項數</span>
-                        <span class="flex items-center"><span class="w-3 h-3 bg-sky-200 rounded-sm mr-1.5"></span>指標總項數</span>
-                        <span class="flex items-center"><span class="w-4 h-1 bg-sky-900 rounded-full mr-1.5"></span>達成比例</span>
-                        <span class="flex items-center"><span class="w-4 h-0.5 border-t border-dashed border-rose-500 mr-1.5"></span>目標線</span>
+                    <div class="flex flex-wrap items-center gap-3 text-[10px] font-semibold text-gray-600 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
+                        <span class="flex items-center"><span class="w-2.5 h-2.5 bg-zinc-700 rounded-sm mr-1"></span>達標項數</span>
+                        <span class="flex items-center"><span class="w-2.5 h-2.5 bg-gray-300 rounded-sm mr-1"></span>指標總項數</span>
+                        <span class="flex items-center"><span class="w-3 h-0.5 bg-zinc-900 mr-1"></span>達成比例</span>
+                        <span class="flex items-center"><span class="w-3 h-0.5 border-t border-dashed border-rose-500 mr-1"></span>目標線</span>
                     </div>
                 </div>
-                <div class="h-[280px] sm:h-[360px]"><canvas id="mainChart"></canvas></div>
+                <div class="h-[280px] sm:h-[340px]"><canvas id="mainChart"></canvas></div>
             </div>
 
-            <div class="lg:col-span-4 dashboard-card p-4 sm:p-6 flex flex-col h-[400px] sm:h-[470px]">
-                <div class="border-b border-sky-100 pb-3 mb-4">
-                    <h2 class="text-lg font-black uppercase text-sky-950 flex items-center gap-2">
-                        <i data-lucide="trophy" class="w-5 h-5 text-amber-500"></i>
+            <div class="lg:col-span-4 dashboard-card p-4 sm:p-5 flex flex-col h-[380px] sm:h-[430px]">
+                <div class="border-b border-gray-100 pb-3 mb-3">
+                    <h2 class="text-base font-bold uppercase text-zinc-800 flex items-center gap-2">
+                        <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
                         達成率單位排行
                     </h2>
-                    <p class="text-xs text-sky-600 mt-0.5">點擊下方中心單位可快速切換矩陣檢視</p>
+                    <p class="text-xs text-gray-400 mt-0.5">點擊下方中心單位可快速切換矩陣檢視</p>
                 </div>
                 <div class="flex-grow overflow-y-auto custom-scroll pr-2">
-                    <table class="w-full text-sm text-left">
+                    <table class="w-full text-xs text-left">
                         <thead>
-                            <tr class="text-xs font-bold text-sky-600 border-b border-sky-100 pb-2">
+                            <tr class="font-semibold text-gray-500 border-b border-gray-100 pb-2">
                                 <th class="pb-2">中心單位</th>
                                 <th class="pb-2 text-center">達標/總項</th>
                                 <th class="pb-2 text-right">累計達成率</th>
                             </tr>
                         </thead>
-                        <tbody id="centerTableBody" class="divide-y divide-sky-50"></tbody>
+                        <tbody id="centerTableBody" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-            <div class="xl:col-span-12 dashboard-card p-4 sm:p-6 space-y-4 w-full max-w-full overflow-hidden">
-                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-sky-100 pb-4">
+            <div class="xl:col-span-12 dashboard-card p-4 sm:p-5 space-y-4 w-full max-w-full overflow-hidden">
+                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-gray-100 pb-3">
                     <div>
-                        <div class="flex flex-wrap items-center gap-4">
-                            <h2 class="text-lg font-black flex items-center gap-2 text-sky-950">
-                                <i data-lucide="layout-grid" class="w-5 h-5 text-sky-700"></i> 
+                        <div class="flex flex-wrap items-center gap-3">
+                            <h2 class="text-base font-bold flex items-center gap-2 text-zinc-800">
+                                <i data-lucide="layout-grid" class="w-4 h-4 text-zinc-600"></i> 
                                 部門矩陣總覽
                             </h2>
                             <div class="flex flex-wrap gap-2">
-                                <div class="flex items-center bg-sky-50 p-1 rounded-lg border border-sky-100">
-                                    <span class="text-[10px] px-2 font-black text-sky-600">範圍</span>
-                                    <select id="matrixCenterSelector" onchange="handleMatrixCenterChange(this.value)" class="custom-select block w-32 sm:w-40 pl-3 pr-8 py-1.5 text-xs border-none focus:ring-0 rounded-md bg-white font-bold text-sky-900"></select>
+                                <div class="flex items-center bg-gray-50 p-1 rounded-md border border-gray-200">
+                                    <span class="text-[10px] px-2 font-bold text-gray-500">範圍</span>
+                                    <select id="matrixCenterSelector" onchange="handleMatrixCenterChange(this.value)" class="custom-select block w-32 sm:w-36 pl-2 pr-6 py-1 text-xs border-none focus:ring-0 rounded bg-white font-semibold text-gray-800"></select>
                                 </div>
-                                <div class="flex items-center bg-sky-50 p-1 rounded-lg border border-sky-100">
-                                    <span class="text-[10px] px-2 font-black text-sky-600">排序</span>
-                                    <select id="sortSelector" onchange="handleSortChange(this.value)" class="custom-select block w-32 sm:w-40 pl-3 pr-8 py-1.5 text-xs border-none focus:ring-0 rounded-md bg-white font-bold text-sky-900">
+                                <div class="flex items-center bg-gray-50 p-1 rounded-md border border-gray-200">
+                                    <span class="text-[10px] px-2 font-bold text-gray-500">排序</span>
+                                    <select id="sortSelector" onchange="handleSortChange(this.value)" class="custom-select block w-32 sm:w-36 pl-2 pr-6 py-1 text-xs border-none focus:ring-0 rounded bg-white font-semibold text-gray-800">
                                         <option value="name_asc" selected>名稱 (A-Z)</option>
                                         <option value="comb_desc">綜合率 (高→低)</option>
                                         <option value="comb_asc">綜合率 (低→高)</option>
@@ -269,309 +268,309 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="text-xs text-sky-600 mt-1">點擊下方任何一個部門單元，可連動下方的「施策追蹤明細項目庫」篩選明細</p>
+                        <p class="text-xs text-gray-400 mt-1">點擊下方任何一個部門單元，可連動下方的「施策追蹤明細項目庫」篩選明細</p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3 text-[10px] font-black text-sky-700 bg-sky-50/80 px-3 py-1.5 rounded-lg border border-sky-200">
+                    <div class="flex flex-wrap items-center gap-3 text-[10px] font-bold text-gray-600 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-200">
                         <div class="flex items-center"><span class="status-light bg-emerald-500 mr-1.5"></span>正常 (71%+)</div>
                         <div class="flex items-center"><span class="status-light bg-amber-400 mr-1.5"></span>注意 (61%~70%)</div>
                         <div class="flex items-center"><span class="status-light bg-rose-500 mr-1.5"></span>警示 (0%~60%)</div>
                     </div>
                 </div>
 
-                <div class="hidden lg:block overflow-x-auto custom-scroll border border-sky-100 rounded-xl h-[380px] w-full bg-white">
-                    <table class="w-full text-[13px] text-left border-collapse min-w-[1000px]">
-                        <thead class="bg-sky-950 text-sky-100 font-bold border-b border-sky-900 uppercase sticky top-0 z-20 shadow-sm">
+                <div class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg h-[360px] w-full bg-white">
+                    <table class="w-full text-xs text-left border-collapse min-w-[1000px]">
+                        <thead class="bg-zinc-800 text-zinc-100 font-semibold uppercase sticky top-0 z-20 shadow-sm">
                             <tr>
-                                <th id="th-center" class="p-3 border-r border-sky-900 xl:w-[15%]" rowspan="2">中心單位</th>
-                                <th class="p-3 border-r border-sky-900 xl:w-[15%]" rowspan="2">執行部門 (廠部)</th>
-                                <th class="p-2 border-r border-sky-900 text-center bg-sky-900 xl:w-[25%]" colspan="3">達標比例 (%)</th>
-                                <th class="p-2 text-center bg-sky-900/80 xl:w-[15%]" colspan="3">警示燈號指標</th>
-                                <th class="p-3 text-left bg-sky-900 xl:w-[30%]" rowspan="2">未達標明細 (異常清單)</th>
+                                <th id="th-center" class="p-2.5 border-r border-zinc-700 xl:w-[15%]" rowspan="2">中心單位</th>
+                                <th class="p-2.5 border-r border-zinc-700 xl:w-[15%]" rowspan="2">執行部門 (廠部)</th>
+                                <th class="p-2 border-r border-zinc-700 text-center bg-zinc-900 xl:w-[25%]" colspan="3">達標比例 (%)</th>
+                                <th class="p-2 text-center bg-zinc-800/80 xl:w-[15%]" colspan="3">警示燈號指標</th>
+                                <th class="p-2.5 text-left bg-zinc-900 xl:w-[30%]" rowspan="2">未達標明細 (異常清單)</th>
                             </tr>
-                            <tr class="bg-sky-900 text-[12px]">
-                                <th class="p-2 border-r border-sky-800 text-center">中心</th>
-                                <th class="p-2 border-r border-sky-800 text-center">廠部</th>
-                                <th class="p-2 border-r border-sky-800 text-center text-white font-black">綜合</th>
-                                <th class="p-2 border-r border-sky-800 text-center">中心</th>
-                                <th class="p-2 border-r border-sky-800 text-center">廠部</th>
-                                <th class="p-2 text-center text-white font-black">綜合</th>
+                            <tr class="bg-zinc-900 text-[11px]">
+                                <th class="p-1.5 border-r border-zinc-700 text-center">中心</th>
+                                <th class="p-1.5 border-r border-zinc-700 text-center">廠部</th>
+                                <th class="p-1.5 border-r border-zinc-700 text-center text-white font-bold">綜合</th>
+                                <th class="p-1.5 border-r border-zinc-700 text-center">中心</th>
+                                <th class="p-1.5 border-r border-zinc-700 text-center">廠部</th>
+                                <th class="p-1.5 text-center text-white font-bold">綜合</th>
                             </tr>
                         </thead>
-                        <tbody id="deptMatrixBody" class="divide-y divide-sky-100"></tbody>
+                        <tbody id="deptMatrixBody" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
 
-                <div class="block lg:hidden w-full max-h-[420px] overflow-y-auto custom-scroll pr-1">
-                    <div id="deptMatrixCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div class="block lg:hidden w-full max-h-[400px] overflow-y-auto custom-scroll pr-1">
+                    <div id="deptMatrixCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                 </div>
             </div>
 
-            <div class="xl:col-span-12 dashboard-card p-4 sm:p-6 flex flex-col space-y-6 border-t-4 border-t-sky-800 bg-white w-full max-w-full overflow-hidden">
+            <div class="xl:col-span-12 dashboard-card p-4 sm:p-5 flex flex-col space-y-5 border-t-2 border-t-zinc-700 bg-white w-full max-w-full overflow-hidden">
                 <div class="flex items-center justify-between flex-wrap gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-sky-100 p-2.5 rounded-lg text-sky-800 border border-sky-200 flex-shrink-0"><i data-lucide="clipboard-check" class="w-5 h-5"></i></div>
+                    <div class="flex items-center gap-2.5">
+                        <div class="bg-gray-100 p-2 rounded-lg text-gray-700 border border-gray-200 flex-shrink-0"><i data-lucide="clipboard-check" class="w-4 h-4"></i></div>
                         <div>
-                            <h2 class="text-lg font-black text-sky-950">施策追蹤明細項目庫</h2>
-                            <p class="text-xs text-sky-600 mt-0.5">即時追蹤各施策項目進度與達成評價，開啟編輯模式可進行多選與批量處理</p>
+                            <h2 class="text-base font-bold text-zinc-800">施策追蹤明細項目庫</h2>
+                            <p class="text-xs text-gray-400 mt-0.5">即時追蹤各施策項目進度與達成評價，開啟編輯模式可進行多選與批量處理</p>
                         </div>
                     </div>
                     
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                        <button onclick="resetDetailsFilter()" class="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold rounded-lg transition flex items-center gap-1 border border-sky-200">
-                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>重設
+                        <button onclick="resetDetailsFilter()" class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded transition flex items-center gap-1 border border-gray-200">
+                            <i data-lucide="refresh-cw" class="w-3 h-3"></i>重設
                         </button>
-                        <button onclick="toggleEditMode()" id="editModeBtn" class="px-3 py-1.5 bg-sky-900 hover:bg-sky-950 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm">
-                            <i data-lucide="edit" class="w-3.5 h-3.5"></i>編輯模式
+                        <button onclick="toggleEditMode()" id="editModeBtn" class="px-3 py-1 bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm">
+                            <i data-lucide="edit" class="w-3 h-3"></i>編輯模式
                         </button>
                     </div>
                 </div>
 
-                <div id="bulkActionBar" class="hidden bg-sky-900 text-white p-3 rounded-xl shadow-md flex-wrap items-center justify-between gap-3 animate-fadeIn">
+                <div id="bulkActionBar" class="hidden bg-zinc-800 text-white p-3 rounded-lg shadow-sm flex-wrap items-center justify-between gap-3 animate-fadeIn">
                     <div class="flex items-center space-x-3">
-                        <span class="text-xs font-bold bg-sky-800 px-3 py-1 rounded-lg border border-sky-700">
-                            已選取 <span id="selectedCountText" class="text-amber-300 font-black text-sm">0</span> 筆項目
+                        <span class="text-xs font-semibold bg-zinc-700 px-2.5 py-1 rounded border border-zinc-600">
+                            已選取 <span id="selectedCountText" class="text-amber-300 font-bold text-sm">0</span> 筆項目
                         </span>
-                        <button onclick="toggleSelectAllVisible(true)" class="text-xs text-sky-200 hover:text-white underline font-medium">全選當前</button>
-                        <button onclick="clearAllSelections()" class="text-xs text-sky-200 hover:text-white underline font-medium">取消勾選</button>
+                        <button onclick="toggleSelectAllVisible(true)" class="text-xs text-zinc-300 hover:text-white underline font-medium">全選當前</button>
+                        <button onclick="clearAllSelections()" class="text-xs text-zinc-300 hover:text-white underline font-medium">取消勾選</button>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="askBulkDelete()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        <button onclick="askBulkDelete()" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>
                             <span>批量刪除選取項</span>
                         </button>
                     </div>
                 </div>
 
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-sky-50/70 p-4 rounded-xl border border-sky-100">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full lg:w-auto">
-                        <div class="flex items-center gap-3 w-full">
-                            <span class="text-xs font-bold text-sky-700 uppercase tracking-wider whitespace-nowrap w-16">中心範圍</span>
-                            <select id="detailCenterSelector" onchange="handleDetailCenterChange(this.value)" class="custom-select block w-full sm:w-48 pl-3 pr-10 py-1.5 text-xs border border-sky-200 focus:ring-2 focus:ring-sky-400 rounded-md bg-white font-bold text-sky-900 transition"></select>
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-gray-50/70 p-3 rounded-lg border border-gray-200">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full lg:w-auto">
+                        <div class="flex items-center gap-2 w-full">
+                            <span class="text-xs font-semibold text-gray-500 whitespace-nowrap w-16">中心範圍</span>
+                            <select id="detailCenterSelector" onchange="handleDetailCenterChange(this.value)" class="custom-select block w-full sm:w-44 pl-2.5 pr-8 py-1 text-xs border border-gray-300 focus:ring-1 focus:ring-gray-400 rounded bg-white font-semibold text-gray-800 transition"></select>
                         </div>
 
-                        <div class="flex items-center gap-3 w-full">
-                            <span class="text-xs font-bold text-sky-700 uppercase tracking-wider whitespace-nowrap w-16">執行部門</span>
-                            <select id="detailDeptSelector" onchange="handleDetailDeptChange(this.value)" class="custom-select block w-full sm:w-48 pl-3 pr-10 py-1.5 text-xs border border-sky-200 focus:ring-2 focus:ring-sky-400 rounded-md bg-white font-bold text-sky-900 transition">
+                        <div class="flex items-center gap-2 w-full">
+                            <span class="text-xs font-semibold text-gray-500 whitespace-nowrap w-16">執行部門</span>
+                            <select id="detailDeptSelector" onchange="handleDetailDeptChange(this.value)" class="custom-select block w-full sm:w-44 pl-2.5 pr-8 py-1 text-xs border border-gray-300 focus:ring-1 focus:ring-gray-400 rounded bg-white font-semibold text-gray-800 transition">
                                 <option value="all">全部部門</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-start lg:self-auto w-full lg:w-auto">
-                        <span class="text-xs font-bold text-sky-700 uppercase tracking-wider hidden sm:inline">指標分類篩選</span>
-                        <div class="flex items-center p-1 bg-sky-200/60 rounded-lg space-x-1 border border-sky-200 shadow-inner w-full sm:w-auto">
-                            <button onclick="applyTypeFilter('all')" id="f-all" class="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 text-[11px] font-bold rounded transition filter-active shadow-sm">全部</button>
-                            <button onclick="applyTypeFilter('中心')" id="f-center" class="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 text-[11px] font-bold rounded transition text-sky-800 hover:text-sky-950">中心指標</button>
-                            <button onclick="applyTypeFilter('廠部')" id="f-plant" class="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 text-[11px] font-bold rounded transition text-sky-800 hover:text-sky-950">廠部指標</button>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 self-start lg:self-auto w-full lg:w-auto">
+                        <span class="text-xs font-semibold text-gray-500 hidden sm:inline">分類篩選</span>
+                        <div class="flex items-center p-0.5 bg-gray-200/80 rounded space-x-1 border border-gray-200 w-full sm:w-auto">
+                            <button onclick="applyTypeFilter('all')" id="f-all" class="flex-1 sm:flex-initial px-3 py-1 text-[11px] font-bold rounded transition filter-active shadow-sm">全部</button>
+                            <button onclick="applyTypeFilter('中心')" id="f-center" class="flex-1 sm:flex-initial px-3 py-1 text-[11px] font-bold rounded transition text-gray-600 hover:text-gray-900">中心指標</button>
+                            <button onclick="applyTypeFilter('廠部')" id="f-plant" class="flex-1 sm:flex-initial px-3 py-1 text-[11px] font-bold rounded transition text-gray-600 hover:text-gray-900">廠部指標</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div class="relative flex-grow">
-                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-sky-400"></i>
-                        <input type="text" id="searchInput" onkeyup="applySearch()" placeholder="全表動態關鍵字檢索 (中心、部門、課別、計畫項目、指標單位)..." class="w-full pl-10 pr-4 py-2 bg-white border border-sky-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-sky-400 transition">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="searchInput" onkeyup="applySearch()" placeholder="關鍵字檢索 (中心、部門、課別、計畫項目)..." class="w-full pl-9 pr-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs outline-none focus:ring-1 focus:ring-gray-400 transition">
                     </div>
-                    <span class="text-[11px] font-black text-sky-700 text-center whitespace-nowrap bg-sky-100 px-4 py-2 rounded-lg border border-sky-200 uppercase tracking-widest shadow-sm">
-                        Total items: <span id="visibleCount" class="text-sky-950 text-sm font-black">0</span>
+                    <span class="text-[11px] font-bold text-gray-500 text-center whitespace-nowrap bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
+                        顯示筆數: <span id="visibleCount" class="text-zinc-800 font-black">0</span>
                     </span>
                 </div>
 
-                <div id="desktopTableContainer" class="hidden lg:block overflow-x-auto custom-scroll border border-sky-100 rounded-xl h-[500px] bg-white w-full">
-                    <table class="w-full text-[13px] text-left border-separate border-spacing-0 lg:min-w-[1600px] min-w-[1300px]">
-                        <thead class="sticky top-0 bg-sky-950 text-sky-100 z-20 shadow-sm">
+                <div id="desktopTableContainer" class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg h-[480px] bg-white w-full">
+                    <table class="w-full text-xs text-left border-separate border-spacing-0 lg:min-w-[1500px] min-w-[1200px]">
+                        <thead class="sticky top-0 bg-zinc-800 text-zinc-100 z-20 shadow-sm font-semibold">
                             <tr>
-                                <th id="th-checkbox" class="p-3 text-center border-r border-sky-900 xl:w-[3%] hidden">
-                                    <input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllChange(this.checked)" class="w-4 h-4 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
+                                <th id="th-checkbox" class="p-2.5 text-center border-r border-zinc-700 xl:w-[3%] hidden">
+                                    <input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllChange(this.checked)" class="w-3.5 h-3.5 text-zinc-700 rounded border-gray-300 focus:ring-zinc-500 cursor-pointer">
                                 </th>
-                                <th class="p-3 border-r border-sky-900 xl:w-[6%]">年月份</th>
-                                <th class="p-3 border-r border-sky-900 xl:w-[8%]">中心單位</th>
-                                <th class="p-3 border-r border-sky-900 xl:w-[8%]">廠部 (部門)</th>
-                                <th class="p-3 border-r border-sky-900 xl:w-[7%]">課別</th>
-                                <th class="p-3 border-r border-sky-900 text-center whitespace-nowrap xl:w-[6%]">類別</th>
-                                <th class="p-3 border-r border-sky-900 xl:w-[22%]">具體施策計畫項目</th>
-                                <th class="p-3 border-r border-sky-900 text-center xl:w-[5%]">單位</th>
-                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">2025實績</th>
-                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">2026目標</th>
-                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">累計目標</th>
-                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">累計實績</th>
-                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">去年同期</th>
-                                <th class="p-3 border-r border-sky-900 text-center xl:w-[5%]">方向</th>
-                                <th class="p-3 border-r border-sky-900 text-center font-black text-white xl:w-[6%]">達成率</th>
-                                <th class="p-3 text-center border-r border-sky-900 xl:w-[4%]">評價</th>
-                                <th id="th-edit-op" class="p-3 text-center xl:w-[6%] hidden">操作</th>
+                                <th class="p-2.5 border-r border-zinc-700 xl:w-[6%]">年月份</th>
+                                <th class="p-2.5 border-r border-zinc-700 xl:w-[8%]">中心單位</th>
+                                <th class="p-2.5 border-r border-zinc-700 xl:w-[8%]">廠部 (部門)</th>
+                                <th class="p-2.5 border-r border-zinc-700 xl:w-[7%]">課別</th>
+                                <th class="p-2.5 border-r border-zinc-700 text-center whitespace-nowrap xl:w-[6%]">類別</th>
+                                <th class="p-2.5 border-r border-zinc-700 xl:w-[22%]">具體施策計畫項目</th>
+                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[5%]">單位</th>
+                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">2025實績</th>
+                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">2026目標</th>
+                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">累計目標</th>
+                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">累計實績</th>
+                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[6%]">去年同期</th>
+                                <th class="p-2.5 border-r border-zinc-700 text-center xl:w-[5%]">方向</th>
+                                <th class="p-2.5 border-r border-zinc-700 text-center font-bold text-white xl:w-[6%]">達成率</th>
+                                <th class="p-2.5 text-center border-r border-zinc-700 xl:w-[4%]">評價</th>
+                                <th id="th-edit-op" class="p-2.5 text-center xl:w-[6%] hidden">操作</th>
                             </tr>
                         </thead>
-                        <tbody id="measureTableBody" class="divide-y divide-sky-100 bg-white"></tbody>
+                        <tbody id="measureTableBody" class="divide-y divide-gray-100 bg-white"></tbody>
                     </table>
                 </div>
 
-                <div id="mobileCardsContainer" class="block lg:hidden h-[550px] overflow-y-auto custom-scroll space-y-4 pr-1 w-full">
-                    <div id="measureCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div id="mobileCardsContainer" class="block lg:hidden h-[500px] overflow-y-auto custom-scroll space-y-3 pr-1 w-full">
+                    <div id="measureCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                 </div>
 
             </div>
         </div>
     </main>
 
-    <div id="formModal" class="fixed inset-0 bg-sky-950/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-sky-100 flex flex-col max-h-[90vh]">
-            <div class="p-6 border-b border-sky-100 flex justify-between items-center bg-sky-950 text-white rounded-t-2xl">
-                <div class="flex items-center space-x-3">
-                    <div class="p-2 bg-sky-900 text-sky-200 rounded-lg"><i data-lucide="edit-3" class="w-5 h-5"></i></div>
-                    <h3 class="text-lg font-black text-white" id="modalTitle">手動新增 KPI 指標</h3>
+    <div id="formModal" class="fixed inset-0 bg-zinc-900/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full shadow-xl border border-gray-200 flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-zinc-800 text-white rounded-t-xl">
+                <div class="flex items-center space-x-2">
+                    <div class="p-1.5 bg-zinc-700 text-zinc-200 rounded"><i data-lucide="edit-3" class="w-4 h-4"></i></div>
+                    <h3 class="text-base font-bold text-white" id="modalTitle">手動新增 KPI 指標</h3>
                 </div>
-                <button onclick="closeFormModal()" class="text-sky-300 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+                <button onclick="closeFormModal()" class="text-zinc-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             
-            <div class="p-6 overflow-y-auto custom-scroll space-y-4">
+            <div class="p-5 overflow-y-auto custom-scroll space-y-3 text-xs">
                 <input type="hidden" id="editIndex">
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">年月份 *</label>
-                        <input type="text" id="m_month" placeholder="例如: 2026年06月" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">年月份 *</label>
+                        <input type="text" id="m_month" placeholder="例如: 2026年06月" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">指標分類 *</label>
-                        <select id="m_type" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">指標分類 *</label>
+                        <select id="m_type" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                             <option value="中心">中心指標</option>
                             <option value="廠部">廠部指標</option>
                         </select>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">中心單位 *</label>
-                        <input type="text" id="m_center" placeholder="例如: 管理中心" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">中心單位 *</label>
+                        <input type="text" id="m_center" placeholder="例如: 管理中心" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">執行部門 (廠部) *</label>
-                        <input type="text" id="m_dept" placeholder="例如: 企管部" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">執行部門 (廠部) *</label>
+                        <input type="text" id="m_dept" placeholder="例如: 企管部" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">課別單位</label>
-                        <input type="text" id="m_section" placeholder="例如: 企管課" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">課別單位</label>
+                        <input type="text" id="m_section" placeholder="例如: 企管課" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-sky-700 mb-1">具體施策計畫項目 *</label>
-                    <textarea id="m_project" rows="2" placeholder="請輸入本年度指標執行細節..." class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400"></textarea>
+                    <label class="block font-semibold text-gray-700 mb-1">具體施策計畫項目 *</label>
+                    <textarea id="m_project" rows="2" placeholder="請輸入本年度指標執行細節..." class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">單位</label>
-                        <input type="text" id="m_unit" placeholder="例如: %, 案, 萬元" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">單位</label>
+                        <input type="text" id="m_unit" placeholder="例如: %, 案, 萬元" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">望大值/望小值 *</label>
-                        <select id="m_direction" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">望大值/望小值 *</label>
+                        <select id="m_direction" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                             <option value="↑">↑ 望大值 (正向指標)</option>
                             <option value="↓">↓ 望小值 (負向指標)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">2025實績</label>
-                        <input type="text" id="m_y25Actual" placeholder="歷史年實績" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">2025實績</label>
+                        <input type="text" id="m_y25Actual" placeholder="歷史年實績" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">2026目標</label>
-                        <input type="text" id="m_y26Target" placeholder="年度目標" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">2026目標</label>
+                        <input type="text" id="m_y26Target" placeholder="年度目標" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-sky-700 mb-1">去年同期累計實績</label>
-                        <input type="text" id="m_yoyActual" placeholder="同比累計" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-700 mb-1">去年同期累計實績</label>
+                        <input type="text" id="m_yoyActual" placeholder="同比累計" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-sky-50/70 p-4 rounded-xl border border-sky-100">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-3 rounded border border-gray-200">
                     <div>
-                        <label class="block text-xs font-bold text-sky-900 mb-1">累計目標 *</label>
-                        <input type="text" id="m_targetAccum" placeholder="請輸入累計目標" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-800 mb-1">累計目標 *</label>
+                        <input type="text" id="m_targetAccum" placeholder="請輸入累計目標" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-sky-900 mb-1">累計實績 *</label>
-                        <input type="text" id="m_actualAccum" placeholder="請輸入累計實績" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                        <label class="block font-semibold text-gray-800 mb-1">累計實績 *</label>
+                        <input type="text" id="m_actualAccum" placeholder="請輸入累計實績" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                 </div>
             </div>
 
-            <div class="p-6 border-t border-sky-100 flex justify-end space-x-3 bg-sky-50/50 rounded-b-2xl">
-                <button onclick="closeFormModal()" class="px-4 py-2 border border-sky-200 text-sky-800 hover:bg-sky-100 text-xs font-bold rounded-lg transition">
+            <div class="p-4 border-t border-gray-100 flex justify-end space-x-2 bg-gray-50/50 rounded-b-xl">
+                <button onclick="closeFormModal()" class="px-4 py-1.5 border border-gray-300 text-gray-700 hover:bg-gray-100 text-xs font-semibold rounded transition">
                     取消返回
                 </button>
-                <button onclick="saveIndicator()" class="px-5 py-2 bg-sky-900 hover:bg-sky-950 text-white text-xs font-bold rounded-lg transition shadow-sm">
+                <button onclick="saveIndicator()" class="px-4 py-1.5 bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-semibold rounded transition shadow-sm">
                     確認儲存指標
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="deleteConfirmModal" class="fixed inset-0 bg-sky-950/60 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-sky-100 p-6 space-y-4">
-            <div class="flex items-center space-x-3 text-rose-600">
-                <div class="p-2.5 bg-rose-50 rounded-xl border border-rose-100"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
-                <h3 class="text-base font-black text-sky-950">確認移除指標項目？</h3>
+    <div id="deleteConfirmModal" class="fixed inset-0 bg-zinc-900/50 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full shadow-xl border border-gray-200 p-5 space-y-3">
+            <div class="flex items-center space-x-2 text-rose-600">
+                <div class="p-2 bg-rose-50 rounded border border-rose-100"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
+                <h3 class="text-base font-bold text-gray-800">確認移除指標項目？</h3>
             </div>
-            <div id="deleteConfirmDetails" class="text-xs text-sky-800 bg-sky-50 p-3.5 rounded-xl border border-sky-100 leading-relaxed font-medium space-y-1">
+            <div id="deleteConfirmDetails" class="text-xs text-gray-700 bg-gray-50 p-3 rounded border border-gray-200 leading-relaxed font-medium space-y-1">
             </div>
-            <div class="flex justify-end space-x-2 pt-2">
-                <button onclick="closeDeleteConfirmModal()" class="px-4 py-2 border border-sky-200 text-sky-800 hover:bg-sky-100 text-xs font-bold rounded-lg transition">
+            <div class="flex justify-end space-x-2 pt-1">
+                <button onclick="closeDeleteConfirmModal()" class="px-3 py-1.5 border border-gray-300 text-gray-700 hover:bg-gray-100 text-xs font-semibold rounded transition">
                     取消
                 </button>
-                <button onclick="executeDeleteIndicator()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
+                <button onclick="executeDeleteIndicator()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded transition shadow-sm">
                     確認刪除
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="guideModal" class="fixed inset-0 bg-sky-950/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-sky-100 flex flex-col max-h-[85vh]">
-            <div class="p-6 border-b border-sky-100 flex justify-between items-center bg-sky-950 text-white rounded-t-2xl">
-                <div class="flex items-center space-x-3">
-                    <div class="p-2 bg-sky-900 text-sky-200 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></div>
-                    <h3 class="text-lg font-black">KPI 系統資料結構與 Excel 7 行群組規範</h3>
+    <div id="guideModal" class="fixed inset-0 bg-zinc-900/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-3xl w-full shadow-xl border border-gray-200 flex flex-col max-h-[85vh]">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-zinc-800 text-white rounded-t-xl">
+                <div class="flex items-center space-x-2">
+                    <div class="p-1.5 bg-zinc-700 text-zinc-200 rounded"><i data-lucide="book-open" class="w-4 h-4"></i></div>
+                    <h3 class="text-base font-bold">KPI 系統資料結構與 Excel 7 行群組規範</h3>
                 </div>
-                <button onclick="closeGuideModal()" class="text-sky-300 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+                <button onclick="closeGuideModal()" class="text-zinc-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             
-            <div class="p-6 overflow-y-auto custom-scroll space-y-6 text-sm text-sky-800 leading-relaxed">
+            <div class="p-5 overflow-y-auto custom-scroll space-y-4 text-xs text-gray-700 leading-relaxed">
                 <div>
-                    <h4 class="font-bold text-sky-950 text-base mb-2">一、 Excel 核心「7行群組（子行）」設計架構</h4>
-                    <p class="mb-2 text-xs">本系統專為精細化月度數據管理所設計。工作表內每一筆施策項目需包含以下連續 7 行資料作為指標之分析主體：</p>
-                    <div class="border border-sky-200 rounded-xl overflow-hidden mb-3">
+                    <h4 class="font-bold text-gray-900 text-sm mb-1.5">一、 Excel 核心「7行群組（子行）」設計架構</h4>
+                    <p class="mb-2">本系統專為精細化月度數據管理所設計。工作表內每一筆施策項目需包含以下連續 7 行資料作為指標之分析主體：</p>
+                    <div class="border border-gray-200 rounded overflow-hidden mb-2">
                         <table class="w-full text-xs text-left">
-                            <thead class="bg-sky-100/70 text-sky-900 font-bold">
+                            <thead class="bg-gray-100 text-gray-800 font-semibold">
                                 <tr>
-                                    <th class="p-2 border-b border-sky-200">子行名稱</th>
-                                    <th class="p-2 border-b border-sky-200">說明</th>
-                                    <th class="p-2 border-b border-sky-200">範例</th>
+                                    <th class="p-2 border-b border-gray-200">子行名稱</th>
+                                    <th class="p-2 border-b border-gray-200">說明</th>
+                                    <th class="p-2 border-b border-gray-200">範例</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-sky-100">
+                            <tbody class="divide-y divide-gray-100">
                                 <tr>
-                                    <td class="p-2 font-bold text-sky-700">當月目標</td>
+                                    <td class="p-2 font-bold text-gray-700">當月目標</td>
                                     <td class="p-2">該月個別單月所預計完成的目標。</td>
                                     <td class="p-2">10 案</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2 font-bold text-sky-700">當月實績</td>
+                                    <td class="p-2 font-bold text-gray-700">當月實績</td>
                                     <td class="p-2">該月個別單月實際錄得之實績成果（未發生則留空）。</td>
                                     <td class="p-2">8 案</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2 font-bold text-sky-900">累計目標</td>
+                                    <td class="p-2 font-bold text-gray-900">累計目標</td>
                                     <td class="p-2">該月及歷史月份累加之目標預算。（系統預設採用）</td>
                                     <td class="p-2">30 案</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2 font-bold text-sky-900">累計實績</td>
+                                    <td class="p-2 font-bold text-gray-900">累計實績</td>
                                     <td class="p-2">該月及歷史月份實際累加完成之數值。（系統預設採用）</td>
                                     <td class="p-2">28 案</td>
                                 </tr>
@@ -581,12 +580,12 @@
                                     <td class="p-2">O</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2 font-bold text-sky-700">去年實績</td>
+                                    <td class="p-2 font-bold text-gray-700">去年實績</td>
                                     <td class="p-2">前一年度該單月份之同期實績成果。</td>
                                     <td class="p-2">5 案</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2 font-bold text-sky-700">去年累計實績</td>
+                                    <td class="p-2 font-bold text-gray-700">去年累計實績</td>
                                     <td class="p-2">前一年度累加至該月份之同期累計成果。</td>
                                     <td class="p-2">20 案</td>
                                 </tr>
@@ -596,8 +595,8 @@
                 </div>
 
                 <div>
-                    <h4 class="font-bold text-sky-950 text-base mb-2">二、 智慧達成率公式與增減評價邏輯</h4>
-                    <div class="bg-sky-50 p-4 rounded-xl border border-sky-200 font-mono text-xs text-sky-900 mb-2 leading-relaxed">
+                    <h4 class="font-bold text-gray-900 text-sm mb-1.5">二、 智慧達成率公式與增減評價邏輯</h4>
+                    <div class="bg-gray-50 p-3 rounded border border-gray-200 font-mono text-xs text-gray-800 leading-relaxed">
                         累計目標為 0 時：累計實績為 0 則達成率為 100%；非 0 時若方向為「望大」則為 200%，方向為「望小」則為 0%。
                         <br>累計目標不為 0 時：
                         <br>&nbsp;&nbsp;- 望大值方向 (↑)： 1 + (累計實績 - 累計目標) / ABS(累計目標)
@@ -605,8 +604,8 @@
                     </div>
                 </div>
             </div>
-            <div class="p-6 border-t border-sky-100 flex justify-end bg-sky-50/50 rounded-b-2xl">
-                <button onclick="closeGuideModal()" class="px-5 py-2 bg-sky-900 hover:bg-sky-950 text-white text-xs font-bold rounded-lg transition">
+            <div class="p-4 border-t border-gray-100 flex justify-end bg-gray-50/50 rounded-b-xl">
+                <button onclick="closeGuideModal()" class="px-4 py-1.5 bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-semibold rounded transition">
                     我已瞭解結構
                 </button>
             </div>
@@ -804,14 +803,14 @@
             const bulkBar = ui('bulkActionBar');
             
             if (isEditMode) {
-                btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i>完成編輯`;
-                btn.className = "px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm";
+                btn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i>完成編輯`;
+                btn.className = "px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
                 bulkBar.classList.remove('hidden');
                 bulkBar.classList.add('flex');
                 showToast("✍️ 已進入編輯模式，可勾選單筆/多筆指標進行批量刪除或編輯。");
             } else {
-                btn.innerHTML = `<i data-lucide="edit" class="w-3.5 h-3.5"></i>編輯模式`;
-                btn.className = "px-3 py-1.5 bg-sky-900 hover:bg-sky-950 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm";
+                btn.innerHTML = `<i data-lucide="edit" class="w-3 h-3"></i>編輯模式`;
+                btn.className = "px-3 py-1 bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
                 bulkBar.classList.add('hidden');
                 bulkBar.classList.remove('flex');
                 clearAllSelections();
@@ -869,7 +868,7 @@
             pendingDeleteIndex = -2; 
             ui('deleteConfirmDetails').innerHTML = `
                 <div class="font-bold text-rose-700 text-sm">⚠️ 您已選取 ${selectedItemIndices.size} 筆指標項目</div>
-                <div class="text-xs text-sky-800 mt-1">確認刪除後將同步更新雲端資料庫，是否確定全部移除？</div>
+                <div class="text-xs text-gray-600 mt-1">確認刪除後將同步更新雲端資料庫，是否確定全部移除？</div>
             `;
             ui('deleteConfirmModal').classList.remove('hidden');
             lucide.createIcons();
@@ -1062,7 +1061,7 @@
                     selectedMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : "all";
                     
                     refreshDatabaseState();
-                    saveToCloud(); // 自動寫回雲端
+                    saveToCloud();
                     showToast(`📊 匯入完成！資料庫新增 ${totalAdded} 筆，覆蓋更新 ${totalUpdated} 筆。`, "success");
                 } catch (err) { 
                     console.error(err);
@@ -1165,10 +1164,10 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        { type: 'line', label: '達成比例', data: rateData, borderColor: '#0c4a6e', borderWidth: 2.5, pointBackgroundColor: '#0c4a6e', pointRadius: 4, yAxisID: 'yR', order: 0, tension: 0.1 },
+                        { type: 'line', label: '達成比例', data: rateData, borderColor: '#18181b', borderWidth: 2, pointBackgroundColor: '#18181b', pointRadius: 3, yAxisID: 'yR', order: 0, tension: 0.1 },
                         { type: 'line', label: '目標線', data: labels.map(()=>100), borderColor: '#ef4444', borderDash: [4, 4], pointRadius: 0, yAxisID: 'yR', order: 1 },
-                        { type: 'bar', label: '達標項數', data: labels.map(l => summaryData[l].pass), backgroundColor: '#0284c7', borderRadius: 4, yAxisID: 'yC', order: 2 },
-                        { type: 'bar', label: '指標總項數', data: labels.map(l => summaryData[l].total), backgroundColor: '#bae6fd', borderRadius: 4, yAxisID: 'yC', order: 3 }
+                        { type: 'bar', label: '達標項數', data: labels.map(l => summaryData[l].pass), backgroundColor: '#52525b', borderRadius: 3, yAxisID: 'yC', order: 2 },
+                        { type: 'bar', label: '指標總項數', data: labels.map(l => summaryData[l].total), backgroundColor: '#e4e4e7', borderRadius: 3, yAxisID: 'yC', order: 3 }
                     ]
                 },
                 options: { 
@@ -1176,7 +1175,7 @@
                     maintainAspectRatio: false, 
                     plugins: { legend: { display: false } },
                     scales: { 
-                        yR: { position: 'left', min: 0, max: 115, ticks: { callback: v => v + '%' }, grid: { borderDash: [2, 4], color: '#f0f9ff' } }, 
+                        yR: { position: 'left', min: 0, max: 115, ticks: { callback: v => v + '%' }, grid: { borderDash: [2, 4], color: '#f4f4f5' } }, 
                         yC: { position: 'right', grid: { display: false } } 
                     }
                 }
@@ -1189,9 +1188,9 @@
                 const data = summaryData[name];
                 const pct = Math.round((data.pass / data.total) * 100);
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-sky-50 cursor-pointer transition rounded-lg ${name === matrixCenter ? 'row-active' : ''}`;
+                tr.className = `hover:bg-gray-50 cursor-pointer transition rounded ${name === matrixCenter ? 'row-active' : ''}`;
                 tr.onclick = () => { matrixCenter = name; renderDashboard(); };
-                tr.innerHTML = `<td class="py-3 px-2 font-bold text-sky-900">${name}</td><td class="py-3 text-center text-sky-600 font-medium">${data.pass}/${data.total}</td><td class="py-3 px-2 text-right font-black ${getRateColor(pct)}">${pct}%</td>`;
+                tr.innerHTML = `<td class="py-2.5 px-2 font-bold text-gray-800">${name}</td><td class="py-2.5 text-center text-gray-500 font-medium">${data.pass}/${data.total}</td><td class="py-2.5 px-2 text-right font-black ${getRateColor(pct)}">${pct}%</td>`;
                 body.appendChild(tr);
             });
         }
@@ -1282,26 +1281,26 @@
                 
                 const failH = row.failItems.length > 0 
                     ? `<div class="flex flex-wrap gap-1.5">${row.failItems.map(i => `<span class="tag-fail" title="${i}">${i}</span>`).join('')}</div>` 
-                    : '<span class="text-emerald-700 font-bold text-[12px] flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i>全項達標</span>';
+                    : '<span class="text-emerald-700 font-bold text-[11px] flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i>全項達標</span>';
 
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-sky-50 cursor-pointer transition ${isSelected ? 'bg-sky-100/80 border-l-4 border-sky-800' : ''}`;
+                tr.className = `hover:bg-gray-50 cursor-pointer transition ${isSelected ? 'bg-gray-100 border-l-3 border-gray-700' : ''}`;
                 tr.onclick = () => { selectDeptMatrixItem(row.centerName, row.deptName); };
                 
-                tr.innerHTML = `${matrixCenter === 'all' ? `<td class="p-3 border-r border-sky-100 font-bold text-sky-700">${row.centerName}</td>` : ''}
-                    <td class="p-3 border-r border-sky-100 font-bold text-sky-950">${row.deptName}</td>
-                    <td class="p-3 border-r border-sky-100 text-center font-bold text-sky-700">${cP}</td>
-                    <td class="p-3 border-r border-sky-100 text-center font-bold text-sky-700">${pP}</td>
-                    <td class="p-3 border-r border-sky-100 text-center font-black text-sky-950 bg-sky-50/80">${combP}</td>
-                    <td class="p-3 border-r border-sky-100 text-center">${getTrafficLight(row.center)}</td>
-                    <td class="p-3 border-r border-sky-100 text-center">${getTrafficLight(row.plant)}</td>
-                    <td class="p-3 border-r border-sky-100 text-center bg-sky-50/80">${getTrafficLight(row.combined)}</td>
-                    <td class="p-3 text-left bg-sky-50/30">${failH}</td>`;
+                tr.innerHTML = `${matrixCenter === 'all' ? `<td class="p-2.5 border-r border-gray-100 font-bold text-gray-700">${row.centerName}</td>` : ''}
+                    <td class="p-2.5 border-r border-gray-100 font-bold text-gray-900">${row.deptName}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center font-semibold text-gray-600">${cP}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center font-semibold text-gray-600">${pP}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50">${combP}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center">${getTrafficLight(row.center)}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center">${getTrafficLight(row.plant)}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center bg-gray-50">${getTrafficLight(row.combined)}</td>
+                    <td class="p-2.5 text-left bg-gray-50/50">${failH}</td>`;
                 body.appendChild(tr);
 
                 const card = document.createElement('div');
-                card.className = `p-4 border rounded-xl flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-200 ${
-                    isSelected ? 'bg-sky-100/90 border-sky-400 ring-2 ring-sky-300' : 'bg-white hover:bg-sky-50 border-sky-100'
+                card.className = `p-3.5 border rounded-lg flex flex-col justify-between space-y-2 cursor-pointer transition ${
+                    isSelected ? 'bg-gray-100 border-gray-400 ring-1 ring-gray-300' : 'bg-white hover:bg-gray-50 border-gray-200'
                 }`;
                 card.onclick = () => { selectDeptMatrixItem(row.centerName, row.deptName); };
 
@@ -1310,8 +1309,8 @@
                 card.innerHTML = `
                     <div class="flex items-start justify-between">
                         <div>
-                            <span class="text-[10px] font-black text-sky-600 block uppercase">${row.centerName}</span>
-                            <h4 class="text-sm font-bold text-sky-950 mt-0.5">${row.deptName}</h4>
+                            <span class="text-[10px] font-bold text-gray-400 block uppercase">${row.centerName}</span>
+                            <h4 class="text-xs font-bold text-gray-800 mt-0.5">${row.deptName}</h4>
                         </div>
                         <div class="flex items-center space-x-1.5">
                             <span class="status-light ${borderLightClass}"></span>
@@ -1319,24 +1318,24 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-1 bg-sky-50/80 p-2 rounded-lg border border-sky-100 text-center">
+                    <div class="grid grid-cols-3 gap-1 bg-gray-50 p-1.5 rounded border border-gray-100 text-center">
                         <div>
-                            <span class="block text-[9px] text-sky-600 font-bold">中心指標</span>
-                            <span class="text-[11px] font-bold text-sky-900">${cP}</span>
+                            <span class="block text-[9px] text-gray-400 font-semibold">中心指標</span>
+                            <span class="text-[10px] font-bold text-gray-700">${cP}</span>
                         </div>
                         <div>
-                            <span class="block text-[9px] text-sky-600 font-bold">廠部指標</span>
-                            <span class="text-[11px] font-bold text-sky-900">${pP}</span>
+                            <span class="block text-[9px] text-gray-400 font-semibold">廠部指標</span>
+                            <span class="text-[10px] font-bold text-gray-700">${pP}</span>
                         </div>
                         <div>
-                            <span class="block text-[9px] text-sky-600 font-bold">綜合評價</span>
+                            <span class="block text-[9px] text-gray-400 font-semibold">綜合評價</span>
                             <div class="flex justify-center items-center mt-0.5">${getTrafficLight(row.combined)}</div>
                         </div>
                     </div>
 
-                    <div class="pt-2 border-t border-sky-100">
-                        <span class="block text-[9px] text-sky-600 font-black uppercase mb-1">未達標明細：</span>
-                        <div class="max-h-[80px] overflow-y-auto custom-scroll pr-1">
+                    <div class="pt-1.5 border-t border-gray-100">
+                        <span class="block text-[9px] text-gray-400 font-bold uppercase mb-1">未達標明細：</span>
+                        <div class="max-h-[70px] overflow-y-auto custom-scroll pr-1">
                             ${failH}
                         </div>
                     </div>
@@ -1352,7 +1351,7 @@
             populateDeptSelector();
             ui('detailDeptSelector').value = deptName;
             renderDeptMatrix(); renderMeasures();
-            showToast(`已為您篩選顯示： ${centerName} - ${deptName} 指標細節`);
+            showToast(`已篩選顯示： ${centerName} - ${deptName} 指標細節`);
         }
 
         function renderMeasures() {
@@ -1380,25 +1379,25 @@
                 const tagClass = p.type === '中心' ? 'tag-center' : 'tag-plant';
                 
                 const dirTag = p.direction === '↓' 
-                    ? '<span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-black text-[11px]">↓ 望小</span>' 
-                    : '<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-[11px]">↑ 望大</span>';
+                    ? '<span class="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[10px]">↓ 望小</span>' 
+                    : '<span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[10px]">↑ 望大</span>';
 
                 const absoluteIndex = allDataItems.indexOf(p);
                 const isChecked = selectedItemIndices.has(absoluteIndex);
 
                 const tr = document.createElement('tr'); 
-                tr.className = `hover:bg-sky-50 transition ${isChecked ? 'bg-sky-50/80' : ''}`;
+                tr.className = `hover:bg-gray-50 transition ${isChecked ? 'bg-gray-100' : ''}`;
 
                 const checkboxCellHtml = isEditMode ? `
-                    <td class="p-3 text-center border-r border-sky-100">
-                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-4 h-4 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
+                    <td class="p-2.5 text-center border-r border-gray-100">
+                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-3.5 h-3.5 text-zinc-700 rounded border-gray-300 focus:ring-zinc-500 cursor-pointer">
                     </td>` : '';
 
                 const actionCellHtml = isEditMode ? `
-                    <td class="p-3 text-center whitespace-nowrap bg-sky-50/50">
-                        <div class="flex items-center justify-center space-x-1.5">
-                            <button onclick="openFormModal(true, ${absoluteIndex})" class="px-2 py-1 text-sky-800 bg-sky-100 hover:bg-sky-200 rounded-md transition font-bold text-xs flex items-center gap-1 border border-sky-200" title="編輯">
-                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-sky-700"></i>
+                    <td class="p-2.5 text-center whitespace-nowrap bg-gray-50">
+                        <div class="flex items-center justify-center space-x-1">
+                            <button onclick="openFormModal(true, ${absoluteIndex})" class="px-2 py-0.5 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded transition font-semibold text-xs flex items-center gap-1 border border-gray-300" title="編輯">
+                                <i data-lucide="edit-3" class="w-3 h-3 text-gray-600"></i>
                                 <span>編輯</span>
                             </button>
                         </div>
@@ -1406,51 +1405,51 @@
 
                 tr.innerHTML = `
                     ${checkboxCellHtml}
-                    <td class="p-3 border-r border-sky-100 font-bold text-sky-600 whitespace-nowrap">${p.month}</td>
-                    <td class="p-3 border-r border-sky-100 font-bold text-sky-700">${p.center}</td>
-                    <td class="p-3 border-r border-sky-100 font-bold text-sky-900">${p.dept}</td>
-                    <td class="p-3 border-r border-sky-100 font-bold text-sky-600">${p.section || '—'}</td>
-                    <td class="p-3 border-r border-sky-100 text-center whitespace-nowrap"><span class="${tagClass}">${p.type}</span></td>
-                    <td class="p-3 border-r border-sky-100 font-medium text-sky-950 leading-tight whitespace-normal break-all">${p.project}</td>
-                    <td class="p-3 border-r border-sky-100 text-center text-sky-600">${p.unit}</td>
-                    <td class="p-3 border-r border-sky-100 text-center text-sky-600 font-semibold">${safeDisplay(p.y25Actual, isPercentUnit, true)}</td>
-                    <td class="p-3 border-r border-sky-100 text-center text-sky-600">${safeDisplay(p.y26Target, isPercentUnit)}</td>
-                    <td class="p-3 border-r border-sky-100 text-center font-bold text-sky-700">${safeDisplay(p.targetAccum, isPercentUnit)}</td>
-                    <td class="p-3 border-r border-sky-100 text-center font-black text-sky-950">${safeDisplay(p.actualAccum, isPercentUnit)}</td>
-                    <td class="p-3 border-r border-sky-100 text-center text-sky-500">${safeDisplay(p.yoyActual, isPercentUnit)}</td>
-                    <td class="p-3 border-r border-sky-100 text-center">${dirTag}</td>
-                    <td class="p-3 border-r border-sky-100 text-center font-black text-sky-950 bg-sky-50/60">${safeDisplay(p.rate, true)}</td>
-                    <td class="p-3 text-center border-r border-sky-100"><span class="px-2.5 py-0.5 rounded-full text-[12px] font-black ${p.eval==='O'?'bg-o':'bg-x'}">${p.eval}</span></td>
+                    <td class="p-2.5 border-r border-gray-100 font-bold text-gray-500 whitespace-nowrap">${p.month}</td>
+                    <td class="p-2.5 border-r border-gray-100 font-bold text-gray-700">${p.center}</td>
+                    <td class="p-2.5 border-r border-gray-100 font-bold text-gray-800">${p.dept}</td>
+                    <td class="p-2.5 border-r border-gray-100 font-medium text-gray-500">${p.section || '—'}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center whitespace-nowrap"><span class="${tagClass}">${p.type}</span></td>
+                    <td class="p-2.5 border-r border-gray-100 font-medium text-gray-900 leading-tight whitespace-normal break-all">${p.project}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center text-gray-500">${p.unit}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center text-gray-500 font-medium">${safeDisplay(p.y25Actual, isPercentUnit, true)}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center text-gray-500">${safeDisplay(p.y26Target, isPercentUnit)}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center font-semibold text-gray-700">${safeDisplay(p.targetAccum, isPercentUnit)}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center font-black text-gray-900">${safeDisplay(p.actualAccum, isPercentUnit)}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center text-gray-400">${safeDisplay(p.yoyActual, isPercentUnit)}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center">${dirTag}</td>
+                    <td class="p-2.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50">${safeDisplay(p.rate, true)}</td>
+                    <td class="p-2.5 text-center border-r border-gray-100"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${p.eval==='O'?'bg-o':'bg-x'}">${p.eval}</span></td>
                     ${actionCellHtml}`;
                 tableBody.appendChild(tr);
 
                 const cardCheckboxHtml = isEditMode ? `
-                    <div class="flex items-center space-x-2 pb-2 border-b border-sky-100">
-                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-4 h-4 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
-                        <span class="text-xs font-bold text-sky-800">勾選此項目</span>
+                    <div class="flex items-center space-x-2 pb-1.5 border-b border-gray-100">
+                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-3.5 h-3.5 text-zinc-700 rounded border-gray-300 focus:ring-zinc-500 cursor-pointer">
+                        <span class="text-xs font-semibold text-gray-700">勾選此項目</span>
                     </div>` : '';
 
                 const cardActionsHtml = isEditMode ? `
-                    <div class="flex items-center justify-end space-x-2 pt-2 border-t border-sky-100">
-                        <button onclick="openFormModal(true, ${absoluteIndex})" class="flex items-center space-x-1 px-3 py-1.5 text-xs text-sky-800 bg-sky-100 hover:bg-sky-200 font-bold rounded-lg transition border border-sky-200">
-                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> <span>編輯</span>
+                    <div class="flex items-center justify-end space-x-1.5 pt-1.5 border-t border-gray-100">
+                        <button onclick="openFormModal(true, ${absoluteIndex})" class="flex items-center space-x-1 px-2.5 py-1 text-xs text-gray-700 bg-gray-100 hover:bg-gray-200 font-semibold rounded transition border border-gray-200">
+                            <i data-lucide="edit-3" class="w-3 h-3"></i> <span>編輯</span>
                         </button>
                     </div>` : '';
 
                 const card = document.createElement('div');
-                card.className = `bg-white border rounded-xl p-4 flex flex-col space-y-3 hover:shadow-md transition ${isChecked ? 'border-sky-400 bg-sky-50/40 ring-1 ring-sky-300' : 'border-sky-100'}`;
+                card.className = `bg-white border rounded-lg p-3.5 flex flex-col space-y-2 hover:shadow-sm transition ${isChecked ? 'border-gray-400 bg-gray-50 ring-1 ring-gray-300' : 'border-gray-200'}`;
                 card.innerHTML = `
                     ${cardCheckboxHtml}
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-black text-sky-600">${p.month}</span>
-                        <span class="px-2 py-0.5 rounded-full text-[11px] font-black ${p.eval==='O'?'bg-o':'bg-x'}">${p.eval}</span>
+                        <span class="text-xs font-bold text-gray-500">${p.month}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${p.eval==='O'?'bg-o':'bg-x'}">${p.eval}</span>
                     </div>
                     <div>
-                        <h4 class="text-xs text-sky-600 font-bold mb-1">${p.center} · ${p.dept} ${p.section ? '· ' + p.section : ''}</h4>
-                        <p class="text-sm font-bold text-sky-950 leading-snug">${p.project}</p>
+                        <h4 class="text-[11px] text-gray-500 font-bold mb-0.5">${p.center} · ${p.dept} ${p.section ? '· ' + p.section : ''}</h4>
+                        <p class="text-xs font-bold text-gray-800 leading-snug">${p.project}</p>
                     </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-sky-100 text-xs">
-                        <span class="font-black text-sky-900">達成率: ${safeDisplay(p.rate, true)}</span>
+                    <div class="flex items-center justify-between pt-1.5 border-t border-gray-100 text-xs">
+                        <span class="font-bold text-gray-800">達成率: ${safeDisplay(p.rate, true)}</span>
                     </div>
                     ${cardActionsHtml}
                 `;
@@ -1461,7 +1460,7 @@
         }
 
         function getTrafficLight(data) {
-            if (data.t === 0) return `<span class="text-sky-300">—</span>`;
+            if (data.t === 0) return `<span class="text-gray-300">—</span>`;
             const pct = (data.p / data.t) * 100;
             const color = pct <= 60 ? 'bg-rose-500' : (pct <= 70 ? 'bg-amber-400' : 'bg-emerald-500');
             return `<span class="status-light ${color} mx-auto"></span>`;
@@ -1568,7 +1567,7 @@
 
             closeFormModal();
             refreshDatabaseState();
-            saveToCloud(); // 同步寫回雲端
+            saveToCloud();
         }
 
         function closeDeleteConfirmModal() {
@@ -1597,7 +1596,6 @@
         function openGuideModal() { ui('guideModal').classList.remove('hidden'); }
         function closeGuideModal() { ui('guideModal').classList.add('hidden'); }
 
-        // 原生相容 CSV 範本下載 (免除瀏覽器套件載入失敗風險)
         function downloadTemplate() {
             try {
                 const csvContent = "\uFEFF" + 
@@ -1622,7 +1620,7 @@
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
 
-                showToast("📄 範本下載成功！(已輸出為標準 CSV 格式，可直接用 Excel 開啟)", "success");
+                showToast("📄 範本下載成功！(已輸出為標準 CSV 格式)", "success");
             } catch (err) {
                 console.error(err);
                 showToast("❌ 下載失敗：" + err.message, "error");
@@ -1659,12 +1657,12 @@
             if (!isClearConfirmPending) {
                 isClearConfirmPending = true;
                 btnText.innerText = "按第二次確認清空";
-                btn.className = "flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-semibold bg-rose-600 text-white transition animate-pulse";
+                btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold bg-rose-600 text-white transition animate-pulse";
                 showToast("⚠️ 請再次點擊工具箱中的清除按鈕以確認清空雲端與地端資料庫。", "error");
                 setTimeout(() => {
                     isClearConfirmPending = false;
                     btnText.innerText = "清空雲端與地端資料庫";
-                    btn.className = "flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-sky-100";
+                    btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100";
                 }, 4000);
             } else {
                 allDataItems = [];
@@ -1674,7 +1672,7 @@
                 saveToCloud(); 
                 isClearConfirmPending = false;
                 btnText.innerText = "清空雲端與地端資料庫";
-                btn.className = "flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-sky-100";
+                btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100";
                 showToast("🧹 雲端與本地暫存資料庫已完全清空！", "success");
             }
         }
@@ -1689,7 +1687,7 @@
             }
             
             const toast = document.createElement('div');
-            let bgColor = 'bg-sky-900';
+            let bgColor = 'bg-zinc-800';
             let icon = 'info';
             if (type === 'success') {
                 bgColor = 'bg-emerald-700';
@@ -1699,7 +1697,7 @@
                 icon = 'alert-triangle';
             }
             
-            toast.className = `px-5 py-3 rounded-xl shadow-2xl text-white text-xs font-bold transition-all duration-300 transform translate-y-5 opacity-0 flex items-center gap-2 pointer-events-auto ${bgColor}`;
+            toast.className = `px-4 py-2.5 rounded-lg shadow-lg text-white text-xs font-medium transition-all duration-300 transform translate-y-5 opacity-0 flex items-center gap-2 pointer-events-auto ${bgColor}`;
             toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i><span>${message}</span>`;
             toastContainer.appendChild(toast);
             lucide.createIcons();
@@ -1716,7 +1714,7 @@
 
         window.onload = () => { 
             lucide.createIcons(); 
-            syncFromCloud(); // 初始化載入時自動從雲端擷取最新數據
+            syncFromCloud();
         };
     </script>
 </body>
