@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>集團 KPI 智慧互動總資料庫系統 PRO (雲端同步版)</title>
-    <!-- 引入專業開發庫 -->
+    <!-- 引入專業開發庫（含雙 CDN 備援機制，確保 Excel 匯入匯出 100% 成功） -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        if (typeof XLSX === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>');
+        }
+    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
@@ -609,7 +614,7 @@
     </div>
 
     <script>
-        // 您的 Google Apps Script API 網址
+        // ⚠️ 請在此處替換您部署好的 Google Apps Script Web 應用程式網址
         const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbyDSIQRiYK3wpQ_vDMndqpIkTDLjjvQFl1D1PePrfmf1uGs54yQZ1fNj-pfPB2NPDuK/exec";
 
         let allDataItems = []; 
@@ -1592,24 +1597,36 @@
         function openGuideModal() { ui('guideModal').classList.remove('hidden'); }
         function closeGuideModal() { ui('guideModal').classList.add('hidden'); }
 
+        // 原生相容 CSV 範本下載 (免除瀏覽器套件載入失敗風險)
         function downloadTemplate() {
-            const h = [
-                ["2026年重點績效指標管理平台（系統標準匯入格式）"],
-                ["說明：1. 請保留第三行之欄位名稱。2. 子行群組順序與名稱必須完全符合『當月目標』、『當月實績』、『累計目標』、『累計實績』、『累計評價』及『去年實績』、『去年累計實績』。"],
-                ["MTS/AOP分類", "中心", "廠部", "課別", "指標分類", "指定報告會議(T/K)", "重點績效評價項目", "MTS/AOP編號", "施策項目", "↑/↓", "基本定義", "計算單位", "2025實績", "2026目標", "項    目", "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
-                ["M", "管理中心", "企管部", "企管課", "中心", "T", "O", "B3-2-1", "數位核心工程與集團AI智慧平台整合計畫", "↑", "專案進度定期回報", "案", "13", "100%", "當月目標", 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "當月實績", 10, 10, 10, 9, 10, "", "", "", "", "", "", ""],
-                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "累計目標", 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120],
-                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "累計實績", 10, 20, 30, 39, 49, "", "", "", "", "", "", ""],
-                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "累計評價", "O", "O", "O", "X", "O", "", "", "", "", "", "", ""],
-                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "去年實績", 8, 9, 10, 11, 12, 10, 10, 10, 10, 10, 10, 10],
-                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "去年累計實績", 8, 17, 27, 38, 50, 60, 70, 80, 90, 100, 110, 120]
-            ];
-            const wb = XLSX.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(h);
-            XLSX.utils.book_append_sheet(wb, ws, "管理中心-總_月目標");
-            XLSX.writeFile(wb, "2026_KPI_Master_Template.xlsx");
-            showToast("範本檔案下載成功！已輸出標準 7 行結構格式之 Excel 範本。", "success");
+            try {
+                const csvContent = "\uFEFF" + 
+                    "2026年重點績效指標管理平台（系統標準匯入格式）,,,,,,,,,,,,,,,,,,,,,,,,,,\n" +
+                    "說明：1. 請保留第三行之欄位名稱。2. 子行群組順序與名稱必須完全符合『當月目標』、『當月實績』、『累計目標』、『累計實績』、『累計評價』及『去年實績』、『去年累計實績』。,,,,,,,,,,,,,,,,,,,,,,,,,,\n" +
+                    "MTS/AOP分類,中心,廠部,課別,指標分類,指定報告會議(T/K),重點績效評價項目,MTS/AOP編號,施策項目,↑/↓,基本定義,計算單位,2025實績,2026目標,項    目,1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月\n" +
+                    "M,管理中心,企管部,企管課,中心,T,O,B3-2-1,數位核心工程與集團AI智慧平台整合計畫,↑,專案進度定期回報,案,13,100%,當月目標,10,10,10,10,10,10,10,10,10,10,10,10\n" +
+                    ",,企管部,,,,,,,,,,,,,當月實績,10,10,10,9,10,,,,,,,\n" +
+                    ",,企管部,,,,,,,,,,,,,累計目標,10,20,30,40,50,60,70,80,90,100,110,120\n" +
+                    ",,企管部,,,,,,,,,,,,,累計實績,10,20,30,39,49,,,,,,,\n" +
+                    ",,企管部,,,,,,,,,,,,,累計評價,O,O,O,X,O,,,,,,,\n" +
+                    ",,企管部,,,,,,,,,,,,,去年實績,8,9,10,11,12,10,10,10,10,10,10,10\n" +
+                    ",,企管部,,,,,,,,,,,,,去年累計實績,8,17,27,38,50,60,70,80,90,100,110,120\n";
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", "2026_KPI_Master_Template.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                showToast("📄 範本下載成功！(已輸出為標準 CSV 格式，可直接用 Excel 開啟)", "success");
+            } catch (err) {
+                console.error(err);
+                showToast("❌ 下載失敗：" + err.message, "error");
+            }
         }
 
         function exportMasterDatabase() {
@@ -1617,18 +1634,23 @@
                 showToast("目前資料庫中尚無資料，無法匯出！", "error");
                 return;
             }
-            const headers = ["年月份", "中心", "部門", "課別", "指標分類", "施策項目", "計算單位", "2025實績", "2026目標", "累計目標", "累計實績", "去年同期累計實績", "望大值/望小值方向", "達成率", "評價"];
-            const dataRows = allDataItems.map(i => [
-                i.month, i.center, i.dept, i.section || "", i.type, i.project, i.unit, 
-                i.y25Actual, i.y26Target, i.targetAccum, i.actualAccum, i.yoyActual, 
-                i.direction, i.rate, i.eval
-            ]);
-            const wsData = [headers, ...dataRows];
-            const wb = XLSX.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
-            XLSX.utils.book_append_sheet(wb, ws, "Master_Database");
-            XLSX.writeFile(wb, `KPI_Master_Database_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
-            showToast("💾 總資料庫備份成功！已打包導出共 " + allDataItems.length + " 筆跨年月份數據。", "success");
+            try {
+                const headers = ["年月份", "中心", "部門", "課別", "指標分類", "施策項目", "計算單位", "2025實績", "2026目標", "累計目標", "累計實績", "去年同期累計實績", "望大值/望小值方向", "達成率", "評價"];
+                const dataRows = allDataItems.map(i => [
+                    i.month, i.center, i.dept, i.section || "", i.type, i.project, i.unit, 
+                    i.y25Actual, i.y26Target, i.targetAccum, i.actualAccum, i.yoyActual, 
+                    i.direction, i.rate, i.eval
+                ]);
+                const wsData = [headers, ...dataRows];
+                const wb = XLSX.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                XLSX.utils.book_append_sheet(wb, ws, "Master_Database");
+                XLSX.writeFile(wb, `KPI_Master_Database_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+                showToast("💾 總資料庫備份成功！已打包導出共 " + allDataItems.length + " 筆跨年月份數據。", "success");
+            } catch(e) {
+                console.error(e);
+                showToast("匯出 Excel 失敗，請確認瀏覽器支援度。", "error");
+            }
         }
 
         function confirmClearDatabase() {
@@ -1649,7 +1671,7 @@
                 selectedMonth = "all";
                 localStorage.removeItem('kpi_master_data');
                 refreshDatabaseState();
-                saveToCloud(); // 清空雲端
+                saveToCloud(); 
                 isClearConfirmPending = false;
                 btnText.innerText = "清空雲端與地端資料庫";
                 btn.className = "flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-sky-100";
