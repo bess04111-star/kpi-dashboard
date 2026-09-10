@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>集團 KPI 智慧互動總資料庫系統 PRO</title>
+    <!-- 引入專業開發庫 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', 'Noto Sans TC', sans-serif; 
+            background-color: #f0f9ff; /* 淺冰藍底色 */
+            color: #0c4a6e;
+            margin: 0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* 滾動條美化 */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #7dd3fc; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f0f9ff; }
+
+        /* 高階商用質感淺藍卡片 */
+        .dashboard-card {
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid #e0f2fe;
+            box-shadow: 0 4px 12px -2px rgba(14, 165, 233, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease-in-out;
+        }
+        .dashboard-card:hover {
+            box-shadow: 0 10px 20px -3px rgba(14, 165, 233, 0.1);
+            border-color: #bae6fd;
+        }
+
+        .status-light { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .row-active { background-color: #e0f2fe !important; border-left: 4px solid #0284c7; }
+        
+        .bg-o { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .bg-x { background-color: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; }
+        
+        /* 異常標籤雲樣式 */
+        .tag-fail { background-color: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; padding: 2px 8px; border-radius: 6px; font-size: 11px; margin-bottom: 2px; display: inline-block; white-space: normal; word-break: break-all; transition: background-color 0.15s; }
+        .tag-fail:hover { background-color: #ffe4e6; }
+        
+        /* 類別標籤 */
+        .tag-center { background-color: #e0f2fe; color: #0369a1; font-weight: 700; border: 1px solid #bae6fd; padding: 2px 7px; border-radius: 6px; font-size: 11px; white-space: nowrap; display: inline-block; }
+        .tag-plant { background-color: #f0fdf4; color: #166534; font-weight: 700; border: 1px solid #bbf7d0; padding: 2px 7px; border-radius: 6px; font-size: 11px; white-space: nowrap; display: inline-block; }
+
+        .filter-active { background-color: #0284c7 !important; color: white !important; }
+
+        .custom-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230284c7'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+        }
+
+        th { white-space: nowrap; }
+
+        /* 下拉選單過渡 */
+        .dropdown-menu { display: none; }
+        .dropdown-menu.show { display: block; animation: fadeIn 0.15s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16">
+
+    <nav class="bg-white/90 border-b border-sky-100 sticky top-0 z-50 shadow-sm backdrop-blur-md w-full py-3 md:py-0">
+        <div class="max-w-[1900px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 h-auto md:h-16">
+            <!-- 左側系統名稱標題區 -->
+            <div class="flex items-center space-x-3 w-full md:w-auto self-start md:self-auto">
+                <div class="bg-sky-700 p-2.5 rounded-xl text-white shadow-sm flex-shrink-0">
+                    <i data-lucide="database" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg md:text-xl font-black tracking-tight text-sky-950 flex flex-wrap items-center gap-1.5 leading-snug">
+                        集團 KPI 智慧互動總資料庫系統
+                        <span class="bg-sky-100 text-sky-800 border border-sky-200 text-[10px] px-2 py-0.5 rounded-md font-bold">PRO v35.0</span>
+                    </h1>
+                    <p class="text-[9px] text-sky-500 font-bold uppercase tracking-widest leading-none mt-0.5">Enterprise Master Database Platform</p>
+                </div>
+            </div>
+            
+            <!-- 右側整合與收納後的按鈕群組區 -->
+            <div class="grid grid-cols-2 sm:flex sm:items-center justify-end gap-2 sm:gap-3 w-full md:w-auto">
+                <label class="col-span-1 flex items-center space-x-2 px-3.5 py-2 sm:py-2 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-xs font-bold transition cursor-pointer shadow-sm justify-center">
+                    <i data-lucide="upload-cloud" class="w-4 h-4 flex-shrink-0"></i>
+                    <span class="truncate">增量匯入 XLSX</span>
+                    <input type="file" id="fileInput" class="hidden" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)">
+                </label>
+                
+                <button onclick="openFormModal(false)" class="col-span-1 flex items-center space-x-2 px-3.5 py-2 bg-sky-950 hover:bg-sky-900 text-white rounded-lg text-xs font-bold transition shadow-sm justify-center">
+                    <i data-lucide="plus" class="w-4 h-4 text-sky-400 flex-shrink-0"></i>
+                    <span class="truncate">手動新增指標</span>
+                </button>
+
+                <!-- 次要工具選單 -->
+                <div class="col-span-2 relative w-full sm:w-auto text-left">
+                    <button id="toolsDropdownBtn" onclick="toggleToolsDropdown()" class="flex items-center justify-center space-x-2 w-full sm:w-auto px-3 py-2 border border-sky-200 bg-sky-50/50 hover:bg-sky-100/60 rounded-lg text-xs font-bold transition text-sky-800 shadow-sm">
+                        <i data-lucide="sliders" class="w-4 h-4 text-sky-600 flex-shrink-0"></i>
+                        <span>系統工具箱</span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 ml-1 flex-shrink-0"></i>
+                    </button>
+                    
+                    <div id="toolsDropdownMenu" class="dropdown-menu absolute right-0 mt-2 w-full sm:w-56 bg-white border border-sky-100 rounded-xl shadow-xl z-50 py-1.5">
+                        <button onclick="openGuideModal(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-medium text-sky-900 hover:bg-sky-50 transition">
+                            <i data-lucide="help-circle" class="w-4 h-4 text-sky-600"></i>
+                            <span>結構說明書</span>
+                        </button>
+                        <button onclick="downloadTemplate(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-medium text-sky-900 hover:bg-sky-50 transition">
+                            <i data-lucide="download" class="w-4 h-4 text-sky-600"></i>
+                            <span>下載標準範本</span>
+                        </button>
+                        <button onclick="exportMasterDatabase(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-medium text-emerald-800 hover:bg-emerald-50 transition">
+                            <i data-lucide="download-cloud" class="w-4 h-4 text-emerald-600"></i>
+                            <span>匯出總資料庫</span>
+                        </button>
+                        <button onclick="loadSampleData(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-medium text-sky-900 hover:bg-sky-50 transition border-t border-sky-100">
+                            <i data-lucide="database-backup" class="w-4 h-4 text-sky-600"></i>
+                            <span>載入多月範例數據</span>
+                        </button>
+                        <button onclick="confirmClearDatabase(); closeToolsDropdown();" id="clearBtn" class="flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-sky-100">
+                            <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>
+                            <span id="clearBtnText">清除資料庫</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-[1900px] mx-auto p-4 sm:p-6 space-y-6">
+
+        <!-- 全域主篩選器面板：採用質感淺海藍 -->
+        <div class="dashboard-card p-4 sm:p-5 bg-sky-900 text-white flex flex-col lg:flex-row justify-between items-center gap-6 shadow-md border-sky-800">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
+                <div class="bg-sky-800/80 p-3 rounded-xl border border-sky-700">
+                    <i data-lucide="calendar-range" class="w-6 h-6 text-sky-200"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold text-sky-300 tracking-wider uppercase block">主資料庫全域篩選面板</span>
+                    <div class="flex flex-wrap items-center gap-3 mt-1">
+                        <span class="text-base font-black text-sky-50">切換檢視日期：</span>
+                        <div class="relative">
+                            <select id="globalMonthSelector" onchange="handleGlobalMonthChange(this.value)" class="custom-select block w-56 pl-3 pr-10 py-1.5 text-sm border border-sky-700 focus:ring-2 focus:ring-sky-400 rounded-lg bg-sky-800 text-white font-black cursor-pointer shadow-sm transition duration-200 hover:bg-sky-750"></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 資料庫狀態統計 -->
+            <div class="flex flex-wrap items-center gap-4 sm:gap-6 bg-sky-800/60 px-6 py-3 rounded-xl border border-sky-700 text-xs w-full lg:w-auto justify-between lg:justify-start">
+                <div>
+                    <span class="text-sky-300 block mb-0.5">資料庫總筆數</span>
+                    <span class="text-lg font-black text-white" id="dbTotalRecords">0 筆</span>
+                </div>
+                <div class="hidden sm:block border-l border-sky-700 h-8"></div>
+                <div>
+                    <span class="text-sky-300 block mb-0.5">覆蓋歷史月數</span>
+                    <span class="text-lg font-black text-amber-300" id="dbTotalMonths">0 個</span>
+                </div>
+                <div class="hidden sm:block border-l border-sky-700 h-8"></div>
+                <div>
+                    <span class="text-sky-300 block mb-0.5">目前檢視日期</span>
+                    <span class="text-lg font-black text-emerald-300" id="dbCurrentView">全部日期</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 頂部指標卡片區 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div class="dashboard-card p-6 border-l-4 border-l-sky-600 relative overflow-hidden group">
+                <div class="absolute right-4 top-4 text-sky-200"><i data-lucide="layers" class="w-8 h-8"></i></div>
+                <p class="text-[10px] font-black text-sky-600 uppercase tracking-wider">總執行指標項數</p>
+                <h3 class="text-3xl font-black mt-2 text-sky-950" id="statTotal">0</h3>
+                <span class="text-[10px] text-sky-500 mt-2 block">當前選取日期範圍內合計</span>
+            </div>
+            <div class="dashboard-card p-6 border-l-4 border-l-emerald-600 relative overflow-hidden group">
+                <div class="absolute right-4 top-4 text-emerald-200"><i data-lucide="check-circle-2" class="w-8 h-8"></i></div>
+                <p class="text-[10px] font-black text-emerald-700 uppercase tracking-wider">準時達標指標數 (O)</p>
+                <h3 class="text-3xl font-black mt-2 text-emerald-700" id="statPass">0</h3>
+                <span class="text-[10px] text-emerald-600 font-semibold mt-2 block">達成率高於 100% 之項目</span>
+            </div>
+            <div class="dashboard-card p-6 border-l-4 border-l-blue-600 relative overflow-hidden group">
+                <div class="absolute right-4 top-4 text-blue-200"><i data-lucide="line-chart" class="w-8 h-8"></i></div>
+                <p class="text-[10px] font-black text-blue-700 uppercase tracking-wider">集團平均指標達成率</p>
+                <h3 class="text-3xl font-black mt-2 text-blue-800" id="statAvgRate">0%</h3>
+                <span class="text-[10px] text-sky-500 mt-2 block">達標項數 / 總指標項數</span>
+            </div>
+            <div class="dashboard-card p-6 border-l-4 border-l-rose-600 relative overflow-hidden group">
+                <div class="absolute right-4 top-4 text-rose-200"><i data-lucide="alert-octagon" class="w-8 h-8"></i></div>
+                <p class="text-[10px] font-black text-rose-600 uppercase tracking-wider">異常監控指標數 (X)</p>
+                <h3 class="text-3xl font-black mt-2 text-rose-600" id="statFail">0</h3>
+                <span class="text-[10px] text-rose-500 font-semibold mt-2 block">亟待施策改善之警示項目</span>
+            </div>
+        </div>
+
+        <!-- 中段分析圖表與排行 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-8 dashboard-card p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-sky-100 pb-4">
+                    <div>
+                        <h2 class="text-lg font-black flex items-center gap-2 text-sky-950"><i data-lucide="bar-chart-3" class="w-5 h-5 text-sky-700"></i> 各中心指標與達成率綜效分析</h2>
+                        <p class="text-xs text-sky-600 mt-0.5">統計當前檢視月份各中心的達標比例與指標總量</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 text-[10px] font-bold text-sky-700 bg-sky-50 px-4 py-2 rounded-full border border-sky-100">
+                        <span class="flex items-center"><span class="w-3 h-3 bg-sky-600 rounded-sm mr-1.5"></span>達標項數</span>
+                        <span class="flex items-center"><span class="w-3 h-3 bg-sky-200 rounded-sm mr-1.5"></span>指標總項數</span>
+                        <span class="flex items-center"><span class="w-4 h-1 bg-sky-900 rounded-full mr-1.5"></span>達成比例</span>
+                        <span class="flex items-center"><span class="w-4 h-0.5 border-t border-dashed border-rose-500 mr-1.5"></span>目標線</span>
+                    </div>
+                </div>
+                <div class="h-[280px] sm:h-[360px]"><canvas id="mainChart"></canvas></div>
+            </div>
+
+            <div class="lg:col-span-4 dashboard-card p-4 sm:p-6 flex flex-col h-[400px] sm:h-[470px]">
+                <div class="border-b border-sky-100 pb-3 mb-4">
+                    <h2 class="text-lg font-black uppercase text-sky-950 flex items-center gap-2">
+                        <i data-lucide="trophy" class="w-5 h-5 text-amber-500"></i>
+                        達成率單位排行
+                    </h2>
+                    <p class="text-xs text-sky-600 mt-0.5">點擊下方中心單位可快速切換矩陣檢視</p>
+                </div>
+                <div class="flex-grow overflow-y-auto custom-scroll pr-2">
+                    <table class="w-full text-sm text-left">
+                        <thead>
+                            <tr class="text-xs font-bold text-sky-600 border-b border-sky-100 pb-2">
+                                <th class="pb-2">中心單位</th>
+                                <th class="pb-2 text-center">達標/總項</th>
+                                <th class="pb-2 text-right">累計達成率</th>
+                            </tr>
+                        </thead>
+                        <tbody id="centerTableBody" class="divide-y divide-sky-50"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 下段部門矩陣 -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+            <div class="xl:col-span-12 dashboard-card p-4 sm:p-6 space-y-4 w-full max-w-full overflow-hidden">
+                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-sky-100 pb-4">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <h2 class="text-lg font-black flex items-center gap-2 text-sky-950">
+                                <i data-lucide="layout-grid" class="w-5 h-5 text-sky-700"></i> 
+                                部門矩陣總覽
+                            </h2>
+                            <div class="flex flex-wrap gap-2">
+                                <div class="flex items-center bg-sky-50 p-1 rounded-lg border border-sky-100">
+                                    <span class="text-[10px] px-2 font-black text-sky-600">範圍</span>
+                                    <select id="matrixCenterSelector" onchange="handleMatrixCenterChange(this.value)" class="custom-select block w-32 sm:w-40 pl-3 pr-8 py-1.5 text-xs border-none focus:ring-0 rounded-md bg-white font-bold text-sky-900"></select>
+                                </div>
+                                <div class="flex items-center bg-sky-50 p-1 rounded-lg border border-sky-100">
+                                    <span class="text-[10px] px-2 font-black text-sky-600">排序</span>
+                                    <select id="sortSelector" onchange="handleSortChange(this.value)" class="custom-select block w-32 sm:w-40 pl-3 pr-8 py-1.5 text-xs border-none focus:ring-0 rounded-md bg-white font-bold text-sky-900">
+                                        <option value="name_asc" selected>名稱 (A-Z)</option>
+                                        <option value="comb_desc">綜合率 (高→低)</option>
+                                        <option value="comb_asc">綜合率 (低→高)</option>
+                                        <option value="center_desc">中心率 (高→低)</option>
+                                        <option value="plant_desc">廠部率 (高→低)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-sky-600 mt-1">點擊下方任何一個部門單元，可連動下方的「施策追蹤明細項目庫」篩選明細</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 text-[10px] font-black text-sky-700 bg-sky-50/80 px-3 py-1.5 rounded-lg border border-sky-200">
+                        <div class="flex items-center"><span class="status-light bg-emerald-500 mr-1.5"></span>正常 (71%+)</div>
+                        <div class="flex items-center"><span class="status-light bg-amber-400 mr-1.5"></span>注意 (61%~70%)</div>
+                        <div class="flex items-center"><span class="status-light bg-rose-500 mr-1.5"></span>警示 (0%~60%)</div>
+                    </div>
+                </div>
+
+                <!-- 電腦端表格 -->
+                <div class="hidden lg:block overflow-x-auto custom-scroll border border-sky-100 rounded-xl h-[380px] w-full bg-white">
+                    <table class="w-full text-[13px] text-left border-collapse min-w-[1000px]">
+                        <thead class="bg-sky-950 text-sky-100 font-bold border-b border-sky-900 uppercase sticky top-0 z-20 shadow-sm">
+                            <tr>
+                                <th id="th-center" class="p-3 border-r border-sky-900 xl:w-[15%]" rowspan="2">中心單位</th>
+                                <th class="p-3 border-r border-sky-900 xl:w-[15%]" rowspan="2">執行部門 (廠部)</th>
+                                <th class="p-2 border-r border-sky-900 text-center bg-sky-900 xl:w-[25%]" colspan="3">達標比例 (%)</th>
+                                <th class="p-2 text-center bg-sky-900/80 xl:w-[15%]" colspan="3">警示燈號指標</th>
+                                <th class="p-3 text-left bg-sky-900 xl:w-[30%]" rowspan="2">未達標明細 (異常清單)</th>
+                            </tr>
+                            <tr class="bg-sky-900 text-[12px]">
+                                <th class="p-2 border-r border-sky-800 text-center">中心</th>
+                                <th class="p-2 border-r border-sky-800 text-center">廠部</th>
+                                <th class="p-2 border-r border-sky-800 text-center text-white font-black">綜合</th>
+                                <th class="p-2 border-r border-sky-800 text-center">中心</th>
+                                <th class="p-2 border-r border-sky-800 text-center">廠部</th>
+                                <th class="p-2 text-center text-white font-black">綜合</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deptMatrixBody" class="divide-y divide-sky-100"></tbody>
+                    </table>
+                </div>
+
+                <!-- 手機/平板端網格 -->
+                <div class="block lg:hidden w-full max-h-[420px] overflow-y-auto custom-scroll pr-1">
+                    <div id="deptMatrixCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+
+            <!-- 施策追蹤明細庫 -->
+            <div class="xl:col-span-12 dashboard-card p-4 sm:p-6 flex flex-col space-y-6 border-t-4 border-t-sky-800 bg-white w-full max-w-full overflow-hidden">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-sky-100 p-2.5 rounded-lg text-sky-800 border border-sky-200 flex-shrink-0"><i data-lucide="clipboard-check" class="w-5 h-5"></i></div>
+                        <div>
+                            <h2 class="text-lg font-black text-sky-950">施策追蹤明細項目庫</h2>
+                            <p class="text-xs text-sky-600 mt-0.5">即時追蹤各施策項目進度與達成評價，開啟編輯模式可進行多選與批量處理</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <button onclick="resetDetailsFilter()" class="px-3 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold rounded-lg transition flex items-center gap-1 border border-sky-200">
+                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>重設
+                        </button>
+                        <button onclick="toggleEditMode()" id="editModeBtn" class="px-3 py-1.5 bg-sky-900 hover:bg-sky-950 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm">
+                            <i data-lucide="edit" class="w-3.5 h-3.5"></i>編輯模式
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 批量操作功能工具列（置於編輯模式按鈕下方、中心範圍篩選列上方） -->
+                <div id="bulkActionBar" class="hidden bg-sky-900 text-white p-3 rounded-xl shadow-md flex-wrap items-center justify-between gap-3 animate-fadeIn">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs font-bold bg-sky-800 px-3 py-1 rounded-lg border border-sky-700">
+                            已選取 <span id="selectedCountText" class="text-amber-300 font-black text-sm">0</span> 筆項目
+                        </span>
+                        <button onclick="toggleSelectAllVisible(true)" class="text-xs text-sky-200 hover:text-white underline font-medium">全選當前</button>
+                        <button onclick="clearAllSelections()" class="text-xs text-sky-200 hover:text-white underline font-medium">取消勾選</button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="askBulkDelete()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            <span>批量刪除選取項</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 明細篩選列（中心範圍與部門等） -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-sky-50/70 p-4 rounded-xl border border-sky-100">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full lg:w-auto">
+                        <div class="flex items-center gap-3 w-full">
+                            <span class="text-xs font-bold text-sky-700 uppercase tracking-wider whitespace-nowrap w-16">中心範圍</span>
+                            <select id="detailCenterSelector" onchange="handleDetailCenterChange(this.value)" class="custom-select block w-full sm:w-48 pl-3 pr-10 py-1.5 text-xs border border-sky-200 focus:ring-2 focus:ring-sky-400 rounded-md bg-white font-bold text-sky-900 transition"></select>
+                        </div>
+
+                        <div class="flex items-center gap-3 w-full">
+                            <span class="text-xs font-bold text-sky-700 uppercase tracking-wider whitespace-nowrap w-16">執行部門</span>
+                            <select id="detailDeptSelector" onchange="handleDetailDeptChange(this.value)" class="custom-select block w-full sm:w-48 pl-3 pr-10 py-1.5 text-xs border border-sky-200 focus:ring-2 focus:ring-sky-400 rounded-md bg-white font-bold text-sky-900 transition">
+                                <option value="all">全部部門</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-start lg:self-auto w-full lg:w-auto">
+                        <span class="text-xs font-bold text-sky-700 uppercase tracking-wider hidden sm:inline">指標分類篩選</span>
+                        <div class="flex items-center p-1 bg-sky-200/60 rounded-lg space-x-1 border border-sky-200 shadow-inner w-full sm:w-auto">
+                            <button onclick="applyTypeFilter('all')" id="f-all" class="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 text-[11px] font-bold rounded transition filter-active shadow-sm">全部</button>
+                            <button onclick="applyTypeFilter('中心')" id="f-center" class="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 text-[11px] font-bold rounded transition text-sky-800 hover:text-sky-950">中心指標</button>
+                            <button onclick="applyTypeFilter('廠部')" id="f-plant" class="flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 text-[11px] font-bold rounded transition text-sky-800 hover:text-sky-950">廠部指標</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 搜尋與筆數 -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                    <div class="relative flex-grow">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-sky-400"></i>
+                        <input type="text" id="searchInput" onkeyup="applySearch()" placeholder="全表動態關鍵字檢索 (中心、部門、課別、計畫項目、指標單位)..." class="w-full pl-10 pr-4 py-2 bg-white border border-sky-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-sky-400 transition">
+                    </div>
+                    <span class="text-[11px] font-black text-sky-700 text-center whitespace-nowrap bg-sky-100 px-4 py-2 rounded-lg border border-sky-200 uppercase tracking-widest shadow-sm">
+                        Total items: <span id="visibleCount" class="text-sky-950 text-sm font-black">0</span>
+                    </span>
+                </div>
+
+                <!-- 電腦端明細表格 -->
+                <div id="desktopTableContainer" class="hidden lg:block overflow-x-auto custom-scroll border border-sky-100 rounded-xl h-[500px] bg-white w-full">
+                    <table class="w-full text-[13px] text-left border-separate border-spacing-0 lg:min-w-[1600px] min-w-[1300px]">
+                        <thead class="sticky top-0 bg-sky-950 text-sky-100 z-20 shadow-sm">
+                            <tr>
+                                <th id="th-checkbox" class="p-3 text-center border-r border-sky-900 xl:w-[3%] hidden">
+                                    <input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllChange(this.checked)" class="w-4 h-4 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
+                                </th>
+                                <th class="p-3 border-r border-sky-900 xl:w-[6%]">年月份</th>
+                                <th class="p-3 border-r border-sky-900 xl:w-[8%]">中心單位</th>
+                                <th class="p-3 border-r border-sky-900 xl:w-[8%]">廠部 (部門)</th>
+                                <th class="p-3 border-r border-sky-900 xl:w-[7%]">課別</th>
+                                <th class="p-3 border-r border-sky-900 text-center whitespace-nowrap xl:w-[6%]">類別</th>
+                                <th class="p-3 border-r border-sky-900 xl:w-[22%]">具體施策計畫項目</th>
+                                <th class="p-3 border-r border-sky-900 text-center xl:w-[5%]">單位</th>
+                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">2025實績</th>
+                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">2026目標</th>
+                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">累計目標</th>
+                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">累計實績</th>
+                                <th class="p-3 border-r border-sky-900 text-center xl:w-[6%]">去年同期</th>
+                                <th class="p-3 border-r border-sky-900 text-center xl:w-[5%]">方向</th>
+                                <th class="p-3 border-r border-sky-900 text-center font-black text-white xl:w-[6%]">達成率</th>
+                                <th class="p-3 text-center border-r border-sky-900 xl:w-[4%]">評價</th>
+                                <th id="th-edit-op" class="p-3 text-center xl:w-[6%] hidden">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="measureTableBody" class="divide-y divide-sky-100 bg-white"></tbody>
+                    </table>
+                </div>
+
+                <!-- 手機與平板卡片網格 -->
+                <div id="mobileCardsContainer" class="block lg:hidden h-[550px] overflow-y-auto custom-scroll space-y-4 pr-1 w-full">
+                    <div id="measureCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- 模組 A：手動新增與編輯 KPI 視窗 -->
+    <div id="formModal" class="fixed inset-0 bg-sky-950/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-sky-100 flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-sky-100 flex justify-between items-center bg-sky-950 text-white rounded-t-2xl">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-sky-900 text-sky-200 rounded-lg"><i data-lucide="edit-3" class="w-5 h-5"></i></div>
+                    <h3 class="text-lg font-black text-white" id="modalTitle">手動新增 KPI 指標</h3>
+                </div>
+                <button onclick="closeFormModal()" class="text-sky-300 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scroll space-y-4">
+                <input type="hidden" id="editIndex">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">年月份 *</label>
+                        <input type="text" id="m_month" placeholder="例如: 2026年06月" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">指標分類 *</label>
+                        <select id="m_type" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                            <option value="中心">中心指標</option>
+                            <option value="廠部">廠部指標</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">中心單位 *</label>
+                        <input type="text" id="m_center" placeholder="例如: 管理中心" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">執行部門 (廠部) *</label>
+                        <input type="text" id="m_dept" placeholder="例如: 企管部" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">課別單位</label>
+                        <input type="text" id="m_section" placeholder="例如: 企管課" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-sky-700 mb-1">具體施策計畫項目 *</label>
+                    <textarea id="m_project" rows="2" placeholder="請輸入本年度指標執行細節..." class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">單位</label>
+                        <input type="text" id="m_unit" placeholder="例如: %, 案, 萬元" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">望大值/望小值 *</label>
+                        <select id="m_direction" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                            <option value="↑">↑ 望大值 (正向指標)</option>
+                            <option value="↓">↓ 望小值 (負向指標)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">2025實績</label>
+                        <input type="text" id="m_y25Actual" placeholder="歷史年實績" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">2026目標</label>
+                        <input type="text" id="m_y26Target" placeholder="年度目標" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-sky-700 mb-1">去年同期累計實績</label>
+                        <input type="text" id="m_yoyActual" placeholder="同比累計" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-sky-50/70 p-4 rounded-xl border border-sky-100">
+                    <div>
+                        <label class="block text-xs font-bold text-sky-900 mb-1">累計目標 *</label>
+                        <input type="text" id="m_targetAccum" placeholder="請輸入累計目標" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-sky-900 mb-1">累計實績 *</label>
+                        <input type="text" id="m_actualAccum" placeholder="請輸入累計實績" class="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-sky-100 flex justify-end space-x-3 bg-sky-50/50 rounded-b-2xl">
+                <button onclick="closeFormModal()" class="px-4 py-2 border border-sky-200 text-sky-800 hover:bg-sky-100 text-xs font-bold rounded-lg transition">
+                    取消返回
+                </button>
+                <button onclick="saveIndicator()" class="px-5 py-2 bg-sky-900 hover:bg-sky-950 text-white text-xs font-bold rounded-lg transition shadow-sm">
+                    確認儲存指標
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 刪除確認視窗（支援單筆與批量） -->
+    <div id="deleteConfirmModal" class="fixed inset-0 bg-sky-950/60 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-sky-100 p-6 space-y-4">
+            <div class="flex items-center space-x-3 text-rose-600">
+                <div class="p-2.5 bg-rose-50 rounded-xl border border-rose-100"><i data-lucide="alert-triangle" class="w-6 h-6"></i></div>
+                <h3 class="text-base font-black text-sky-950">確認移除指標項目？</h3>
+            </div>
+            <div id="deleteConfirmDetails" class="text-xs text-sky-800 bg-sky-50 p-3.5 rounded-xl border border-sky-100 leading-relaxed font-medium space-y-1">
+                <!-- 動態注入刪除細節 -->
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="closeDeleteConfirmModal()" class="px-4 py-2 border border-sky-200 text-sky-800 hover:bg-sky-100 text-xs font-bold rounded-lg transition">
+                    取消
+                </button>
+                <button onclick="executeDeleteIndicator()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
+                    確認刪除
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模組 B：結構說明引導視窗 -->
+    <div id="guideModal" class="fixed inset-0 bg-sky-950/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-sky-100 flex flex-col max-h-[85vh]">
+            <div class="p-6 border-b border-sky-100 flex justify-between items-center bg-sky-950 text-white rounded-t-2xl">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-sky-900 text-sky-200 rounded-lg"><i data-lucide="book-open" class="w-5 h-5"></i></div>
+                    <h3 class="text-lg font-black">KPI 系統資料結構與 Excel 7 行群組規範</h3>
+                </div>
+                <button onclick="closeGuideModal()" class="text-sky-300 hover:text-white transition"><i data-lucide="x" class="w-6 h-6"></i></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scroll space-y-6 text-sm text-sky-800 leading-relaxed">
+                <div>
+                    <h4 class="font-bold text-sky-950 text-base mb-2">一、 Excel 核心「7行群組（子行）」設計架構</h4>
+                    <p class="mb-2 text-xs">本系統專為精細化月度數據管理所設計。工作表內每一筆施策項目需包含以下連續 7 行資料作為指標之分析主體：</p>
+                    <div class="border border-sky-200 rounded-xl overflow-hidden mb-3">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-sky-100/70 text-sky-900 font-bold">
+                                <tr>
+                                    <th class="p-2 border-b border-sky-200">子行名稱</th>
+                                    <th class="p-2 border-b border-sky-200">說明</th>
+                                    <th class="p-2 border-b border-sky-200">範例</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-sky-100">
+                                <tr>
+                                    <td class="p-2 font-bold text-sky-700">當月目標</td>
+                                    <td class="p-2">該月個別單月所預計完成的目標。</td>
+                                    <td class="p-2">10 案</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold text-sky-700">當月實績</td>
+                                    <td class="p-2">該月個別單月實際錄得之實績成果（未發生則留空）。</td>
+                                    <td class="p-2">8 案</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold text-sky-900">累計目標</td>
+                                    <td class="p-2">該月及歷史月份累加之目標預算。（系統預設採用）</td>
+                                    <td class="p-2">30 案</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold text-sky-900">累計實績</td>
+                                    <td class="p-2">該月及歷史月份實際累加完成之數值。（系統預設採用）</td>
+                                    <td class="p-2">28 案</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold text-rose-600">累計評價</td>
+                                    <td class="p-2">判斷該項目累計至今是否達標，常用標誌為 <strong>O (達標)</strong> 或 <strong>X (未達標)</strong>。</td>
+                                    <td class="p-2">O</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold text-sky-700">去年實績</td>
+                                    <td class="p-2">前一年度該單月份之同期實績成果。</td>
+                                    <td class="p-2">5 案</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 font-bold text-sky-700">去年累計實績</td>
+                                    <td class="p-2">前一年度累加至該月份之同期累計成果。</td>
+                                    <td class="p-2">20 案</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-sky-950 text-base mb-2">二、 智慧達成率公式與增減評價邏輯</h4>
+                    <div class="bg-sky-50 p-4 rounded-xl border border-sky-200 font-mono text-xs text-sky-900 mb-2 leading-relaxed">
+                        累計目標為 0 時：累計實績為 0 則達成率為 100%；非 0 時若方向為「望大」則為 200%，方向為「望小」則為 0%。
+                        <br>累計目標不為 0 時：
+                        <br>&nbsp;&nbsp;- 望大值方向 (↑)： 1 + (累計實績 - 累計目標) / ABS(累計目標)
+                        <br>&nbsp;&nbsp;- 望小值方向 (↓)： 1 + (累計目標 - 累計實績) / ABS(累計目標)
+                    </div>
+                </div>
+            </div>
+            <div class="p-6 border-t border-sky-100 flex justify-end bg-sky-50/50 rounded-b-2xl">
+                <button onclick="closeGuideModal()" class="px-5 py-2 bg-sky-900 hover:bg-sky-950 text-white text-xs font-bold rounded-lg transition">
+                    我已瞭解結構
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allDataItems = []; // Master Database
+        let activeDataItems = []; // 目前過濾出來正在檢視的數據
+        let summaryData = {}; // 依據當前檢視數據聚合的統計成果
+        
+        let selectedMonth = "all"; // 當前選擇月份過濾器
+        let matrixCenter = "all";
+        let detailCenter = "all"; 
+        let detailDept = "all";   
+        
+        let typeFilter = "all";
+        let sortField = "name_asc";
+        let mainChartInstance = null;
+        let isClearConfirmPending = false; 
+        let pendingDeleteIndex = -1; // -1: 無, -2: 批量刪除, >=0: 單筆刪除
+
+        // 編輯模式與多選 State
+        let isEditMode = false;
+        let selectedItemIndices = new Set(); // 儲存選取的項目絕對索引
+
+        const ui = (id) => document.getElementById(id);
+        const setVal = (id, text) => { if(ui(id)) ui(id).innerText = text; };
+
+        // 全域無效佔位符定義
+        const EMPTY_PLACEHOLDERS = ["—", "-", "–", "―", "一", "n/a", "null", "undefined", ""];
+
+        function isPlaceholder(val) {
+            if (val === null || val === undefined) return true;
+            const s = String(val).trim().toLowerCase();
+            return s === "" || EMPTY_PLACEHOLDERS.includes(s);
+        }
+
+        // 下拉選單控制
+        function toggleToolsDropdown() {
+            const menu = ui('toolsDropdownMenu');
+            menu.classList.toggle('show');
+        }
+
+        function closeToolsDropdown() {
+            const menu = ui('toolsDropdownMenu');
+            menu.classList.remove('show');
+        }
+
+        window.addEventListener('click', function(e) {
+            const btn = ui('toolsDropdownBtn');
+            const menu = ui('toolsDropdownMenu');
+            if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.remove('show');
+            }
+        });
+
+        // 格式化顯示工具
+        function safeDisplay(val, isPct = false, noDecimal = false) {
+            if (isPlaceholder(val)) return "—";
+            
+            let s = String(val).trim();
+            let cleanS = s.replace(/,/g, ''); 
+            
+            if (isPct) {
+                if (s.includes("%")) {
+                    let numPart = parseFloat(cleanS.replace(/%/g, ''));
+                    if (!isNaN(numPart)) return numPart.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+                    return s;
+                }
+                if (!isNaN(cleanS) && cleanS !== "") {
+                    let num = parseFloat(cleanS);
+                    if (num > 0 && num <= 2.0) {
+                        return (num * 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+                    }
+                    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+                }
+                return s;
+            } else {
+                if (!isNaN(cleanS) && cleanS !== "") {
+                    let num = parseFloat(cleanS);
+                    if (noDecimal) {
+                        return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
+                    }
+                    return num.toLocaleString('en-US', { maximumFractionDigits: 2 });
+                }
+                let match = cleanS.match(/^([+-]?\d*(?:\.\d+)?)\s*(.*)$/);
+                if (match && match[1] && !isNaN(match[1]) && match[1] !== "") {
+                    let num = parseFloat(match[1]);
+                    let unitPart = match[2] ? " " + match[2] : "";
+                    if (noDecimal) {
+                        return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 }) + unitPart;
+                    }
+                    return num.toLocaleString('en-US', { maximumFractionDigits: 2 }) + unitPart;
+                }
+                return s;
+            }
+        }
+
+        // 達成率邏輯計算
+        function calculateRate(targetVal, actualVal, direction) {
+            if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
+            
+            let tNum = parseFloat(String(targetVal).trim().replace(/,/g, '').replace(/%/g, ''));
+            let aNum = parseFloat(String(actualVal).trim().replace(/,/g, '').replace(/%/g, ''));
+            
+            if (isNaN(tNum) || isNaN(aNum)) return "—";
+            
+            let dir = String(direction).trim();
+            if (dir !== "↓") dir = "↑"; 
+
+            let rateVal = 0;
+            if (tNum === 0) {
+                if (aNum === 0) {
+                    rateVal = 1.0; 
+                } else {
+                    rateVal = (dir === "↑") ? 2.0 : 0.0; 
+                }
+            } else {
+                if (dir === "↓") {
+                    rateVal = 1 + (tNum - aNum) / Math.abs(tNum);
+                } else {
+                    rateVal = 1 + (aNum - tNum) / Math.abs(tNum);
+                }
+            }
+
+            let percentage = rateVal * 100;
+            return percentage.toFixed(2) + "%";
+        }
+
+        function getMonthsWithActualData() {
+            const validMonths = new Set();
+            const uniqueMonths = [...new Set(allDataItems.map(i => i.month))];
+            
+            uniqueMonths.forEach(m => {
+                const monthItems = allDataItems.filter(i => i.month === m);
+                const hasRealData = monthItems.some(item => {
+                    if (!item.actualAccum) return false;
+                    if (isPlaceholder(item.actualAccum)) return false;
+                    
+                    const cleanVal = String(item.actualAccum).trim().replace(/%/g, '');
+                    const num = parseFloat(cleanVal.replace(/,/g, ''));
+                    if (!isNaN(num) && num === 0) return false; 
+                    return true;
+                });
+                
+                if (hasRealData) validMonths.add(m);
+            });
+            
+            return Array.from(validMonths).sort();
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const btn = ui('editModeBtn');
+            const bulkBar = ui('bulkActionBar');
+            
+            if (isEditMode) {
+                btn.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i>完成編輯`;
+                btn.className = "px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm";
+                bulkBar.classList.remove('hidden');
+                bulkBar.classList.add('flex');
+                showToast("✍️ 已進入編輯模式，可勾選單筆/多筆指標進行批量刪除或編輯。");
+            } else {
+                btn.innerHTML = `<i data-lucide="edit" class="w-3.5 h-3.5"></i>編輯模式`;
+                btn.className = "px-3 py-1.5 bg-sky-900 hover:bg-sky-950 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm";
+                bulkBar.classList.add('hidden');
+                bulkBar.classList.remove('flex');
+                clearAllSelections();
+                showToast("💾 已退出編輯模式。");
+            }
+            renderMeasures();
+            lucide.createIcons();
+        }
+
+        function handleSelectItem(index, isChecked) {
+            if (isChecked) {
+                selectedItemIndices.add(index);
+            } else {
+                selectedItemIndices.delete(index);
+            }
+            updateBulkActionBarUI();
+        }
+
+        function handleSelectAllChange(isChecked) {
+            toggleSelectAllVisible(isChecked);
+        }
+
+        function toggleSelectAllVisible(isChecked) {
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = isChecked;
+                const idx = parseInt(cb.getAttribute('data-index'));
+                if (!isNaN(idx)) {
+                    if (isChecked) selectedItemIndices.add(idx);
+                    else selectedItemIndices.delete(idx);
+                }
+            });
+            const mainCb = ui('selectAllCheckbox');
+            if (mainCb) mainCb.checked = isChecked;
+            updateBulkActionBarUI();
+        }
+
+        function clearAllSelections() {
+            selectedItemIndices.clear();
+            const mainCb = ui('selectAllCheckbox');
+            if (mainCb) mainCb.checked = false;
+            document.querySelectorAll('.item-checkbox').forEach(cb => cb.checked = false);
+            updateBulkActionBarUI();
+        }
+
+        function updateBulkActionBarUI() {
+            setVal('selectedCountText', selectedItemIndices.size);
+        }
+
+        function askBulkDelete() {
+            if (selectedItemIndices.size === 0) {
+                showToast("請先勾選欲刪除的指標項目！", "error");
+                return;
+            }
+            pendingDeleteIndex = -2; // -2 代表批量刪除標記
+            ui('deleteConfirmDetails').innerHTML = `
+                <div class="font-bold text-rose-700 text-sm">⚠️ 您已選取 ${selectedItemIndices.size} 筆指標項目</div>
+                <div class="text-xs text-sky-800 mt-1">確認刪除後將無法復原，是否確定全部移除？</div>
+            `;
+            ui('deleteConfirmModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = new Uint8Array(event.target.result);
+                    const wb = XLSX.read(data, { type: 'array' });
+                    
+                    let totalAdded = 0;
+                    let totalUpdated = 0;
+                    
+                    wb.SheetNames.forEach((sheetName, index) => {
+                        const sheetState = wb.Workbook && wb.Workbook.Sheets && wb.Workbook.Sheets[index];
+                        if (sheetState && sheetState.Hidden && sheetState.Hidden !== 0) return;
+
+                        const worksheet = wb.Sheets[sheetName];
+                        const grid = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                        if (grid.length === 0) return;
+                        
+                        const wsRows = worksheet['!rows']; 
+
+                        let fallbackCenter = "未定義單位";
+                        const cleanSheet = sheetName.replace(/\s+/g, '');
+                        const matchCenter = cleanSheet.match(/([^\-_]+中心)/);
+                        if (matchCenter) {
+                            fallbackCenter = matchCenter[1];
+                        } else {
+                            fallbackCenter = sheetName.split('-')[0].split('_')[0].trim();
+                        }
+                        fallbackCenter = fallbackCenter.replace(/\s+/g, '');
+                        
+                        let year = "2026年";
+                        for (let r = 0; r < Math.min(5, grid.length); r++) {
+                            if (wsRows && wsRows[r] && wsRows[r].hidden) continue;
+                            const row = grid[r];
+                            if (!row) continue;
+                            const match = row.join(' ').match(/(\d{4})\s*年/);
+                            if (match) { year = match[1] + "年"; break; }
+                        }
+                        
+                        let headerRowIndex = -1;
+                        let colIndices = {};
+                        for (let r = 0; r < grid.length; r++) {
+                            if (wsRows && wsRows[r] && wsRows[r].hidden) continue;
+
+                            const row = grid[r];
+                            if (!row) continue;
+                            const rowStr = row.map(v => String(v || '').replace(/\s+/g, '')).join('|');
+                            
+                            if ((rowStr.includes("施策項目") || rowStr.includes("重點績效評價")) && rowStr.includes("1月") && rowStr.includes("12月")) {
+                                headerRowIndex = r;
+                                row.forEach((cell, c) => {
+                                    const s = String(cell || '').replace(/\s+/g, '').replace(/\n/g, '');
+                                    if (s.includes("中心") && !s.includes("中心指標")) colIndices["center"] = c;
+                                    else if (s.includes("廠部") && !s.includes("廠部指標")) colIndices["dept"] = c;
+                                    else if (s.includes("課別")) colIndices["section"] = c;
+                                    else if (s.includes("指標分類") || s.includes("分類")) { if (!colIndices["type"]) colIndices["type"] = c; }
+                                    else if (s.includes("施策項目") || s.includes("重點績效評價")) colIndices["project"] = c;
+                                    else if (s.includes("計算單位") || s.includes("單位")) { if (!colIndices["unit"]) colIndices["unit"] = c; }
+                                    else if (s.includes("2025實績")) colIndices["y25Actual"] = c;
+                                    else if (s.includes("2026目標")) colIndices["y26Target"] = c;
+                                    else if (s.includes("↑/↓") || s.includes("方向")) colIndices["direction"] = c;
+                                    else if (s.includes("項目") || s.includes("項    目")) colIndices["subItem"] = c;
+                                    
+                                    for (let m = 1; m <= 12; m++) {
+                                        if (s === `${m}月`) colIndices[`m${m}`] = c;
+                                    }
+                                });
+                                break;
+                            }
+                        }
+                        
+                        if (headerRowIndex === -1) return;
+                        
+                        let items = [];
+                        let currentItem = null;
+                        
+                        for (let r = headerRowIndex + 1; r < grid.length; r++) {
+                            if (wsRows && wsRows[r] && wsRows[r].hidden) continue;
+
+                            const row = grid[r];
+                            if (!row || row.length === 0) continue;
+                            
+                            const cellProject = String(row[colIndices["project"]] || '').trim();
+                            const cellSubItem = String(row[colIndices["subItem"]] || '').trim().replace(/\s+/g, '');
+                            
+                            if (cellProject !== "" && cellSubItem !== "") {
+                                currentItem = {
+                                    center: String(row[colIndices["center"]] || '').trim(),
+                                    dept: String(row[colIndices["dept"]] || '').trim(),
+                                    section: String(row[colIndices["section"]] || '').trim(),
+                                    type: String(row[colIndices["type"]] || '').trim(),
+                                    project: cellProject,
+                                    unit: String(row[colIndices["unit"]] || '').trim(),
+                                    y25Actual: String(row[colIndices["y25Actual"]] || '').trim(),
+                                    y26Target: String(row[colIndices["y26Target"]] || '').trim(),
+                                    direction: String(row[colIndices["direction"]] || '↑').trim(),
+                                    subRows: {}
+                                };
+                                items.push(currentItem);
+                            }
+                            
+                            if (currentItem && cellSubItem !== "") {
+                                if (!currentItem.center && row[colIndices["center"]]) currentItem.center = String(row[colIndices["center"]] || '').trim();
+                                if (!currentItem.dept && row[colIndices["dept"]]) currentItem.dept = String(row[colIndices["dept"]] || '').trim();
+                                if (!currentItem.section && row[colIndices["section"]]) currentItem.section = String(row[colIndices["section"]] || '').trim();
+                                
+                                const monthlyVals = {};
+                                for (let m = 1; m <= 12; m++) {
+                                    const colIdx = colIndices[`m${m}`];
+                                    if (colIdx !== undefined) monthlyVals[m] = row[colIdx];
+                                }
+                                currentItem.subRows[cellSubItem] = monthlyVals;
+                            }
+                        }
+                        
+                        items.forEach(item => {
+                            let center = String(item.center || '').replace(/\s+/g, '');
+                            if (!center || center === "—" || center === "N/A" || center === "未定義單位") center = fallbackCenter;
+                            
+                            let dept = String(item.dept || '').replace(/\s+/g, '');
+                            if (!dept || dept === "—" || dept === "N/A") dept = "未定義部門";
+
+                            let section = String(item.section || '').replace(/\s+/g, '');
+                            if (!section || section === "—" || section === "N/A") section = "";
+
+                            const type = item.type || "中心";
+                            const project = item.project;
+                            const unit = item.unit || "—";
+                            const rawY25Actual = item.y25Actual || "—"; 
+                            const y26Target = item.y26Target || "—";
+                            const direction = item.direction || "↑";
+                            
+                            for (let m = 1; m <= 12; m++) {
+                                const targetVal = item.subRows["累計目標"] ? item.subRows["累計目標"][m] : (item.subRows["當月目標"] ? item.subRows["當月目標"][m] : null);
+                                const actualVal = item.subRows["累計實績"] ? item.subRows["累計實績"][m] : (item.subRows["當月實績"] ? item.subRows["當月實績"][m] : null);
+                                const lastYearVal = item.subRows["去年實績"] ? item.subRows["去年實績"][m] : null;
+                                const lastYearAccumVal = item.subRows["去年累計實績"] ? item.subRows["去年累計實績"][m] : null;
+                                let evalVal = item.subRows["累計評價"] ? item.subRows["累計評價"][m] : null;
+                                
+                                if (targetVal === undefined && actualVal === undefined) continue;
+                                if (targetVal === null && actualVal === null) continue;
+                                
+                                const isPercentUnit = (unit !== "—" && unit.includes("%"));
+                                const targetDisp = safeDisplay(targetVal, isPercentUnit);
+                                const actualDisp = safeDisplay(actualVal, isPercentUnit);
+                                const yoyDisp = safeDisplay(lastYearAccumVal || lastYearVal, isPercentUnit);
+                                
+                                let rateDisp = calculateRate(targetVal, actualVal, direction);
+                                let evalChar = "X";
+                                
+                                let rNum = parseFloat(rateDisp.replace(/%/g, ''));
+                                if (!isNaN(rNum)) evalChar = rNum >= 100 ? "O" : "X";
+                                
+                                if (evalVal !== undefined && evalVal !== null && String(evalVal).trim() !== "") {
+                                    const sEval = String(evalVal).trim().toUpperCase();
+                                    evalChar = (sEval === "O" || sEval === "✔" || sEval === "OK") ? "O" : "X";
+                                }
+                                
+                                const monthStr = `${year}${String(m).padStart(2, '0')}月`;
+                                
+                                const newItem = {
+                                    month: monthStr, center, dept, section, type, project, unit,
+                                    y25Actual: safeDisplay(rawY25Actual, isPercentUnit, true), 
+                                    y26Target: y26Target, targetAccum: targetDisp, actualAccum: actualDisp, 
+                                    yoyActual: yoyDisp, direction: direction, rate: rateDisp, eval: evalChar
+                                };
+                                
+                                const uniqueKey = `${newItem.month}_${newItem.center}_${newItem.dept}_${newItem.section}_${newItem.project}`;
+                                const idx = allDataItems.findIndex(existing => 
+                                    `${existing.month}_${existing.center}_${existing.dept}_${existing.section}_${existing.project}` === uniqueKey
+                                );
+                                
+                                if (idx > -1) {
+                                    allDataItems[idx] = newItem; totalUpdated++;
+                                } else {
+                                    allDataItems.push(newItem); totalAdded++;
+                                }
+                            }
+                        });
+                    });
+                    
+                    localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
+                    
+                    const validMonths = getMonthsWithActualData();
+                    selectedMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : "all";
+                    
+                    refreshDatabaseState();
+                    showToast(`📊 匯入完成！資料庫新增 ${totalAdded} 筆，覆蓋更新 ${totalUpdated} 筆。`, "success");
+                } catch (err) { 
+                    console.error(err);
+                    showToast("檔案解析失敗，請確認是否為重點績效指標管理平台 Excel 格式。", "error"); 
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            e.target.value = ''; 
+        }
+
+        function refreshDatabaseState() {
+            const validMonths = getMonthsWithActualData();
+            populateMonthFilterSelector(validMonths);
+
+            if (selectedMonth !== "all" && !validMonths.includes(selectedMonth)) {
+                selectedMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : "all";
+            }
+
+            if (selectedMonth === "all") {
+                activeDataItems = allDataItems.filter(i => validMonths.includes(i.month));
+                setVal('dbCurrentView', "全部已有實績日期數據");
+            } else {
+                activeDataItems = allDataItems.filter(i => i.month === selectedMonth);
+                setVal('dbCurrentView', selectedMonth);
+            }
+
+            const validRecordsCount = allDataItems.filter(i => validMonths.includes(i.month)).length;
+            setVal('dbTotalRecords', `${validRecordsCount} 筆`);
+            setVal('dbTotalMonths', `${validMonths.length} 個`);
+
+            processData();
+        }
+
+        function populateMonthFilterSelector(validMonths) {
+            const selector = ui('globalMonthSelector');
+            let options = '<option value="all">📁 全部已有實績日期數據</option>';
+            validMonths.forEach(m => {
+                options += `<option value="${m}">📅 ${m}</option>`;
+            });
+            selector.innerHTML = options;
+            selector.value = selectedMonth;
+        }
+
+        function handleGlobalMonthChange(val) {
+            selectedMonth = val;
+            refreshDatabaseState();
+            showToast("已切換至當月份已有實績數據。");
+        }
+
+        function processData() {
+            summaryData = {};
+            activeDataItems.forEach(item => {
+                const c = item.center === "N/A" ? "未定義單位" : item.center;
+                const d = item.dept === "N/A" ? "未定義部門" : item.dept;
+                const cat = item.type === "廠部" ? "plant" : "center";
+                
+                if (!summaryData[c]) summaryData[c] = { total: 0, pass: 0, depts: {} };
+                if (!summaryData[c].depts[d]) {
+                    summaryData[c].depts[d] = { center: { t: 0, p: 0 }, plant: { t: 0, p: 0 }, combined: { t: 0, p: 0 }, failItems: [] };
+                }
+                
+                summaryData[c].total++;
+                summaryData[c].depts[d].combined.t++;
+                if (item.eval === "O") {
+                    summaryData[c].pass++;
+                    summaryData[c].depts[d].combined.p++;
+                    summaryData[c].depts[d][cat].p++;
+                } else if (item.project !== "—") {
+                    const label = selectedMonth === "all" ? `[${item.month}] ${item.project}` : item.project;
+                    summaryData[c].depts[d].failItems.push(label);
+                }
+                summaryData[c].depts[d][cat].t++;
+            });
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            renderStats(); 
+            renderMainChart(); 
+            renderRanking(); 
+            populateSelectors();
+            renderDeptMatrix();
+            renderMeasures();
+            lucide.createIcons();
+        }
+
+        function renderStats() {
+            const total = activeDataItems.length;
+            const pass = activeDataItems.filter(i => i.eval === "O").length;
+            setVal('statTotal', total); setVal('statPass', pass); setVal('statFail', total - pass);
+            setVal('statAvgRate', (total > 0 ? Math.round((pass/total)*100) : 0) + "%");
+        }
+
+        function renderMainChart() {
+            const ctx = ui('mainChart').getContext('2d');
+            if (mainChartInstance) mainChartInstance.destroy();
+            const labels = Object.keys(summaryData);
+            const rateData = labels.map(l => Math.round((summaryData[l].pass / summaryData[l].total) * 100));
+            mainChartInstance = new Chart(ctx, {
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { type: 'line', label: '達成比例', data: rateData, borderColor: '#0c4a6e', borderWidth: 2.5, pointBackgroundColor: '#0c4a6e', pointRadius: 4, yAxisID: 'yR', order: 0, tension: 0.1 },
+                        { type: 'line', label: '目標線', data: labels.map(()=>100), borderColor: '#ef4444', borderDash: [4, 4], pointRadius: 0, yAxisID: 'yR', order: 1 },
+                        { type: 'bar', label: '達標項數', data: labels.map(l => summaryData[l].pass), backgroundColor: '#0284c7', borderRadius: 4, yAxisID: 'yC', order: 2 },
+                        { type: 'bar', label: '指標總項數', data: labels.map(l => summaryData[l].total), backgroundColor: '#bae6fd', borderRadius: 4, yAxisID: 'yC', order: 3 }
+                    ]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        yR: { position: 'left', min: 0, max: 115, ticks: { callback: v => v + '%' }, grid: { borderDash: [2, 4], color: '#f0f9ff' } }, 
+                        yC: { position: 'right', grid: { display: false } } 
+                    }
+                }
+            });
+        }
+
+        function renderRanking() {
+            const body = ui('centerTableBody'); body.innerHTML = '';
+            Object.keys(summaryData).forEach(name => {
+                const data = summaryData[name];
+                const pct = Math.round((data.pass / data.total) * 100);
+                const tr = document.createElement('tr');
+                tr.className = `hover:bg-sky-50 cursor-pointer transition rounded-lg ${name === matrixCenter ? 'row-active' : ''}`;
+                tr.onclick = () => { matrixCenter = name; renderDashboard(); };
+                tr.innerHTML = `<td class="py-3 px-2 font-bold text-sky-900">${name}</td><td class="py-3 text-center text-sky-600 font-medium">${data.pass}/${data.total}</td><td class="py-3 px-2 text-right font-black ${getRateColor(pct)}">${pct}%</td>`;
+                body.appendChild(tr);
+            });
+        }
+
+        function populateSelectors() {
+            const centers = Object.keys(summaryData);
+            const options = '<option value="all">全部中心總覽</option>' + centers.map(c => `<option value="${c}">${c}</option>`).join('');
+            ui('matrixCenterSelector').innerHTML = options;
+            ui('detailCenterSelector').innerHTML = options;
+            ui('matrixCenterSelector').value = matrixCenter;
+            ui('detailCenterSelector').value = detailCenter;
+            
+            populateDeptSelector();
+        }
+
+        function populateDeptSelector() {
+            const selector = ui('detailDeptSelector');
+            let options = '<option value="all">全部部門</option>';
+            
+            if (detailCenter === "all") {
+                const allDepts = new Set();
+                Object.keys(summaryData).forEach(c => {
+                    Object.keys(summaryData[c].depts).forEach(d => allDepts.add(d));
+                });
+                allDepts.forEach(d => { options += `<option value="${d}">${d}</option>`; });
+            } else {
+                const depts = summaryData[detailCenter]?.depts || {};
+                Object.keys(depts).forEach(d => { options += `<option value="${d}">${d}</option>`; });
+            }
+            selector.innerHTML = options;
+            selector.value = detailDept;
+        }
+
+        function handleMatrixCenterChange(val) { matrixCenter = val; renderDeptMatrix(); renderRanking(); }
+        function handleDetailCenterChange(val) { detailCenter = val; detailDept = "all"; populateDeptSelector(); renderMeasures(); }
+        function handleDetailDeptChange(val) { detailDept = val; renderMeasures(); }
+        function handleSortChange(val) { sortField = val; renderDeptMatrix(); }
+        
+        function resetDetailsFilter() {
+            detailCenter = "all"; detailDept = "all"; typeFilter = "all";
+            ui('searchInput').value = "";
+            applyTypeFilter("all");
+            populateSelectors();
+            renderMeasures();
+            showToast("已成功重設明細項目搜尋與分類篩選。");
+        }
+
+        function renderDeptMatrix() {
+            const body = ui('deptMatrixBody'); 
+            const cardsGrid = ui('deptMatrixCardsGrid');
+            
+            body.innerHTML = ''; cardsGrid.innerHTML = '';
+            
+            let list = [];
+            if (matrixCenter === "all") {
+                ui('th-center').classList.remove('hidden');
+                Object.keys(summaryData).forEach(c => { 
+                    Object.keys(summaryData[c].depts).forEach(d => list.push({ centerName: c, deptName: d, ...summaryData[c].depts[d] })); 
+                });
+            } else {
+                ui('th-center').classList.add('hidden');
+                const depts = summaryData[matrixCenter]?.depts || {};
+                Object.keys(depts).forEach(d => list.push({ centerName: matrixCenter, deptName: d, ...depts[d] }));
+            }
+
+            list.sort((a, b) => {
+                const getPct = (x) => x.combined.t > 0 ? (x.combined.p / x.combined.t) : 0;
+                if (sortField === "name_asc") return a.centerName.localeCompare(b.centerName, 'zh-Hant') || a.deptName.localeCompare(b.deptName, 'zh-Hant');
+                if (sortField === "comb_desc") return getPct(b) - getPct(a);
+                if (sortField === "comb_asc") return getPct(a) - getPct(b);
+                if (sortField === "center_desc") {
+                    const getCenterPct = (x) => x.center.t > 0 ? (x.center.p / x.center.t) : 0;
+                    return getCenterPct(b) - getCenterPct(a);
+                }
+                if (sortField === "plant_desc") {
+                    const getPlantPct = (x) => x.plant.t > 0 ? (x.plant.p / x.plant.t) : 0;
+                    return getPlantPct(b) - getPlantPct(a);
+                }
+                return 0;
+            });
+
+            list.forEach(row => {
+                const isSelected = row.deptName === detailDept && row.centerName === detailCenter;
+                
+                const cP = row.center.t > 0 ? Math.round((row.center.p / row.center.t) * 100) + "%" : "N/A";
+                const pP = row.plant.t > 0 ? Math.round((row.plant.p / row.plant.t) * 100) + "%" : "N/A";
+                const combP = row.combined.t > 0 ? Math.round((row.combined.p / row.combined.t) * 100) + "%" : "N/A";
+                const combPctNum = row.combined.t > 0 ? Math.round((row.combined.p / row.combined.t) * 100) : 0;
+                
+                const failH = row.failItems.length > 0 
+                    ? `<div class="flex flex-wrap gap-1.5">${row.failItems.map(i => `<span class="tag-fail" title="${i}">${i}</span>`).join('')}</div>` 
+                    : '<span class="text-emerald-700 font-bold text-[12px] flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i>全項達標</span>';
+
+                const tr = document.createElement('tr');
+                tr.className = `hover:bg-sky-50 cursor-pointer transition ${isSelected ? 'bg-sky-100/80 border-l-4 border-sky-800' : ''}`;
+                tr.onclick = () => { selectDeptMatrixItem(row.centerName, row.deptName); };
+                
+                tr.innerHTML = `${matrixCenter === 'all' ? `<td class="p-3 border-r border-sky-100 font-bold text-sky-700">${row.centerName}</td>` : ''}
+                    <td class="p-3 border-r border-sky-100 font-bold text-sky-950">${row.deptName}</td>
+                    <td class="p-3 border-r border-sky-100 text-center font-bold text-sky-700">${cP}</td>
+                    <td class="p-3 border-r border-sky-100 text-center font-bold text-sky-700">${pP}</td>
+                    <td class="p-3 border-r border-sky-100 text-center font-black text-sky-950 bg-sky-50/80">${combP}</td>
+                    <td class="p-3 border-r border-sky-100 text-center">${getTrafficLight(row.center)}</td>
+                    <td class="p-3 border-r border-sky-100 text-center">${getTrafficLight(row.plant)}</td>
+                    <td class="p-3 border-r border-sky-100 text-center bg-sky-50/80">${getTrafficLight(row.combined)}</td>
+                    <td class="p-3 text-left bg-sky-50/30">${failH}</td>`;
+                body.appendChild(tr);
+
+                const card = document.createElement('div');
+                card.className = `p-4 border rounded-xl flex flex-col justify-between space-y-3 cursor-pointer transition-all duration-200 ${
+                    isSelected ? 'bg-sky-100/90 border-sky-400 ring-2 ring-sky-300' : 'bg-white hover:bg-sky-50 border-sky-100'
+                }`;
+                card.onclick = () => { selectDeptMatrixItem(row.centerName, row.deptName); };
+
+                const borderLightClass = combPctNum >= 71 ? 'bg-emerald-500' : (combPctNum >= 61 ? 'bg-amber-400' : 'bg-rose-500');
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-[10px] font-black text-sky-600 block uppercase">${row.centerName}</span>
+                            <h4 class="text-sm font-bold text-sky-950 mt-0.5">${row.deptName}</h4>
+                        </div>
+                        <div class="flex items-center space-x-1.5">
+                            <span class="status-light ${borderLightClass}"></span>
+                            <span class="text-xs font-black ${getRateColor(combPctNum)}">${combP}</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1 bg-sky-50/80 p-2 rounded-lg border border-sky-100 text-center">
+                        <div>
+                            <span class="block text-[9px] text-sky-600 font-bold">中心指標</span>
+                            <span class="text-[11px] font-bold text-sky-900">${cP}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] text-sky-600 font-bold">廠部指標</span>
+                            <span class="text-[11px] font-bold text-sky-900">${pP}</span>
+                        </div>
+                        <div>
+                            <span class="block text-[9px] text-sky-600 font-bold">綜合評價</span>
+                            <div class="flex justify-center items-center mt-0.5">${getTrafficLight(row.combined)}</div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-sky-100">
+                        <span class="block text-[9px] text-sky-600 font-black uppercase mb-1">未達標明細：</span>
+                        <div class="max-h-[80px] overflow-y-auto custom-scroll pr-1">
+                            ${failH}
+                        </div>
+                    </div>
+                `;
+                cardsGrid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function selectDeptMatrixItem(centerName, deptName) {
+            detailCenter = centerName; detailDept = deptName;
+            ui('detailCenterSelector').value = centerName;
+            populateDeptSelector();
+            ui('detailDeptSelector').value = deptName;
+            renderDeptMatrix(); renderMeasures();
+            showToast(`已為您篩選顯示： ${centerName} - ${deptName} 指標細節`);
+        }
+
+        function renderMeasures() {
+            const tableBody = ui('measureTableBody'); 
+            const cardsGrid = ui('measureCardsGrid');
+            tableBody.innerHTML = ''; cardsGrid.innerHTML = '';
+            
+            if (isEditMode) {
+                ui('th-edit-op').classList.remove('hidden');
+                ui('th-checkbox').classList.remove('hidden');
+            } else {
+                ui('th-edit-op').classList.add('hidden');
+                ui('th-checkbox').classList.add('hidden');
+            }
+
+            const filtered = activeDataItems.filter(i => {
+                const matchesCenter = (detailCenter === "all" || i.center === detailCenter);
+                const matchesDept = (detailDept === "all" || i.dept === detailDept);
+                const matchesType = (typeFilter === "all" || i.type === typeFilter);
+                return matchesCenter && matchesDept && matchesType;
+            });
+            
+            filtered.forEach(p => {
+                const isPercentUnit = (p.unit !== "—" && p.unit.includes("%"));
+                const tagClass = p.type === '中心' ? 'tag-center' : 'tag-plant';
+                
+                const dirTag = p.direction === '↓' 
+                    ? '<span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-black text-[11px]">↓ 望小</span>' 
+                    : '<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-black text-[11px]">↑ 望大</span>';
+
+                const absoluteIndex = allDataItems.indexOf(p);
+                const isChecked = selectedItemIndices.has(absoluteIndex);
+
+                const tr = document.createElement('tr'); 
+                tr.className = `hover:bg-sky-50 transition ${isChecked ? 'bg-sky-50/80' : ''}`;
+
+                const checkboxCellHtml = isEditMode ? `
+                    <td class="p-3 text-center border-r border-sky-100">
+                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-4 h-4 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
+                    </td>` : '';
+
+                const actionCellHtml = isEditMode ? `
+                    <td class="p-3 text-center whitespace-nowrap bg-sky-50/50">
+                        <div class="flex items-center justify-center space-x-1.5">
+                            <button onclick="openFormModal(true, ${absoluteIndex})" class="px-2 py-1 text-sky-800 bg-sky-100 hover:bg-sky-200 rounded-md transition font-bold text-xs flex items-center gap-1 border border-sky-200" title="編輯">
+                                <i data-lucide="edit-3" class="w-3.5 h-3.5 text-sky-700"></i>
+                                <span>編輯</span>
+                            </button>
+                        </div>
+                    </td>` : '';
+
+                tr.innerHTML = `
+                    ${checkboxCellHtml}
+                    <td class="p-3 border-r border-sky-100 font-bold text-sky-600 whitespace-nowrap">${p.month}</td>
+                    <td class="p-3 border-r border-sky-100 font-bold text-sky-700">${p.center}</td>
+                    <td class="p-3 border-r border-sky-100 font-bold text-sky-900">${p.dept}</td>
+                    <td class="p-3 border-r border-sky-100 font-bold text-sky-600">${p.section || '—'}</td>
+                    <td class="p-3 border-r border-sky-100 text-center whitespace-nowrap"><span class="${tagClass}">${p.type}</span></td>
+                    <td class="p-3 border-r border-sky-100 font-medium text-sky-950 leading-tight whitespace-normal break-all">${p.project}</td>
+                    <td class="p-3 border-r border-sky-100 text-center text-sky-600">${p.unit}</td>
+                    <td class="p-3 border-r border-sky-100 text-center text-sky-600 font-semibold">${safeDisplay(p.y25Actual, isPercentUnit, true)}</td>
+                    <td class="p-3 border-r border-sky-100 text-center text-sky-600">${safeDisplay(p.y26Target, isPercentUnit)}</td>
+                    <td class="p-3 border-r border-sky-100 text-center font-bold text-sky-700">${safeDisplay(p.targetAccum, isPercentUnit)}</td>
+                    <td class="p-3 border-r border-sky-100 text-center font-black text-sky-950">${safeDisplay(p.actualAccum, isPercentUnit)}</td>
+                    <td class="p-3 border-r border-sky-100 text-center text-sky-500">${safeDisplay(p.yoyActual, isPercentUnit)}</td>
+                    <td class="p-3 border-r border-sky-100 text-center">${dirTag}</td>
+                    <td class="p-3 border-r border-sky-100 text-center font-black text-sky-950 bg-sky-50/60">${safeDisplay(p.rate, true)}</td>
+                    <td class="p-3 text-center border-r border-sky-100"><span class="px-2.5 py-0.5 rounded-full text-[12px] font-black ${p.eval==='O'?'bg-o':'bg-x'}">${p.eval}</span></td>
+                    ${actionCellHtml}`;
+                tableBody.appendChild(tr);
+
+                const cardCheckboxHtml = isEditMode ? `
+                    <div class="flex items-center space-x-2 pb-2 border-b border-sky-100">
+                        <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-4 h-4 text-sky-600 rounded border-sky-300 focus:ring-sky-500 cursor-pointer">
+                        <span class="text-xs font-bold text-sky-800">勾選此項目</span>
+                    </div>` : '';
+
+                const cardActionsHtml = isEditMode ? `
+                    <div class="flex items-center justify-end space-x-2 pt-2 border-t border-sky-100">
+                        <button onclick="openFormModal(true, ${absoluteIndex})" class="flex items-center space-x-1 px-3 py-1.5 text-xs text-sky-800 bg-sky-100 hover:bg-sky-200 font-bold rounded-lg transition border border-sky-200">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> <span>編輯</span>
+                        </button>
+                    </div>` : '';
+
+                const card = document.createElement('div');
+                card.className = `bg-white border rounded-xl p-4 flex flex-col space-y-3 hover:shadow-md transition ${isChecked ? 'border-sky-400 bg-sky-50/40 ring-1 ring-sky-300' : 'border-sky-100'}`;
+                card.innerHTML = `
+                    ${cardCheckboxHtml}
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-black text-sky-600">${p.month}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-black ${p.eval==='O'?'bg-o':'bg-x'}">${p.eval}</span>
+                    </div>
+                    <div>
+                        <h4 class="text-xs text-sky-600 font-bold mb-1">${p.center} · ${p.dept} ${p.section ? '· ' + p.section : ''}</h4>
+                        <p class="text-sm font-bold text-sky-950 leading-snug">${p.project}</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-sky-100 text-xs">
+                        <span class="font-black text-sky-900">達成率: ${safeDisplay(p.rate, true)}</span>
+                    </div>
+                    ${cardActionsHtml}
+                `;
+                cardsGrid.appendChild(card);
+            });
+            setVal('visibleCount', filtered.length);
+            updateBulkActionBarUI();
+        }
+
+        function getTrafficLight(data) {
+            if (data.t === 0) return `<span class="text-sky-300">—</span>`;
+            const pct = (data.p / data.t) * 100;
+            const color = pct <= 60 ? 'bg-rose-500' : (pct <= 70 ? 'bg-amber-400' : 'bg-emerald-500');
+            return `<span class="status-light ${color} mx-auto"></span>`;
+        }
+
+        function getRateColor(pct) { return pct >= 71 ? 'text-emerald-700' : (pct >= 61 ? 'text-amber-600' : 'text-rose-600'); }
+        function applyTypeFilter(t) { typeFilter = t; document.querySelectorAll('#f-all, #f-center, #f-plant').forEach(b => b.classList.remove('filter-active')); ui('f-'+(t==='all'?'all':(t==='中心'?'center':'plant'))).classList.add('filter-active'); renderMeasures(); }
+        
+        function applySearch() { 
+            const q = ui('searchInput').value.toLowerCase(); 
+            document.querySelectorAll('#measureTableBody tr').forEach(r => r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none');
+            document.querySelectorAll('#measureCardsGrid > div').forEach(c => c.style.display = c.innerText.toLowerCase().includes(q) ? '' : 'none');
+        }
+
+        function openFormModal(isEdit = false, index = -1) {
+            const modal = ui('formModal');
+            modal.classList.remove('hidden');
+            
+            if (isEdit && index > -1) {
+                ui('modalTitle').innerText = "編輯手動指標";
+                const p = allDataItems[index];
+                ui('editIndex').value = index;
+                ui('m_month').value = p.month;
+                ui('m_type').value = p.type;
+                ui('m_center').value = p.center;
+                ui('m_dept').value = p.dept;
+                ui('m_section').value = p.section || "";
+                ui('m_project').value = p.project;
+                ui('m_unit').value = p.unit;
+                ui('m_direction').value = p.direction;
+                ui('m_y25Actual').value = p.y25Actual;
+                ui('m_y26Target').value = p.y26Target;
+                ui('m_yoyActual').value = p.yoyActual;
+                ui('m_targetAccum').value = p.targetAccum;
+                ui('m_actualAccum').value = p.actualAccum;
+            } else {
+                ui('modalTitle').innerText = "手動新增 KPI 指標";
+                ui('editIndex').value = "-1";
+                ui('m_month').value = selectedMonth === "all" ? "2026年06月" : selectedMonth;
+                ui('m_type').value = "中心";
+                ui('m_center').value = "";
+                ui('m_dept').value = "";
+                ui('m_section').value = "";
+                ui('m_project').value = "";
+                ui('m_unit').value = "%";
+                ui('m_direction').value = "↑";
+                ui('m_y25Actual').value = "";
+                ui('m_y26Target').value = "";
+                ui('m_yoyActual').value = "";
+                ui('m_targetAccum').value = "";
+                ui('m_actualAccum').value = "";
+            }
+            lucide.createIcons();
+        }
+
+        function closeFormModal() { ui('formModal').classList.add('hidden'); }
+
+        function saveIndicator() {
+            const index = parseInt(ui('editIndex').value);
+            const month = ui('m_month').value.trim();
+            const center = ui('m_center').value.trim().replace(/\s+/g, '');
+            const dept = ui('m_dept').value.trim().replace(/\s+/g, '');
+            const section = ui('m_section').value.trim().replace(/\s+/g, '');
+            const project = ui('m_project').value.trim();
+            const type = ui('m_type').value;
+            const unit = ui('m_unit').value.trim();
+            const direction = ui('m_direction').value;
+            const y25Actual = ui('m_y25Actual').value.trim();
+            const y26Target = ui('m_y26Target').value.trim();
+            const yoyActual = ui('m_yoyActual').value.trim();
+            const targetAccum = ui('m_targetAccum').value.trim();
+            const actualAccum = ui('m_actualAccum').value.trim();
+
+            if (!month || !center || !dept || !project || !targetAccum || !actualAccum) {
+                showToast("帶 * 號欄位為必填項目，請確認填寫！", "error");
+                return;
+            }
+
+            const isPercentUnit = (unit !== "" && unit.includes("%"));
+            const computedRate = calculateRate(targetAccum, actualAccum, direction);
+            let evalChar = "X";
+            let rNum = parseFloat(computedRate.replace(/%/g, ''));
+            if (!isNaN(rNum)) evalChar = rNum >= 100 ? "O" : "X";
+
+            const item = {
+                month, center, dept, section, type, project, unit,
+                y25Actual: safeDisplay(y25Actual, isPercentUnit, true),
+                y26Target: safeDisplay(y26Target, isPercentUnit),
+                targetAccum: safeDisplay(targetAccum, isPercentUnit),
+                actualAccum: safeDisplay(actualAccum, isPercentUnit),
+                yoyActual: safeDisplay(yoyActual, isPercentUnit),
+                direction,
+                rate: computedRate,
+                eval: evalChar
+            };
+
+            if (index > -1) {
+                allDataItems[index] = item;
+                showToast("指標編輯修改儲存成功！", "success");
+            } else {
+                allDataItems.push(item);
+                showToast("全新指標手動新增成功！", "success");
+            }
+
+            localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
+            closeFormModal();
+            refreshDatabaseState();
+        }
+
+        function askDeleteIndicator(index) {
+            if (index > -1 && index < allDataItems.length) {
+                pendingDeleteIndex = index;
+                const p = allDataItems[index];
+                ui('deleteConfirmDetails').innerHTML = `
+                    <div><span class="text-sky-600">月份：</span><strong>${p.month}</strong></div>
+                    <div><span class="text-sky-600">單位：</span><strong>${p.center} - ${p.dept} (${p.section || '無課別'})</strong></div>
+                    <div><span class="text-sky-600">施策項目：</span><strong>${p.project}</strong></div>
+                `;
+                ui('deleteConfirmModal').classList.remove('hidden');
+                lucide.createIcons();
+            }
+        }
+
+        function closeDeleteConfirmModal() {
+            ui('deleteConfirmModal').classList.add('hidden');
+            pendingDeleteIndex = -1;
+        }
+
+        function executeDeleteIndicator() {
+            if (pendingDeleteIndex === -2) {
+                // 執行批量刪除
+                const deleteSet = new Set(selectedItemIndices);
+                allDataItems = allDataItems.filter((_, idx) => !deleteSet.has(idx));
+                localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
+                closeDeleteConfirmModal();
+                clearAllSelections();
+                refreshDatabaseState();
+                showToast(`🧹 已成功刪除選取的 ${deleteSet.size} 筆指標！`, "success");
+            } else if (pendingDeleteIndex > -1 && pendingDeleteIndex < allDataItems.length) {
+                // 單筆刪除
+                allDataItems.splice(pendingDeleteIndex, 1);
+                localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
+                closeDeleteConfirmModal();
+                refreshDatabaseState();
+                showToast("指標已成功移除！", "success");
+            }
+        }
+
+        function openGuideModal() { ui('guideModal').classList.remove('hidden'); }
+        function closeGuideModal() { ui('guideModal').classList.add('hidden'); }
+
+        function downloadTemplate() {
+            const h = [
+                ["2026年重點績效指標管理平台（系統標準匯入格式）"],
+                ["說明：1. 請保留第三行之欄位名稱。2. 子行群組順序與名稱必須完全符合『當月目標』、『當月實績』、『累計目標』、『累計實績』、『累計評價』及『去年實績』、『去年累計實績』。"],
+                ["MTS/AOP分類", "中心", "廠部", "課別", "指標分類", "指定報告會議(T/K)", "重點績效評價項目", "MTS/AOP編號", "施策項目", "↑/↓", "基本定義", "計算單位", "2025實績", "2026目標", "項    目", "1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+                ["M", "管理中心", "企管部", "企管課", "中心", "T", "O", "B3-2-1", "數位核心工程與集團AI智慧平台整合計畫", "↑", "專案進度定期回報", "案", "13", "100%", "當月目標", 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "當月實績", 10, 10, 10, 9, 10, "", "", "", "", "", "", ""],
+                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "累計目標", 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120],
+                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "累計實績", 10, 20, 30, 39, 49, "", "", "", "", "", "", ""],
+                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "累計評價", "O", "O", "O", "X", "O", "", "", "", "", "", "", ""],
+                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "去年實績", 8, 9, 10, 11, 12, 10, 10, 10, 10, 10, 10, 10],
+                ["", "", "企管部", "", "", "", "", "", "", "", "", "", "", "", "去年累計實績", 8, 17, 27, 38, 50, 60, 70, 80, 90, 100, 110, 120]
+            ];
+            const wb = XLSX.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(h);
+            XLSX.utils.book_append_sheet(wb, ws, "管理中心-總_月目標");
+            XLSX.writeFile(wb, "2026_KPI_Master_Template.xlsx");
+            showToast("範本檔案下載成功！已輸出符合您公司重點績效 7 行結構格式之 Excel 範本。", "success");
+        }
+
+        function exportMasterDatabase() {
+            if (allDataItems.length === 0) {
+                showToast("目前資料庫中尚無資料，無法匯出！", "error");
+                return;
+            }
+            const headers = ["年月份", "中心", "部門", "課別", "指標分類", "施策項目", "計算單位", "2025實績", "2026目標", "累計目標", "累計實績", "去年同期累計實績", "望大值/望小值方向", "達成率", "評價"];
+            const dataRows = allDataItems.map(i => [
+                i.month, i.center, i.dept, i.section || "", i.type, i.project, i.unit, 
+                i.y25Actual, i.y26Target, i.targetAccum, i.actualAccum, i.yoyActual, 
+                i.direction, i.rate, i.eval
+            ]);
+            const wsData = [headers, ...dataRows];
+            const wb = XLSX.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "Master_Database");
+            XLSX.writeFile(wb, `KPI_Master_Database_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+            showToast("💾 總資料庫備份成功！已打包導出共 " + allDataItems.length + " 筆跨年月份數據。", "success");
+        }
+
+        function confirmClearDatabase() {
+            const btn = ui('clearBtn');
+            const btnText = ui('clearBtnText');
+            if (!isClearConfirmPending) {
+                isClearConfirmPending = true;
+                btnText.innerText = "按第二次確認清除";
+                btn.className = "flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-semibold bg-rose-600 text-white transition animate-pulse";
+                showToast("⚠️ 請再次點擊工具箱中的清除按鈕以確認清空整個主資料庫。", "error");
+                setTimeout(() => {
+                    isClearConfirmPending = false;
+                    btnText.innerText = "清除資料庫";
+                    btn.className = "flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-sky-100";
+                }, 4000);
+            } else {
+                allDataItems = [];
+                selectedMonth = "all";
+                localStorage.removeItem('kpi_master_data');
+                refreshDatabaseState();
+                isClearConfirmPending = false;
+                btnText.innerText = "清除資料庫";
+                btn.className = "flex items-center space-x-2 w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-sky-100";
+                showToast("🧹 本地與地端暫存資料庫已完全清空！", "success");
+            }
+        }
+
+        function loadSampleData() {
+            const sampleData = [
+                { "month": "2026年01月", "center": "管理中心", "dept": "企管部", "section": "企管課", "type": "中心", "project": "數位核心工程與集團AI智慧平台整合計畫(第一期項目細節優化)", "unit": "%", "y25Actual": "80", "y26Target": "100%", "targetAccum": "40", "actualAccum": "38", "yoyActual": "30%", "direction": "↑", "rate": "95.00%", "eval": "O" },
+                { "month": "2026年01月", "center": "研發中心", "dept": "技術部", "section": "技術課", "type": "廠部", "project": "全新型號綠色永續節能產品線研發推廣項目", "unit": "元", "y25Actual": "1250000", "y26Target": "5,000,000 元", "targetAccum": "250,000", "actualAccum": "250,000", "yoyActual": "200,000", "direction": "↑", "rate": "100.00%", "eval": "O" },
+                { "month": "2026年01月", "center": "研發中心", "dept": "技術部", "section": "減碳課", "type": "廠部", "project": "碳中和綠色工廠製程優化減排試驗", "unit": "案", "y25Actual": "0", "y26Target": "4 案", "targetAccum": "1", "actualAccum": "0", "yoyActual": "0", "direction": "↓", "rate": "0.00%", "eval": "X" },
+                { "month": "2026年02月", "center": "管理中心", "dept": "企管部", "section": "企管課", "type": "中心", "project": "數位核心工程與集團AI智慧平台整合計畫(第一期項目細節優化)", "unit": "%", "y25Actual": "80", "y26Target": "100%", "targetAccum": "50", "actualAccum": "49", "yoyActual": "35%", "direction": "↑", "rate": "98.00%", "eval": "O" },
+                { "month": "2026年02月", "center": "研發中心", "dept": "技術部", "section": "技術課", "type": "廠部", "project": "全新型號綠色永續節能產品線研發推廣項目", "unit": "元", "y25Actual": "1250000", "y26Target": "5,000,000 元", "targetAccum": "500,000", "actualAccum": "480,000", "yoyActual": "400,000", "direction": "↑", "rate": "96.00%", "eval": "O" },
+                { "month": "2026年02月", "center": "研發中心", "dept": "技術部", "section": "減碳課", "type": "廠部", "project": "碳中和綠色工廠製程優化減排試驗", "unit": "案", "y25Actual": "0", "y26Target": "4 案", "targetAccum": "2", "actualAccum": "2", "yoyActual": "0", "direction": "↓", "rate": "100.00%", "eval": "O" },
+                { "month": "2026年02月", "center": "營運中心", "dept": "採購課", "section": "採購一組", "type": "廠部", "project": "供應鏈碳足跡盤查與供應商綠色認證名錄擴增", "unit": "家", "y25Actual": "10", "y26Target": "30 家", "targetAccum": "5", "actualAccum": "3", "yoyActual": "2", "direction": "↑", "rate": "60.00%", "eval": "X" },
+                { "month": "2026年03月", "center": "管理中心", "dept": "企管部", "section": "企管課", "type": "中心", "project": "數位核心工程與集團AI智慧平台整合計畫", "unit": "%", "y25Actual": "80", "y26Target": "100%", "targetAccum": "60", "actualAccum": "—", "yoyActual": "40%", "direction": "↑", "rate": "—", "eval": "X" }
+            ];
+            
+            allDataItems = sampleData;
+            localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
+            
+            const validMonths = getMonthsWithActualData();
+            selectedMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : "all";
+            refreshDatabaseState();
+            showToast("📅 成功載入多月份範例數據！", "success");
+        }
+
+        function showToast(message, type = 'info') {
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.className = 'fixed bottom-5 right-5 z-[999] flex flex-col gap-2 pointer-events-none';
+                document.body.appendChild(toastContainer);
+            }
+            
+            const toast = document.createElement('div');
+            let bgColor = 'bg-sky-900';
+            let icon = 'info';
+            if (type === 'success') {
+                bgColor = 'bg-emerald-700';
+                icon = 'check-circle';
+            } else if (type === 'error') {
+                bgColor = 'bg-rose-700';
+                icon = 'alert-triangle';
+            }
+            
+            toast.className = `px-5 py-3 rounded-xl shadow-2xl text-white text-xs font-bold transition-all duration-300 transform translate-y-5 opacity-0 flex items-center gap-2 pointer-events-auto ${bgColor}`;
+            toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i><span>${message}</span>`;
+            toastContainer.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-5', 'opacity-0');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-5', 'opacity-0');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3500);
+        }
+
+        window.onload = () => { 
+            lucide.createIcons(); 
+            
+            const savedData = localStorage.getItem('kpi_master_data');
+            if (savedData) {
+                allDataItems = JSON.parse(savedData);
+                const validMonths = getMonthsWithActualData();
+                selectedMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : "all";
+                refreshDatabaseState();
+                showToast("📅 已自地端儲存庫成功讀取歷史 KPI 數據！", "success");
+            } else {
+                loadSampleData(); 
+            }
+        };
+    </script>
+</body>
+</html>
