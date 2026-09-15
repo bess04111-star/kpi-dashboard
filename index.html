@@ -27,7 +27,6 @@
             scroll-behavior: smooth;
         }
 
-        /* 自訂淺灰背景色類別 */
         .bg-f2 { background-color: rgb(242, 242, 242) !important; }
         .border-f2 { border-color: rgb(220, 220, 220) !important; }
 
@@ -51,8 +50,10 @@
         .status-light { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .row-active { background-color: #f1f5f9 !important; border-left: 3px solid #475569; }
         
+        /* 三種評價標籤樣式 */
         .bg-o { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
         .bg-x { background-color: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; }
+        .bg-delta { background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
         
         .tag-fail { background-color: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-bottom: 2px; display: inline-block; word-break: break-all; }
         
@@ -81,44 +82,38 @@
 </head>
 <body class="min-h-screen pb-16">
 
+    <!-- 隱藏的檔案輸入框（供權限選單觸發） -->
+    <input type="file" id="fileInput" class="hidden" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)">
+
     <!-- 導航欄 -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm backdrop-blur-md w-full py-3 md:py-0">
-        <div class="max-w-[1900px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4 h-auto md:h-16">
-            <div class="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
-                <div class="flex items-center space-x-3">
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm backdrop-blur-md w-full">
+        <div class="max-w-[1900px] mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex flex-col lg:flex-row items-center justify-between gap-3 min-h-[64px]">
+            
+            <div class="flex items-center space-x-2.5 sm:space-x-3 w-full lg:w-auto justify-between lg:justify-start">
+                <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
                     <div class="bg-f2 border border-gray-300 p-2 sm:p-2.5 rounded-lg text-gray-800 shadow-sm flex-shrink-0">
-                        <i data-lucide="cloud-lightning" class="w-5 h-5 md:w-6 md:h-6"></i>
+                        <i data-lucide="cloud-lightning" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </div>
-                    <div>
-                        <h1 class="text-sm sm:text-base md:text-xl font-bold tracking-tight text-gray-900 flex flex-wrap items-center gap-1.5 leading-snug">
-                            集團 KPI 智慧互動總資料庫系統
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold">v36.0</span>
+                    <div class="min-w-0">
+                        <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
+                            <span class="truncate">集團 KPI 智慧互動總資料庫系統</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.0</span>
                         </h1>
-                        <p class="text-[8px] sm:text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-0.5">Enterprise Cloud Sync Master Platform</p>
+                        <p class="text-[8px] sm:text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1 truncate">Enterprise Cloud Sync Master Platform</p>
                     </div>
                 </div>
             </div>
             
-            <div class="grid grid-cols-2 sm:flex sm:items-center justify-end gap-2 sm:gap-3 w-full md:w-auto">
-                <button onclick="syncFromCloud()" class="col-span-1 flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition shadow-sm justify-center">
+            <div class="flex flex-wrap items-center justify-end gap-2 sm:gap-2.5 w-full lg:w-auto">
+                <button onclick="syncFromCloud()" class="flex-1 sm:flex-initial flex items-center justify-center space-x-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition shadow-sm whitespace-nowrap">
                     <i data-lucide="refresh-cw" class="w-3.5 h-3.5 flex-shrink-0"></i>
-                    <span class="truncate">雲端同步</span>
+                    <span>雲端同步</span>
                 </button>
 
-                <label class="col-span-1 flex items-center space-x-1.5 px-3 py-1.5 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 rounded-lg text-xs font-semibold transition cursor-pointer shadow-sm justify-center">
-                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5 flex-shrink-0"></i>
-                    <span class="truncate">匯入 XLSX</span>
-                    <input type="file" id="fileInput" class="hidden" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)">
-                </label>
-                
-                <button onclick="openFormModal(false)" class="col-span-1 flex items-center space-x-1.5 px-3 py-1.5 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 rounded-lg text-xs font-semibold transition shadow-sm justify-center">
-                    <i data-lucide="plus" class="w-3.5 h-3.5 text-gray-600 flex-shrink-0"></i>
-                    <span class="truncate">新增指標</span>
-                </button>
-
-                <div class="col-span-1 sm:col-span-1 relative w-full sm:w-auto text-left">
-                    <button id="toolsDropdownBtn" onclick="toggleToolsDropdown()" class="flex items-center justify-center space-x-1.5 w-full sm:w-auto px-3 py-1.5 border border-gray-300 bg-white hover:bg-gray-50 rounded-lg text-xs font-semibold transition text-gray-700 shadow-sm">
-                        <i data-lucide="sliders" class="w-3.5 h-3.5 text-gray-500 flex-shrink-0"></i>
+                <!-- 1. 工具箱 -->
+                <div class="relative flex-1 sm:flex-initial text-left">
+                    <button id="toolsDropdownBtn" onclick="toggleToolsDropdown()" class="flex items-center justify-center space-x-1.5 w-full px-3 py-1.5 border border-gray-300 bg-white hover:bg-gray-50 rounded-lg text-xs font-semibold transition text-gray-700 shadow-sm whitespace-nowrap">
+                        <i data-lucide="wrench" class="w-3.5 h-3.5 text-gray-500 flex-shrink-0"></i>
                         <span>工具箱</span>
                         <i data-lucide="chevron-down" class="w-3.5 h-3.5 ml-0.5 flex-shrink-0"></i>
                     </button>
@@ -132,51 +127,85 @@
                             <i data-lucide="download" class="w-4 h-4 text-gray-500"></i>
                             <span>下載標準範本</span>
                         </button>
-                        <button onclick="exportMasterDatabase(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-medium text-emerald-800 hover:bg-emerald-50 transition">
+                        <button onclick="exportMasterDatabase(); closeToolsDropdown();" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-medium text-emerald-800 hover:bg-emerald-50 transition border-t border-gray-100">
                             <i data-lucide="download-cloud" class="w-4 h-4 text-emerald-600"></i>
                             <span>匯出總資料庫</span>
                         </button>
-                        <button onclick="confirmClearDatabase(); closeToolsDropdown();" id="clearBtn" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100">
+                    </div>
+                </div>
+
+                <!-- 2. 權限管理 -->
+                <div class="relative flex-1 sm:flex-initial text-left">
+                    <button id="authDropdownBtn" onclick="toggleAuthDropdown()" class="flex items-center justify-center space-x-1.5 w-full px-3 py-1.5 border border-amber-300 bg-amber-50/80 hover:bg-amber-100/80 rounded-lg text-xs font-semibold transition text-amber-900 shadow-sm whitespace-nowrap">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-600 flex-shrink-0"></i>
+                        <span>權限管理</span>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 ml-0.5 flex-shrink-0"></i>
+                    </button>
+                    
+                    <div id="authDropdownMenu" class="dropdown-menu absolute right-0 mt-2 w-48 sm:w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50 py-1.5">
+                        <button onclick="triggerImportWithAuth(); closeAuthDropdown();" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-medium text-gray-700 hover:bg-gray-100 transition">
+                            <i data-lucide="upload-cloud" class="w-4 h-4 text-gray-500"></i>
+                            <span>匯入 XLSX</span>
+                        </button>
+                        <button onclick="triggerAddWithAuth(); closeAuthDropdown();" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-medium text-gray-700 hover:bg-gray-100 transition">
+                            <i data-lucide="plus-circle" class="w-4 h-4 text-gray-500"></i>
+                            <span>新增指標</span>
+                        </button>
+                        <button onclick="confirmClearDatabase(); closeAuthDropdown();" id="clearBtn" class="flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100">
                             <i data-lucide="trash-2" class="w-4 h-4 text-rose-500"></i>
                             <span id="clearBtnText">清空雲端與地端資料庫</span>
                         </button>
+                        <button onclick="logoutAdmin(); closeAuthDropdown();" id="logoutBtn" class="hidden flex items-center space-x-2 w-full px-4 py-1.5 text-left text-[11px] font-semibold text-gray-400 hover:bg-gray-100 transition border-t border-gray-100">
+                            <i data-lucide="log-out" class="w-3.5 h-3.5 text-gray-400"></i>
+                            <span>登出管理員身份</span>
+                        </button>
                     </div>
                 </div>
+
             </div>
+
         </div>
     </nav>
 
     <main class="max-w-[1900px] mx-auto p-3 sm:p-5 md:p-6 space-y-4 sm:space-y-6">
 
-        <!-- 全域篩選面板 -->
+        <!-- 全域時間彈性區間篩選面板 -->
         <div class="dashboard-card p-4 sm:p-5 bg-f2 text-gray-800 flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 sm:gap-6 shadow-sm border-gray-300">
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full lg:w-auto">
                 <div class="bg-white p-2.5 sm:p-3 rounded-lg border border-gray-300 shadow-sm hidden sm:block">
                     <i data-lucide="calendar-range" class="w-5 h-5 text-gray-600"></i>
                 </div>
-                <div class="w-full sm:w-auto">
-                    <span class="text-[10px] font-bold text-gray-500 tracking-wider uppercase block">主資料庫全域篩選面板</span>
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-1 w-full sm:w-auto">
-                        <span class="text-xs sm:text-sm font-bold text-gray-800 whitespace-nowrap">切換檢視日期：</span>
-                        <select id="globalMonthSelector" onchange="handleGlobalMonthChange(this.value)" class="custom-select block w-full sm:w-56 pl-3 pr-10 py-1.5 text-xs border border-gray-300 focus:ring-1 focus:ring-gray-400 rounded-lg bg-white text-gray-800 font-bold cursor-pointer transition hover:bg-gray-50 shadow-sm"></select>
+                <div class="w-full sm:w-auto space-y-1.5">
+                    <span class="text-[10px] font-bold text-gray-500 tracking-wider uppercase block">主資料庫時間維度篩選面板</span>
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-gray-700 whitespace-nowrap">目標年度：</span>
+                            <select id="globalYearSelector" onchange="handleYearChange(this.value)" class="custom-select block w-28 sm:w-32 pl-2.5 pr-8 py-1 text-xs border border-gray-300 focus:ring-1 focus:ring-gray-400 rounded-lg bg-white text-gray-800 font-bold cursor-pointer transition shadow-sm"></select>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-white px-2.5 py-1 border border-gray-300 rounded-lg shadow-sm">
+                            <span class="text-xs font-bold text-gray-700 whitespace-nowrap">檢視月份：</span>
+                            <input type="text" id="singleMonthInput" placeholder="0" oninput="handleSingleMonthChange()" onblur="validateSingleMonthInput()" class="w-16 text-center text-xs font-bold text-gray-800 border border-gray-200 rounded py-0.5 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400">
+                            <span class="text-xs font-bold text-gray-700">月</span>
+                            <span class="text-[10px] text-gray-400 font-medium pl-1">(輸入 1、1-2 或 0 為全年度)</span>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="grid grid-cols-3 sm:flex sm:items-center gap-2 sm:gap-6 bg-white/80 p-3 sm:px-5 sm:py-2.5 rounded-lg border border-gray-300 text-xs w-full lg:w-auto justify-between shadow-sm">
                 <div class="text-center sm:text-left">
-                    <span class="text-gray-500 block text-[10px] sm:text-xs mb-0.5">資料庫總筆數</span>
+                    <span class="text-gray-500 block text-[10px] sm:text-xs mb-0.5">當前範圍總筆數</span>
                     <span class="text-xs sm:text-base font-bold text-gray-900" id="dbTotalRecords">0 筆</span>
                 </div>
                 <div class="hidden sm:block border-l border-gray-300 h-6"></div>
                 <div class="text-center sm:text-left border-l border-gray-200 sm:border-none pl-2 sm:pl-0">
-                    <span class="text-gray-500 block text-[10px] sm:text-xs mb-0.5">覆蓋歷史月數</span>
+                    <span class="text-gray-500 block text-[10px] sm:text-xs mb-0.5">覆蓋月數</span>
                     <span class="text-xs sm:text-base font-bold text-amber-600" id="dbTotalMonths">0 個</span>
                 </div>
                 <div class="hidden sm:block border-l border-gray-300 h-6"></div>
                 <div class="text-center sm:text-left border-l border-gray-200 sm:border-none pl-2 sm:pl-0">
-                    <span class="text-gray-500 block text-[10px] sm:text-xs mb-0.5">目前檢視日期</span>
-                    <span class="text-xs sm:text-base font-bold text-emerald-700" id="dbCurrentView">全部日期</span>
+                    <span class="text-gray-500 block text-[10px] sm:text-xs mb-0.5">目前檢視週期</span>
+                    <span class="text-xs sm:text-base font-bold text-emerald-700" id="dbCurrentView">--</span>
                 </div>
             </div>
         </div>
@@ -203,9 +232,9 @@
             </div>
             <div class="dashboard-card p-4 sm:p-5 border-l-4 border-l-rose-600 relative overflow-hidden">
                 <div class="absolute right-3 top-3 text-rose-200"><i data-lucide="alert-octagon" class="w-6 h-6 sm:w-7 sm:h-7"></i></div>
-                <p class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">異常監控指標數 (X)</p>
+                <p class="text-[10px] font-bold text-rose-600 uppercase tracking-wider">異常與注意指標數 (X / △)</p>
                 <h3 class="text-xl sm:text-2xl font-black mt-1 text-rose-600" id="statFail">0</h3>
-                <span class="text-[10px] text-rose-500 font-semibold mt-1 block">亟待施策改善之警示項目</span>
+                <span class="text-[10px] text-rose-500 font-semibold mt-1 block">未達標 (X) 與部分達標 (△) 合計</span>
             </div>
         </div>
 
@@ -252,42 +281,47 @@
 
         <!-- 部門矩陣總覽 -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-            <div class="xl:col-span-12 dashboard-card p-4 sm:p-5 space-y-4 w-full max-w-full overflow-hidden">
-                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-3 sm:gap-4 border-b border-gray-100 pb-3">
-                    <div>
-                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                            <h2 class="text-sm sm:text-base font-bold flex items-center gap-1.5 sm:gap-2 text-gray-800">
-                                <i data-lucide="layout-grid" class="w-4 h-4 text-gray-600"></i> 
-                                部門矩陣總覽
-                            </h2>
-                            <div class="flex flex-wrap gap-1.5 sm:gap-2">
-                                <div class="flex items-center bg-gray-50 p-1 rounded-md border border-gray-200">
-                                    <span class="text-[10px] px-1.5 font-bold text-gray-500">範圍</span>
-                                    <select id="matrixCenterSelector" onchange="handleMatrixCenterChange(this.value)" class="custom-select block w-28 sm:w-36 pl-2 pr-6 py-0.5 text-xs border-none focus:ring-0 rounded bg-white font-semibold text-gray-800"></select>
-                                </div>
-                                <div class="flex items-center bg-gray-50 p-1 rounded-md border border-gray-200">
-                                    <span class="text-[10px] px-1.5 font-bold text-gray-500">排序</span>
-                                    <select id="sortSelector" onchange="handleSortChange(this.value)" class="custom-select block w-28 sm:w-36 pl-2 pr-6 py-0.5 text-xs border-none focus:ring-0 rounded bg-white font-semibold text-gray-800">
-                                        <option value="name_asc" selected>名稱 (A-Z)</option>
-                                        <option value="comb_desc">中心+廠部率 (高→低)</option>
-                                        <option value="comb_asc">中心+廠部率 (低→高)</option>
-                                        <option value="center_desc">中心率 (高→低)</option>
-                                        <option value="plant_desc">廠部率 (高→低)</option>
-                                    </select>
-                                </div>
+            <div id="deptMatrixCard" class="xl:col-span-12 dashboard-card p-4 sm:p-5 space-y-4 w-full max-w-full overflow-hidden">
+                
+                <!-- 🎯 重新優化佈局：標題在上，範圍與排序選單置於標題正下方 -->
+                <div class="border-b border-gray-100 pb-3 space-y-2.5">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <h2 class="text-sm sm:text-base font-bold flex items-center gap-1.5 sm:gap-2 text-gray-800">
+                            <i data-lucide="layout-grid" class="w-4 h-4 text-gray-600"></i> 
+                            部門矩陣總覽
+                        </h2>
+                        
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] font-bold text-gray-600 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-200">
+                            <div class="flex items-center"><span class="status-light bg-emerald-500 mr-1"></span>正常(71%+)</div>
+                            <div class="flex items-center"><span class="status-light bg-amber-400 mr-1"></span>注意(61~70%)</div>
+                            <div class="flex items-center"><span class="status-light bg-rose-500 mr-1"></span>警示(0~60%)</div>
+                        </div>
+                    </div>
+
+                    <!-- 標題正下方的 控制與說明區 -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pt-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="flex items-center bg-gray-50 p-1 rounded-md border border-gray-200">
+                                <span class="text-[10px] px-1.5 font-bold text-gray-500">範圍</span>
+                                <select id="matrixCenterSelector" onchange="handleMatrixCenterChange(this.value)" class="custom-select block w-32 sm:w-40 pl-2 pr-6 py-0.5 text-xs border-none focus:ring-0 rounded bg-white font-semibold text-gray-800"></select>
+                            </div>
+                            <div class="flex items-center bg-gray-50 p-1 rounded-md border border-gray-200">
+                                <span class="text-[10px] px-1.5 font-bold text-gray-500">排序</span>
+                                <select id="sortSelector" onchange="handleSortChange(this.value)" class="custom-select block w-32 sm:w-40 pl-2 pr-6 py-0.5 text-xs border-none focus:ring-0 rounded bg-white font-semibold text-gray-800">
+                                    <option value="name_asc" selected>名稱 (A-Z)</option>
+                                    <option value="comb_desc">中心+廠部率 (高→低)</option>
+                                    <option value="comb_asc">中心+廠部率 (低→高)</option>
+                                    <option value="center_desc">中心率 (高→低)</option>
+                                    <option value="plant_desc">廠部率 (高→低)</option>
+                                </select>
                             </div>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-gray-400 mt-1">點擊部門可連動下方「施策追蹤明細項目庫」</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] font-bold text-gray-600 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-200">
-                        <div class="flex items-center"><span class="status-light bg-emerald-500 mr-1"></span>正常(71%+)</div>
-                        <div class="flex items-center"><span class="status-light bg-amber-400 mr-1"></span>注意(61~70%)</div>
-                        <div class="flex items-center"><span class="status-light bg-rose-500 mr-1"></span>警示(0~60%)</div>
+                        <p class="text-[11px] sm:text-xs text-gray-400">點擊部門可連動下方「施策追蹤明細項目庫」並自動滾動跳轉</p>
                     </div>
                 </div>
 
-                <!-- 電腦版 Table (取消固定高度，讓其隨內容 hug 撐開) -->
-                <div class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg w-full bg-white">
+                <!-- 電腦版 Table -->
+                <div id="deptMatrixTableContainer" class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg w-full bg-white transition-all duration-300">
                     <table class="w-full text-xs text-left border-collapse min-w-[1000px]">
                         <thead class="bg-f2 text-gray-800 font-bold border-b border-gray-300 uppercase sticky top-0 z-20 shadow-sm">
                             <tr>
@@ -295,7 +329,7 @@
                                 <th class="p-2.5 border-r border-gray-300 xl:w-[15%] bg-f2" rowspan="2">執行部門 (廠部)</th>
                                 <th class="p-2 border-r border-gray-300 text-center bg-f2 xl:w-[25%]" colspan="3">達標比例 (%)</th>
                                 <th class="p-2 text-center bg-f2 xl:w-[15%]" colspan="3">警示燈號指標</th>
-                                <th class="p-2.5 text-left bg-f2 xl:w-[30%]" rowspan="2">未達標明細 (異常清單)</th>
+                                <th class="p-2.5 text-left bg-f2 xl:w-[30%]" rowspan="2">未達標明細 (異常/注意清單)</th>
                             </tr>
                             <tr class="bg-f2 text-[11px] text-gray-800 border-b border-gray-300">
                                 <th class="p-1.5 border-r border-gray-300 text-center bg-f2">中心</th>
@@ -310,14 +344,37 @@
                     </table>
                 </div>
 
-                <!-- 手機/平板版 卡片網格 (取消最大高度限制，隨內容 hug 撐開) -->
-                <div class="block lg:hidden w-full">
+                <!-- 手機/平板版 卡片網格 -->
+                <div id="deptMatrixCardsContainer" class="block lg:hidden w-full transition-all duration-300">
                     <div id="deptMatrixCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3"></div>
                 </div>
+
+                <!-- 分頁與展開控制項 -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 border-t border-gray-100">
+                    <div class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-lg border border-gray-200 text-xs">
+                        <button onclick="changeMatrixPage(event, -1)" id="matrixPrevBtn" class="px-2.5 py-1 bg-white hover:bg-gray-100 text-gray-700 font-bold rounded border border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1">
+                            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>上一頁
+                        </button>
+                        
+                        <span class="text-gray-600 font-semibold px-2">
+                            第 <span id="matrixCurrentPage" class="text-gray-900 font-black">1</span> / <span id="matrixTotalPages" class="text-gray-700 font-bold">1</span> 頁
+                        </span>
+
+                        <button onclick="changeMatrixPage(event, 1)" id="matrixNextBtn" class="px-2.5 py-1 bg-white hover:bg-gray-100 text-gray-700 font-bold rounded border border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1">
+                            下一頁<i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                    <button onclick="toggleMatrixShowAll(event)" id="matrixShowAllBtn" class="px-3.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold rounded-lg border border-sky-200 transition flex items-center gap-1 shadow-sm">
+                        <i data-lucide="eye" id="matrixShowAllIcon" class="w-3.5 h-3.5"></i>
+                        <span id="matrixShowAllText">展開 (檢視全部)</span>
+                    </button>
+                </div>
+
             </div>
 
             <!-- 明細追蹤資料庫 -->
-            <div class="xl:col-span-12 dashboard-card p-4 sm:p-5 flex flex-col space-y-4 sm:space-y-5 border-t-2 border-t-gray-400 bg-white w-full max-w-full overflow-hidden">
+            <div id="measureCard" class="xl:col-span-12 dashboard-card p-4 sm:p-5 flex flex-col space-y-4 sm:space-y-5 border-t-2 border-t-gray-400 bg-white w-full max-w-full overflow-hidden">
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <div class="flex items-center gap-2">
                         <div class="bg-gray-100 p-1.5 sm:p-2 rounded-lg text-gray-700 border border-gray-200 flex-shrink-0"><i data-lucide="clipboard-check" class="w-4 h-4"></i></div>
@@ -353,9 +410,9 @@
                     </div>
                 </div>
 
-                <!-- 篩選列 -->
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-gray-50/70 p-3 rounded-lg border border-gray-200">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 w-full lg:w-auto">
+                <!-- 🎯 擴充篩選列：包含「指標分類」與「評價 (O/X/△)」兩重篩選機制 -->
+                <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 bg-gray-50/70 p-3 rounded-lg border border-gray-200">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 w-full xl:w-auto">
                         <div class="flex items-center gap-2 w-full">
                             <span class="text-xs font-semibold text-gray-500 whitespace-nowrap w-16">中心範圍</span>
                             <select id="detailCenterSelector" onchange="handleDetailCenterChange(this.value)" class="custom-select block w-full sm:w-44 pl-2.5 pr-8 py-1 text-xs border border-gray-300 focus:ring-1 focus:ring-gray-400 rounded bg-white font-semibold text-gray-800 transition"></select>
@@ -369,12 +426,26 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 self-start lg:self-auto w-full lg:w-auto">
-                        <span class="text-xs font-semibold text-gray-500 hidden sm:inline">分類篩選</span>
-                        <div class="flex items-center p-0.5 bg-gray-200/80 rounded space-x-1 border border-gray-200 w-full sm:w-auto">
-                            <button onclick="applyTypeFilter('all')" id="f-all" class="flex-1 sm:flex-initial px-3 py-1 text-[11px] font-bold rounded transition filter-active shadow-sm">全部</button>
-                            <button onclick="applyTypeFilter('中心')" id="f-center" class="flex-1 sm:flex-initial px-3 py-1 text-[11px] font-bold rounded transition text-gray-600 hover:text-gray-900">中心指標</button>
-                            <button onclick="applyTypeFilter('廠部')" id="f-plant" class="flex-1 sm:flex-initial px-3 py-1 text-[11px] font-bold rounded transition text-gray-600 hover:text-gray-900">廠部指標</button>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full xl:w-auto flex-wrap">
+                        <!-- 1. 指標分類篩選 -->
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-semibold text-gray-500 whitespace-nowrap">類別：</span>
+                            <div class="flex items-center p-0.5 bg-gray-200/80 rounded space-x-1 border border-gray-200">
+                                <button onclick="applyTypeFilter('all')" id="f-all" class="px-2.5 py-1 text-[11px] font-bold rounded transition filter-active shadow-sm">全部</button>
+                                <button onclick="applyTypeFilter('中心')" id="f-center" class="px-2.5 py-1 text-[11px] font-bold rounded transition text-gray-600 hover:text-gray-900">中心指標</button>
+                                <button onclick="applyTypeFilter('廠部')" id="f-plant" class="px-2.5 py-1 text-[11px] font-bold rounded transition text-gray-600 hover:text-gray-900">廠部指標</button>
+                            </div>
+                        </div>
+
+                        <!-- 2. 🎯 評價 (O / X / △) 篩選 -->
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-semibold text-gray-500 whitespace-nowrap">評價：</span>
+                            <div class="flex items-center p-0.5 bg-gray-200/80 rounded space-x-1 border border-gray-200">
+                                <button onclick="applyEvalFilter('all')" id="fe-all" class="px-2.5 py-1 text-[11px] font-bold rounded transition filter-active shadow-sm">全部</button>
+                                <button onclick="applyEvalFilter('O')" id="fe-o" class="px-2.5 py-1 text-[11px] font-bold rounded transition text-emerald-800 hover:bg-emerald-100">O 達標</button>
+                                <button onclick="applyEvalFilter('X')" id="fe-x" class="px-2.5 py-1 text-[11px] font-bold rounded transition text-rose-800 hover:bg-rose-100">X 未達標</button>
+                                <button onclick="applyEvalFilter('△')" id="fe-delta" class="px-2.5 py-1 text-[11px] font-bold rounded transition text-amber-800 hover:bg-amber-100">△ 部分達標</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -385,34 +456,35 @@
                         <input type="text" id="searchInput" onkeyup="applySearch()" placeholder="關鍵字檢索 (中心、部門、課別、計畫項目)..." class="w-full pl-9 pr-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs outline-none focus:ring-1 focus:ring-gray-400 transition">
                     </div>
                     <span class="text-[11px] font-bold text-gray-500 text-center whitespace-nowrap bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">
-                        顯示筆數: <span id="visibleCount" class="text-gray-900 font-black">0</span>
+                        總筆數: <span id="visibleCount" class="text-gray-900 font-black">0</span>
                     </span>
                 </div>
 
-                <!-- 電腦版 Table (移除水平滾軸與 min-w 強制寬度，改為自適應全螢幕版面 table-fixed) -->
-                <div id="desktopTableContainer" class="hidden lg:block border border-gray-200 rounded-lg bg-white w-full">
+                <!-- 電腦版 Table -->
+                <div id="desktopTableContainer" class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg bg-white w-full transition-all duration-300">
                     <table class="w-full text-[11px] text-left border-collapse table-fixed">
                         <thead class="sticky top-0 bg-f2 text-gray-800 font-bold border-b border-gray-300 z-20 shadow-sm">
                             <tr>
                                 <th id="th-checkbox" class="p-2 text-center border-r border-gray-300 w-[3%] hidden">
                                     <input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllChange(this.checked)" class="w-3.5 h-3.5 text-gray-700 rounded border-gray-300 focus:ring-gray-500 cursor-pointer">
                                 </th>
-                                <th class="p-2 border-r border-gray-300 w-[6%]">年月份</th>
-                                <th class="p-2 border-r border-gray-300 w-[7%]">中心單位</th>
-                                <th class="p-2 border-r border-gray-300 w-[7%]">廠部 (部門)</th>
-                                <th class="p-2 border-r border-gray-300 w-[6%]">課別</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[5%]">類別</th>
-                                <th class="p-2 border-r border-gray-300 w-[18%]">具體施策計畫項目</th>
+                                <th class="p-2 border-r border-gray-300 w-[5%]">年月份</th>
+                                <th class="p-2 border-r border-gray-300 w-[6%]">中心單位</th>
+                                <th class="p-2 border-r border-gray-300 w-[6%]">廠部 (部門)</th>
+                                <th class="p-2 border-r border-gray-300 w-[5%]">課別</th>
+                                <th class="p-2 border-r border-gray-300 text-center w-[4%]">類別</th>
+                                <th class="p-2 border-r border-gray-300 w-[14%]">具體施策計畫項目</th>
                                 <th class="p-2 border-r border-gray-300 text-center w-[4%]">單位</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[5%]">2025實績</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[5%]">2026目標</th>
+                                <th class="p-2 border-r border-gray-300 text-center w-[7%]" id="lbl_y25Actual">2025實績</th>
+                                <th class="p-2 border-r border-gray-300 text-center w-[7%]" id="lbl_y26Target">2026目標</th>
                                 <th class="p-2 border-r border-gray-300 text-center w-[5%]">累計目標</th>
                                 <th class="p-2 border-r border-gray-300 text-center w-[5%]">累計實績</th>
                                 <th class="p-2 border-r border-gray-300 text-center w-[5%]">去年同期</th>
                                 <th class="p-2 border-r border-gray-300 text-center w-[5%]">方向</th>
-                                <th class="p-2 border-r border-gray-300 text-center font-bold text-gray-900 w-[6%]">達成率</th>
+                                <th class="p-2 border-r border-gray-300 text-center font-bold text-gray-900 w-[5%]">達成率</th>
                                 <th class="p-2 text-center border-r border-gray-300 w-[4%]">評價</th>
-                                <th id="th-edit-op" class="p-2 text-center w-[6%] hidden">操作</th>
+                                <th class="p-2 border-r border-gray-300 w-[6%]">備註</th>
+                                <th id="th-edit-op" class="p-2 text-center w-[5%] hidden">操作</th>
                             </tr>
                         </thead>
                         <tbody id="measureTableBody" class="divide-y divide-gray-100 bg-white"></tbody>
@@ -420,13 +492,59 @@
                 </div>
 
                 <!-- 手機/平板版 卡片網格 -->
-                <div id="mobileCardsContainer" class="block lg:hidden space-y-3 pr-1 w-full">
+                <div id="mobileCardsContainer" class="block lg:hidden space-y-3 pr-1 w-full transition-all duration-300">
                     <div id="measureCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3"></div>
+                </div>
+
+                <!-- 分頁與展開控制項 -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3 border-t border-gray-100">
+                    <div class="flex items-center gap-2 bg-gray-50 p-1.5 rounded-lg border border-gray-200 text-xs">
+                        <button onclick="changeMeasurePage(event, -1)" id="measurePrevBtn" class="px-2.5 py-1 bg-white hover:bg-gray-100 text-gray-700 font-bold rounded border border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1">
+                            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>上一頁
+                        </button>
+                        
+                        <span class="text-gray-600 font-semibold px-2">
+                            第 <span id="measureCurrentPage" class="text-gray-900 font-black">1</span> / <span id="measureTotalPages" class="text-gray-700 font-bold">1</span> 頁
+                        </span>
+
+                        <button onclick="changeMeasurePage(event, 1)" id="measureNextBtn" class="px-2.5 py-1 bg-white hover:bg-gray-100 text-gray-700 font-bold rounded border border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1">
+                            下一頁<i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+
+                    <button onclick="toggleMeasureShowAll(event)" id="measureShowAllBtn" class="px-3.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 text-xs font-bold rounded-lg border border-sky-200 transition flex items-center gap-1 shadow-sm">
+                        <i data-lucide="eye" id="measureShowAllIcon" class="w-3.5 h-3.5"></i>
+                        <span id="measureShowAllText">展開 (檢視全部)</span>
+                    </button>
                 </div>
 
             </div>
         </div>
     </main>
+
+    <!-- 管理員驗證 Modal -->
+    <div id="authModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-xl max-w-xs sm:max-w-sm w-full shadow-2xl border border-gray-200 p-5 space-y-4 text-center">
+            <div class="w-12 h-12 bg-amber-100 border border-amber-200 text-amber-700 rounded-full flex items-center justify-center mx-auto">
+                <i data-lucide="lock" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-gray-900">管理員權限驗證</h3>
+                <p class="text-xs text-gray-500 mt-1">此區包含高敏感資料寫入與刪除操作，請輸入管理員密碼以解鎖執行。</p>
+            </div>
+            <div>
+                <input type="password" id="adminPasswordInput" placeholder="請輸入管理員密碼" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-center text-sm font-bold tracking-widest outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+            </div>
+            <div class="flex gap-2 pt-1">
+                <button onclick="closeAuthModal()" class="flex-1 py-1.5 border border-gray-300 text-gray-700 hover:bg-gray-100 text-xs font-semibold rounded-lg transition">
+                    取消
+                </button>
+                <button onclick="verifyAdminPassword()" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg transition shadow-sm">
+                    解鎖驗證
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- 手動新增/編輯 彈出視窗 -->
     <div id="formModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-3 sm:p-4">
@@ -488,14 +606,14 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">2025實績</label>
+                        <label class="block font-semibold text-gray-700 mb-1" id="m_lbl_y25Actual">2025實績</label>
                         <input type="text" id="m_y25Actual" placeholder="歷史年實績" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">2026目標</label>
+                        <label class="block font-semibold text-gray-700 mb-1" id="m_lbl_y26Target">2026目標</label>
                         <input type="text" id="m_y26Target" placeholder="年度目標" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
@@ -504,7 +622,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-gray-50 p-3 rounded border border-gray-200">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-gray-50 p-3 rounded border border-gray-200">
                     <div>
                         <label class="block font-semibold text-gray-800 mb-1">累計目標 *</label>
                         <input type="text" id="m_targetAccum" placeholder="請輸入累計目標" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
@@ -513,6 +631,20 @@
                         <label class="block font-semibold text-gray-800 mb-1">累計實績 *</label>
                         <input type="text" id="m_actualAccum" placeholder="請輸入累計實績" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-1">評價狀態 (O / X / △)</label>
+                        <select id="m_eval" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400 font-bold">
+                            <option value="auto">自動依達成率計算</option>
+                            <option value="O">O 達標 (綠標)</option>
+                            <option value="X">X 未達標 (紅標)</option>
+                            <option value="△">△ 部分達標 (黃標)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">備註說明</label>
+                    <input type="text" id="m_remark" placeholder="請輸入相關備註或補充說明..." class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                 </div>
             </div>
 
@@ -527,7 +659,7 @@
         </div>
     </div>
 
-    <!-- 刪除確認 彈出視窗 -->
+    <!-- 刪除確認 Modal -->
     <div id="deleteConfirmModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[110] hidden flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-md w-full shadow-xl border border-gray-200 p-4 sm:p-5 space-y-3">
             <div class="flex items-center space-x-2 text-rose-600">
@@ -547,7 +679,7 @@
         </div>
     </div>
 
-    <!-- 說明書 彈出視窗 -->
+    <!-- 說明書 Modal -->
     <div id="guideModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-3xl w-full shadow-xl border border-gray-200 flex flex-col max-h-[85vh]">
             <div class="p-4 sm:p-5 border-b border-gray-200 flex justify-between items-center bg-f2 text-gray-800 rounded-t-xl">
@@ -594,8 +726,8 @@
                                 </tr>
                                 <tr>
                                     <td class="p-2 font-bold text-rose-600">累計評價</td>
-                                    <td class="p-2">判斷該項目累計至今是否達標，常用標誌為 <strong>O (達標)</strong> 或 <strong>X (未達標)</strong>。</td>
-                                    <td class="p-2">O</td>
+                                    <td class="p-2">判斷該項目累計至今是否達標，標誌為 <strong>O (達標)</strong>、<strong>X (未達標)</strong> 或 <strong>△ (部分達標/觀察)</strong>。</td>
+                                    <td class="p-2">O / X / △</td>
                                 </tr>
                                 <tr>
                                     <td class="p-2 font-bold text-gray-700">去年實績</td>
@@ -633,16 +765,26 @@
     <script>
         const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzjQI6OgYFRcSpLpc352NedGuAmIpRJR3mIEdKfP6y9xDYG60Ke0UiWCf3WnZI7iusO/exec";
 
+        let CONFIG_TARGET_YEAR = 2026; 
+        let CONFIG_PREV_YEAR = CONFIG_TARGET_YEAR - 1;
+        const ADMIN_PASSWORD = "1500";
+        let isAdminAuthenticated = false;
+        let pendingAdminAction = null;
+
         let allDataItems = []; 
         let activeDataItems = []; 
         let summaryData = {}; 
         
-        let selectedMonth = "all"; 
+        let selectedYear = `${CONFIG_TARGET_YEAR}`; 
+        let monthStartFilter = 0; 
+        let monthEndFilter = 0;
+
         let matrixCenter = "all";
         let detailCenter = "all"; 
         let detailDept = "all";   
         
         let typeFilter = "all";
+        let evalFilter = "all"; // 🎯 全新：評價篩選狀態 ('all', 'O', 'X', '△')
         let sortField = "name_asc";
         let mainChartInstance = null;
         let isClearConfirmPending = false; 
@@ -650,6 +792,14 @@
 
         let isEditMode = false;
         let selectedItemIndices = new Set(); 
+
+        let matrixCurrentPage = 1;
+        let matrixShowAll = false;
+        const MATRIX_PAGE_SIZE = 10;
+
+        let measureCurrentPage = 1;
+        let measureShowAll = false;
+        const MEASURE_PAGE_SIZE = 10;
 
         const ui = (id) => document.getElementById(id);
         const setVal = (id, text) => { if(ui(id)) ui(id).innerText = text; };
@@ -662,30 +812,149 @@
             return s === "" || EMPTY_PLACEHOLDERS.includes(s);
         }
 
-        async function syncFromCloud() {
-            showToast("☁️ 正在連線至 Google 中央資料庫同步資料...", "info");
+        function toggleToolsDropdown() {
+            const menu = ui('toolsDropdownMenu');
+            if (menu) menu.classList.toggle('show');
+            closeAuthDropdown();
+        }
+
+        function closeToolsDropdown() {
+            const menu = ui('toolsDropdownMenu');
+            if (menu) menu.classList.remove('show');
+        }
+
+        function toggleAuthDropdown() {
+            const menu = ui('authDropdownMenu');
+            if (menu) menu.classList.toggle('show');
+            closeToolsDropdown();
+        }
+
+        function closeAuthDropdown() {
+            const menu = ui('authDropdownMenu');
+            if (menu) menu.classList.remove('show');
+        }
+
+        window.addEventListener('click', function(e) {
+            const tBtn = ui('toolsDropdownBtn');
+            const tMenu = ui('toolsDropdownMenu');
+            const aBtn = ui('authDropdownBtn');
+            const aMenu = ui('authDropdownMenu');
+            if (tBtn && tMenu && !tBtn.contains(e.target) && !tMenu.contains(e.target)) {
+                tMenu.classList.remove('show');
+            }
+            if (aBtn && aMenu && !aBtn.contains(e.target) && !aMenu.contains(e.target)) {
+                aMenu.classList.remove('show');
+            }
+        });
+
+        function checkAdminPermission(callback) {
+            if (isAdminAuthenticated) {
+                callback();
+            } else {
+                pendingAdminAction = callback;
+                ui('adminPasswordInput').value = '';
+                ui('authModal').classList.remove('hidden');
+                setTimeout(() => ui('adminPasswordInput').focus(), 100);
+            }
+        }
+
+        function verifyAdminPassword() {
+            const inputPwd = ui('adminPasswordInput').value.trim();
+            if (inputPwd === ADMIN_PASSWORD) {
+                isAdminAuthenticated = true;
+                ui('authModal').classList.add('hidden');
+                if (ui('logoutBtn')) ui('logoutBtn').classList.remove('hidden');
+                showToast("🔓 管理員身份驗證成功！", "success");
+                if (typeof pendingAdminAction === 'function') {
+                    const action = pendingAdminAction;
+                    pendingAdminAction = null;
+                    action();
+                }
+            } else {
+                showToast("❌ 密碼錯誤，請再試一次。", "error");
+                ui('adminPasswordInput').value = '';
+                ui('adminPasswordInput').focus();
+            }
+        }
+
+        function closeAuthModal() {
+            ui('authModal').classList.add('hidden');
+            pendingAdminAction = null;
+        }
+
+        function logoutAdmin() {
+            isAdminAuthenticated = false;
+            if (ui('logoutBtn')) ui('logoutBtn').classList.add('hidden');
+            showToast("🔒 已登出管理員權限。", "info");
+        }
+
+        function triggerImportWithAuth() {
+            checkAdminPermission(() => {
+                ui('fileInput').click();
+            });
+        }
+
+        function triggerAddWithAuth() {
+            checkAdminPermission(() => {
+                openFormModal(false);
+            });
+        }
+
+        function updateYearDynamicLabels() {
+            if(ui('lbl_y25Actual')) ui('lbl_y25Actual').innerText = `${CONFIG_PREV_YEAR}實績`;
+            if(ui('lbl_y26Target')) ui('lbl_y26Target').innerText = `${CONFIG_TARGET_YEAR}目標`;
+            if(ui('m_lbl_y25Actual')) ui('m_lbl_y25Actual').innerText = `${CONFIG_PREV_YEAR}實績`;
+            if(ui('m_lbl_y26Target')) ui('m_lbl_y26Target').innerText = `${CONFIG_TARGET_YEAR}目標`;
+        }
+
+        function formatCleanMonth(rawMonth) {
+            if (!rawMonth || isPlaceholder(rawMonth)) return "未知月份";
+            let s = String(rawMonth).trim();
+            
+            if (s.includes('T') || s.includes('Z')) {
+                let d = new Date(s);
+                if (!isNaN(d.getTime())) {
+                    let dLoc = new Date(d.getTime() + (8 * 3600000));
+                    let y = dLoc.getUTCFullYear();
+                    let m = String(dLoc.getUTCMonth() + 1).padStart(2, '0');
+                    return `${y}年${m}月`;
+                }
+            }
+            
+            let match = s.match(/(\d{4})[年/-]?(\d{1,2})/);
+            if (match) {
+                return `${match[1]}年${String(match[2]).padStart(2, '0')}月`;
+            }
+            return s;
+        }
+
+        async function syncFromCloud(isAuto = false) {
+            if (!isAuto) showToast("正在連線至 Google 中央資料庫同步資料...", "info");
             try {
                 const response = await fetch(GOOGLE_API_URL);
                 const data = await response.json();
                 if (data && Array.isArray(data) && data.length > 0) {
-                    allDataItems = data;
+                    allDataItems = data.map(item => ({
+                        ...item,
+                        month: formatCleanMonth(item.month)
+                    }));
                     localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
                     refreshDatabaseState();
-                    showToast("✅ 已成功同步全公司最新 KPI 資料！", "success");
+                    if (!isAuto) showToast("✅ 已成功同步全公司最新 KPI 資料！", "success");
                 } else {
-                    showToast("💡 中央資料庫目前尚無數據，請先匯入 XLSX 資料。", "info");
+                    if (!isAuto) showToast("中央資料庫目前尚無數據，請先匯入 XLSX 資料。", "info");
                     const savedData = localStorage.getItem('kpi_master_data');
                     if (savedData) {
-                        allDataItems = JSON.parse(savedData);
+                        allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
                         refreshDatabaseState();
                     }
                 }
             } catch (err) {
                 console.error(err);
-                showToast("⚠️ 無法連線至 Google 試算表，自動讀取本地暫存資料。", "error");
+                if (!isAuto) showToast("⚠️ 無法連線至 Google 試算表，自動讀取本地暫存資料。", "error");
                 const savedData = localStorage.getItem('kpi_master_data');
                 if (savedData) {
-                    allDataItems = JSON.parse(savedData);
+                    allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
                     refreshDatabaseState();
                 }
             }
@@ -693,37 +962,19 @@
 
         async function saveToCloud() {
             localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
-            showToast("☁️ 正在將異動同步寫回 Google 試算表...", "info");
+            showToast("正在將異動同步寫回 Google 試算表...", "info");
             try {
                 await fetch(GOOGLE_API_URL, {
                     method: "POST",
                     body: JSON.stringify(allDataItems),
                     headers: { "Content-Type": "text/plain;charset=utf-8" }
                 });
-                showToast("💾 雲端中央資料庫更新成功！所有同事點開皆可看到最新數據。", "success");
+                showToast("雲端資料庫更新成功!", "success");
             } catch (err) {
                 console.error(err);
-                showToast("❌ 寫入雲端資料庫失敗，請確認網路連線。", "error");
+                showToast("❌寫入雲端資料庫失敗，請確認網路連線。", "error");
             }
         }
-
-        function toggleToolsDropdown() {
-            const menu = ui('toolsDropdownMenu');
-            menu.classList.toggle('show');
-        }
-
-        function closeToolsDropdown() {
-            const menu = ui('toolsDropdownMenu');
-            menu.classList.remove('show');
-        }
-
-        window.addEventListener('click', function(e) {
-            const btn = ui('toolsDropdownBtn');
-            const menu = ui('toolsDropdownMenu');
-            if (btn && menu && !btn.contains(e.target) && !menu.contains(e.target)) {
-                menu.classList.remove('show');
-            }
-        });
 
         function safeDisplay(val, isPct = false, noDecimal = false) {
             if (isPlaceholder(val)) return "—";
@@ -767,10 +1018,21 @@
 
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
-            let tNum = parseFloat(String(targetVal).trim().replace(/,/g, '').replace(/%/g, ''));
-            let aNum = parseFloat(String(actualVal).trim().replace(/,/g, '').replace(/%/g, ''));
-            if (isNaN(tNum) || isNaN(aNum)) return "—";
             
+            let tStr = String(targetVal).trim().replace(/,/g, '');
+            let aStr = String(actualVal).trim().replace(/,/g, '');
+
+            let isTargetPct = tStr.includes('%');
+            let isActualPct = aStr.includes('%');
+
+            let tNum = parseFloat(tStr.replace(/%/g, ''));
+            let aNum = parseFloat(aStr.replace(/%/g, ''));
+
+            if (isNaN(tNum) || isNaN(aNum)) return "—";
+
+            if (isTargetPct) tNum = tNum / 100;
+            if (isActualPct) aNum = aNum / 100;
+
             let dir = String(direction).trim();
             if (dir !== "↓") dir = "↑"; 
 
@@ -813,26 +1075,28 @@
         }
 
         function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const btn = ui('editModeBtn');
-            const bulkBar = ui('bulkActionBar');
-            
-            if (isEditMode) {
-                btn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i>完成編輯`;
-                btn.className = "px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
-                bulkBar.classList.remove('hidden');
-                bulkBar.classList.add('flex');
-                showToast("✍️ 已進入編輯模式，可勾選單筆/多筆指標進行批量刪除或編輯。");
-            } else {
-                btn.innerHTML = `<i data-lucide="edit" class="w-3 h-3"></i>編輯模式`;
-                btn.className = "px-3 py-1 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
-                bulkBar.classList.add('hidden');
-                bulkBar.classList.remove('flex');
-                clearAllSelections();
-                showToast("💾 已退出編輯模式。");
-            }
-            renderMeasures();
-            lucide.createIcons();
+            checkAdminPermission(() => {
+                isEditMode = !isEditMode;
+                const btn = ui('editModeBtn');
+                const bulkBar = ui('bulkActionBar');
+                
+                if (isEditMode) {
+                    btn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i>完成編輯`;
+                    btn.className = "px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
+                    bulkBar.classList.remove('hidden');
+                    bulkBar.classList.add('flex');
+                    showToast("✍️ 已進入編輯模式，可勾選單筆/多筆指標進行批量刪除或編輯。");
+                } else {
+                    btn.innerHTML = `<i data-lucide="edit" class="w-3 h-3"></i>編輯模式`;
+                    btn.className = "px-3 py-1 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
+                    bulkBar.classList.add('hidden');
+                    bulkBar.classList.remove('flex');
+                    clearAllSelections();
+                    showToast("💾 已退出編輯模式。");
+                }
+                renderMeasures();
+                lucide.createIcons();
+            });
         }
 
         function handleSelectItem(index, isChecked) {
@@ -876,17 +1140,19 @@
         }
 
         function askBulkDelete() {
-            if (selectedItemIndices.size === 0) {
-                showToast("請先勾選欲刪除的指標項目！", "error");
-                return;
-            }
-            pendingDeleteIndex = -2; 
-            ui('deleteConfirmDetails').innerHTML = `
-                <div class="font-bold text-rose-700 text-sm">⚠️ 您已選取 ${selectedItemIndices.size} 筆指標項目</div>
-                <div class="text-xs text-gray-600 mt-1">確認刪除後將同步更新雲端資料庫，是否確定全部移除？</div>
-            `;
-            ui('deleteConfirmModal').classList.remove('hidden');
-            lucide.createIcons();
+            checkAdminPermission(() => {
+                if (selectedItemIndices.size === 0) {
+                    showToast("請先勾選欲刪除的指標項目！", "error");
+                    return;
+                }
+                pendingDeleteIndex = -2; 
+                ui('deleteConfirmDetails').innerHTML = `
+                    <div class="font-bold text-rose-700 text-sm">⚠️ 您已選取 ${selectedItemIndices.size} 筆指標項目</div>
+                    <div class="text-xs text-gray-600 mt-1">確認刪除後將同步更新雲端資料庫，是否確定全部移除？</div>
+                `;
+                ui('deleteConfirmModal').classList.remove('hidden');
+                lucide.createIcons();
+            });
         }
 
         function handleFileUpload(e) {
@@ -921,7 +1187,7 @@
                         }
                         fallbackCenter = fallbackCenter.replace(/\s+/g, '');
                         
-                        let year = "2026年";
+                        let year = `${CONFIG_TARGET_YEAR}年`;
                         for (let r = 0; r < Math.min(5, grid.length); r++) {
                             if (wsRows && wsRows[r] && wsRows[r].hidden) continue;
                             const row = grid[r];
@@ -949,9 +1215,10 @@
                                     else if (s.includes("指標分類") || s.includes("分類")) { if (!colIndices["type"]) colIndices["type"] = c; }
                                     else if (s.includes("施策項目") || s.includes("重點績效評價")) colIndices["project"] = c;
                                     else if (s.includes("計算單位") || s.includes("單位")) { if (!colIndices["unit"]) colIndices["unit"] = c; }
-                                    else if (s.includes("2025實績")) colIndices["y25Actual"] = c;
-                                    else if (s.includes("2026目標")) colIndices["y26Target"] = c;
+                                    else if (s.includes("實績")) colIndices["y25Actual"] = c;
+                                    else if (s.includes("目標")) colIndices["y26Target"] = c;
                                     else if (s.includes("↑/↓") || s.includes("方向")) colIndices["direction"] = c;
+                                    else if (s.includes("備註")) colIndices["remark"] = c;
                                     else if (s.includes("項目") || s.includes("項    目")) colIndices["subItem"] = c;
                                     
                                     for (let m = 1; m <= 12; m++) {
@@ -987,6 +1254,7 @@
                                     y25Actual: String(row[colIndices["y25Actual"]] || '').trim(),
                                     y26Target: String(row[colIndices["y26Target"]] || '').trim(),
                                     direction: String(row[colIndices["direction"]] || '↑').trim(),
+                                    remark: colIndices["remark"] !== undefined ? String(row[colIndices["remark"]] || '').trim() : "",
                                     subRows: {}
                                 };
                                 items.push(currentItem);
@@ -1022,6 +1290,7 @@
                             const rawY25Actual = item.y25Actual || "—"; 
                             const y26Target = item.y26Target || "—";
                             const direction = item.direction || "↑";
+                            const remark = item.remark || "";
                             
                             for (let m = 1; m <= 12; m++) {
                                 const targetVal = item.subRows["累計目標"] ? item.subRows["累計目標"][m] : (item.subRows["當月目標"] ? item.subRows["當月目標"][m] : null);
@@ -1044,9 +1313,16 @@
                                 let rNum = parseFloat(rateDisp.replace(/%/g, ''));
                                 if (!isNaN(rNum)) evalChar = rNum >= 100 ? "O" : "X";
                                 
+                                // 🎯 評價判定：支援 O / X / △ 三種
                                 if (evalVal !== undefined && evalVal !== null && String(evalVal).trim() !== "") {
                                     const sEval = String(evalVal).trim().toUpperCase();
-                                    evalChar = (sEval === "O" || sEval === "✔" || sEval === "OK") ? "O" : "X";
+                                    if (sEval === "O" || sEval === "✔" || sEval === "OK") {
+                                        evalChar = "O";
+                                    } else if (sEval === "△" || sEval === "Δ" || sEval === "DELTA") {
+                                        evalChar = "△";
+                                    } else {
+                                        evalChar = "X";
+                                    }
                                 }
                                 
                                 const monthStr = `${year}${String(m).padStart(2, '0')}月`;
@@ -1055,7 +1331,8 @@
                                     month: monthStr, center, dept, section, type, project, unit,
                                     y25Actual: safeDisplay(rawY25Actual, isPercentUnit, true), 
                                     y26Target: y26Target, targetAccum: targetDisp, actualAccum: actualDisp, 
-                                    yoyActual: yoyDisp, direction: direction, rate: rateDisp, eval: evalChar
+                                    yoyActual: yoyDisp, direction: direction, rate: rateDisp, eval: evalChar,
+                                    remark: remark
                                 };
                                 
                                 const uniqueKey = `${newItem.month}_${newItem.center}_${newItem.dept}_${newItem.section}_${newItem.project}`;
@@ -1072,9 +1349,6 @@
                         });
                     });
                     
-                    const validMonths = getMonthsWithActualData();
-                    selectedMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : "all";
-                    
                     refreshDatabaseState();
                     saveToCloud();
                     showToast(`📊 匯入完成！資料庫新增 ${totalAdded} 筆，覆蓋更新 ${totalUpdated} 筆。`, "success");
@@ -1087,43 +1361,113 @@
             e.target.value = ''; 
         }
 
-        function refreshDatabaseState() {
+        function parseMonthInput(rawVal) {
+            if (!rawVal || rawVal.trim() === '' || rawVal.trim() === '0') {
+                return { start: 0, end: 0 };
+            }
+            const s = rawVal.trim();
+            const matchRange = s.match(/^(\d{1,2})\s*[-~._]\s*(\d{1,2})$/);
+            if (matchRange) {
+                let start = parseInt(matchRange[1]);
+                let end = parseInt(matchRange[2]);
+                if (start > end) [start, end] = [end, start]; 
+                return { start: Math.max(1, Math.min(12, start)), end: Math.max(1, Math.min(12, end)) };
+            }
+            const singleNum = parseInt(s);
+            if (!isNaN(singleNum) && singleNum >= 1 && singleNum <= 12) {
+                return { start: singleNum, end: singleNum };
+            }
+            return { start: 0, end: 0 };
+        }
+
+        function populateTimeSelectors() {
             const validMonths = getMonthsWithActualData();
-            populateMonthFilterSelector(validMonths);
-
-            if (selectedMonth !== "all" && !validMonths.includes(selectedMonth)) {
-                selectedMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : "all";
+            const yearSet = new Set();
+            
+            validMonths.forEach(m => {
+                const match = m.match(/(\d{4})年/);
+                if (match) yearSet.add(match[1]);
+            });
+            
+            const years = Array.from(yearSet).sort().reverse();
+            if (years.length > 0 && (!selectedYear || !years.includes(selectedYear))) {
+                selectedYear = years[0];
+            } else if (years.length === 0) {
+                selectedYear = `${CONFIG_TARGET_YEAR}`;
             }
 
-            if (selectedMonth === "all") {
-                activeDataItems = allDataItems.filter(i => validMonths.includes(i.month));
-                setVal('dbCurrentView', "全部已有實績日期數據");
+            let yearOptions = years.map(y => `<option value="${y}">📅 ${y} 年</option>`).join('');
+            if (years.length === 0) yearOptions = `<option value="${CONFIG_TARGET_YEAR}">📅 ${CONFIG_TARGET_YEAR} 年</option>`;
+            ui('globalYearSelector').innerHTML = yearOptions;
+            ui('globalYearSelector').value = selectedYear;
+
+            if (ui('singleMonthInput') && ui('singleMonthInput').value === '') {
+                ui('singleMonthInput').value = '0';
+            }
+        }
+
+        function handleSingleMonthChange() {
+            const raw = ui('singleMonthInput').value;
+            const { start, end } = parseMonthInput(raw);
+            monthStartFilter = start;
+            monthEndFilter = end;
+            refreshDatabaseState();
+        }
+
+        function validateSingleMonthInput() {
+            const raw = ui('singleMonthInput').value;
+            const { start, end } = parseMonthInput(raw);
+            monthStartFilter = start;
+            monthEndFilter = end;
+
+            if (start === 0 && end === 0) {
+                ui('singleMonthInput').value = '0';
+                showToast(`已切換檢視範圍：${selectedYear}年 (全年度)`);
+            } else if (start === end) {
+                ui('singleMonthInput').value = `${start}`;
+                showToast(`已切換檢視範圍：${selectedYear}年 (${start}月)`);
             } else {
-                activeDataItems = allDataItems.filter(i => i.month === selectedMonth);
-                setVal('dbCurrentView', selectedMonth);
+                ui('singleMonthInput').value = `${start}-${end}`;
+                showToast(`已切換檢視範圍：${selectedYear}年 (${start}~${end}月)`);
+            }
+            refreshDatabaseState();
+        }
+
+        function handleYearChange(val) {
+            selectedYear = val;
+            refreshDatabaseState();
+            showToast(`已切換至 ${val} 年資料維度`);
+        }
+
+        function refreshDatabaseState() {
+            updateYearDynamicLabels();
+            const validMonths = getMonthsWithActualData();
+            populateTimeSelectors();
+
+            activeDataItems = allDataItems.filter(item => {
+                if (!validMonths.includes(item.month)) return false;
+                if (!item.month.startsWith(`${selectedYear}年`)) return false;
+                if (monthStartFilter === 0 && monthEndFilter === 0) return true;
+
+                const match = item.month.match(/(\d{2})月/);
+                if (!match) return false;
+                const m = parseInt(match[1]);
+
+                return m >= monthStartFilter && m <= monthEndFilter;
+            });
+
+            let monthLabel = "全年度 (01-12月)";
+            if (monthStartFilter > 0) {
+                monthLabel = (monthStartFilter === monthEndFilter) 
+                    ? `${String(monthStartFilter).padStart(2, '0')}月` 
+                    : `${String(monthStartFilter).padStart(2, '0')}~${String(monthEndFilter).padStart(2, '0')}月`;
             }
 
-            const validRecordsCount = allDataItems.filter(i => validMonths.includes(i.month)).length;
-            setVal('dbTotalRecords', `${validRecordsCount} 筆`);
-            setVal('dbTotalMonths', `${validMonths.length} 個`);
+            setVal('dbCurrentView', `${selectedYear}年 (${monthLabel})`);
+            setVal('dbTotalRecords', `${activeDataItems.length} 筆`);
+            setVal('dbTotalMonths', `${new Set(activeDataItems.map(i => i.month)).size} 個`);
 
             processData();
-        }
-
-        function populateMonthFilterSelector(validMonths) {
-            const selector = ui('globalMonthSelector');
-            let options = '<option value="all">📁 全部已有實績日期數據</option>';
-            validMonths.forEach(m => {
-                options += `<option value="${m}">📅 ${m}</option>`;
-            });
-            selector.innerHTML = options;
-            selector.value = selectedMonth;
-        }
-
-        function handleGlobalMonthChange(val) {
-            selectedMonth = val;
-            refreshDatabaseState();
-            showToast("已切換至當月份已有實績數據。");
         }
 
         function processData() {
@@ -1140,12 +1484,17 @@
                 
                 summaryData[c].total++;
                 summaryData[c].depts[d].combined.t++;
+                
                 if (item.eval === "O") {
                     summaryData[c].pass++;
                     summaryData[c].depts[d].combined.p++;
                     summaryData[c].depts[d][cat].p++;
                 } else if (item.project !== "—") {
-                    const label = selectedMonth === "all" ? `[${item.month}] ${item.project}` : item.project;
+                    const cleanM = formatCleanMonth(item.month);
+                    const labelPrefix = item.eval === "△" ? "[△注意] " : "";
+                    const label = (monthStartFilter === 0 && monthEndFilter === 0) 
+                        ? `[${cleanM}] ${labelPrefix}${item.project}` 
+                        : `${labelPrefix}${item.project}`;
                     summaryData[c].depts[d].failItems.push(label);
                 }
                 summaryData[c].depts[d][cat].t++;
@@ -1239,18 +1588,74 @@
             selector.value = detailDept;
         }
 
-        function handleMatrixCenterChange(val) { matrixCenter = val; renderDeptMatrix(); renderRanking(); }
-        function handleDetailCenterChange(val) { detailCenter = val; detailDept = "all"; populateDeptSelector(); renderMeasures(); }
-        function handleDetailDeptChange(val) { detailDept = val; renderMeasures(); }
-        function handleSortChange(val) { sortField = val; renderDeptMatrix(); }
+        function handleMatrixCenterChange(val) { 
+            matrixCenter = val; 
+            matrixCurrentPage = 1; 
+            renderDeptMatrix(); 
+            renderRanking(); 
+        }
+
+        function handleDetailCenterChange(val) { 
+            detailCenter = val; 
+            detailDept = "all"; 
+            measureCurrentPage = 1; 
+            populateDeptSelector(); 
+            renderMeasures(); 
+        }
+
+        function handleDetailDeptChange(val) { 
+            detailDept = val; 
+            measureCurrentPage = 1; 
+            renderMeasures(); 
+        }
+
+        function handleSortChange(val) { 
+            sortField = val; 
+            matrixCurrentPage = 1; 
+            renderDeptMatrix(); 
+        }
         
         function resetDetailsFilter() {
-            detailCenter = "all"; detailDept = "all"; typeFilter = "all";
+            detailCenter = "all"; detailDept = "all"; typeFilter = "all"; evalFilter = "all";
             ui('searchInput').value = "";
             applyTypeFilter("all");
+            applyEvalFilter("all");
             populateSelectors();
             renderMeasures();
             showToast("已成功重設明細項目搜尋與分類篩選。");
+        }
+
+        function changeMatrixPage(e, delta) {
+            if(e) e.preventDefault();
+            matrixCurrentPage += delta;
+            renderDeptMatrix();
+            const card = ui('deptMatrixCard');
+            if(card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function toggleMatrixShowAll(e) {
+            if(e) e.preventDefault();
+            matrixShowAll = !matrixShowAll;
+            const btnText = ui('matrixShowAllText');
+            const btnIcon = ui('matrixShowAllIcon');
+            const tableContainer = ui('deptMatrixTableContainer');
+            const cardsContainer = ui('deptMatrixCardsContainer');
+
+            if (matrixShowAll) {
+                btnText.innerText = "收合";
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'eye-off');
+                if(tableContainer) tableContainer.classList.add('max-h-[520px]', 'overflow-y-auto');
+                if(cardsContainer) cardsContainer.classList.add('max-h-[520px]', 'overflow-y-auto');
+            } else {
+                btnText.innerText = "展開 (檢視全部)";
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'eye');
+                if(tableContainer) tableContainer.classList.remove('max-h-[520px]', 'overflow-y-auto');
+                if(cardsContainer) cardsContainer.classList.remove('max-h-[520px]', 'overflow-y-auto');
+            }
+            renderDeptMatrix();
+            lucide.createIcons();
+            const card = ui('deptMatrixCard');
+            if(card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function renderDeptMatrix() {
@@ -1286,7 +1691,25 @@
                 return 0;
             });
 
-            list.forEach(row => {
+            const totalPages = Math.ceil(list.length / MATRIX_PAGE_SIZE) || 1;
+            if (matrixCurrentPage < 1) matrixCurrentPage = 1;
+            if (matrixCurrentPage > totalPages) matrixCurrentPage = totalPages;
+
+            setVal('matrixCurrentPage', matrixCurrentPage);
+            setVal('matrixTotalPages', totalPages);
+            
+            const prevBtn = ui('matrixPrevBtn');
+            const nextBtn = ui('matrixNextBtn');
+            if (prevBtn) prevBtn.disabled = matrixShowAll || (matrixCurrentPage <= 1);
+            if (nextBtn) nextBtn.disabled = matrixShowAll || (matrixCurrentPage >= totalPages);
+
+            let displayList = list;
+            if (!matrixShowAll) {
+                const startIndex = (matrixCurrentPage - 1) * MATRIX_PAGE_SIZE;
+                displayList = list.slice(startIndex, startIndex + MATRIX_PAGE_SIZE);
+            }
+
+            displayList.forEach(row => {
                 const isSelected = row.deptName === detailDept && row.centerName === detailCenter;
                 
                 const cP = row.center.t > 0 ? Math.round((row.center.p / row.center.t) * 100) + "%" : "N/A";
@@ -1349,7 +1772,7 @@
                     </div>
 
                     <div class="pt-1.5 border-t border-gray-100">
-                        <span class="block text-[9px] text-gray-400 font-bold uppercase mb-1">未達標明細：</span>
+                        <span class="block text-[9px] text-gray-400 font-bold uppercase mb-1">未達標與注意明細：</span>
                         <div>
                             ${failH}
                         </div>
@@ -1361,12 +1784,53 @@
         }
 
         function selectDeptMatrixItem(centerName, deptName) {
-            detailCenter = centerName; detailDept = deptName;
+            detailCenter = centerName; 
+            detailDept = deptName;
             ui('detailCenterSelector').value = centerName;
             populateDeptSelector();
             ui('detailDeptSelector').value = deptName;
-            renderDeptMatrix(); renderMeasures();
+            
+            renderDeptMatrix(); 
+            renderMeasures();
             showToast(`已篩選顯示： ${centerName} - ${deptName} 指標細節`);
+
+            const measureCard = ui('measureCard');
+            if (measureCard) {
+                measureCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function changeMeasurePage(e, delta) {
+            if(e) e.preventDefault();
+            measureCurrentPage += delta;
+            renderMeasures();
+            const card = ui('measureCard');
+            if(card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function toggleMeasureShowAll(e) {
+            if(e) e.preventDefault();
+            measureShowAll = !measureShowAll;
+            const btnText = ui('measureShowAllText');
+            const btnIcon = ui('measureShowAllIcon');
+            const desktopTable = ui('desktopTableContainer');
+            const mobileCards = ui('mobileCardsContainer');
+
+            if (measureShowAll) {
+                btnText.innerText = "收合";
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'eye-off');
+                if(desktopTable) desktopTable.classList.add('max-h-[520px]', 'overflow-y-auto');
+                if(mobileCards) mobileCards.classList.add('max-h-[520px]', 'overflow-y-auto');
+            } else {
+                btnText.innerText = "展開 (檢視全部)";
+                if(btnIcon) btnIcon.setAttribute('data-lucide', 'eye');
+                if(desktopTable) desktopTable.classList.remove('max-h-[520px]', 'overflow-y-auto');
+                if(mobileCards) mobileCards.classList.remove('max-h-[520px]', 'overflow-y-auto');
+            }
+            renderMeasures();
+            lucide.createIcons();
+            const card = ui('measureCard');
+            if(card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function renderMeasures() {
@@ -1386,10 +1850,29 @@
                 const matchesCenter = (detailCenter === "all" || i.center === detailCenter);
                 const matchesDept = (detailDept === "all" || i.dept === detailDept);
                 const matchesType = (typeFilter === "all" || i.type === typeFilter);
-                return matchesCenter && matchesDept && matchesType;
+                const matchesEval = (evalFilter === "all" || i.eval === evalFilter); // 🎯 評價雙重連動過濾
+                return matchesCenter && matchesDept && matchesType && matchesEval;
             });
+
+            const totalPages = Math.ceil(filtered.length / MEASURE_PAGE_SIZE) || 1;
+            if (measureCurrentPage < 1) measureCurrentPage = 1;
+            if (measureCurrentPage > totalPages) measureCurrentPage = totalPages;
+
+            setVal('measureCurrentPage', measureCurrentPage);
+            setVal('measureTotalPages', totalPages);
             
-            filtered.forEach(p => {
+            const prevBtn = ui('measurePrevBtn');
+            const nextBtn = ui('measureNextBtn');
+            if (prevBtn) prevBtn.disabled = measureShowAll || (measureCurrentPage <= 1);
+            if (nextBtn) nextBtn.disabled = measureShowAll || (measureCurrentPage >= totalPages);
+
+            let displayList = filtered;
+            if (!measureShowAll) {
+                const startIndex = (measureCurrentPage - 1) * MEASURE_PAGE_SIZE;
+                displayList = filtered.slice(startIndex, startIndex + MEASURE_PAGE_SIZE);
+            }
+            
+            displayList.forEach(p => {
                 const isPercentUnit = (p.unit !== "—" && p.unit.includes("%"));
                 const tagClass = p.type === '中心' ? 'tag-center' : 'tag-plant';
                 
@@ -1397,9 +1880,15 @@
                     ? '<span class="px-1 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[9px]">↓ 望小</span>' 
                     : '<span class="px-1 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[9px]">↑ 望大</span>';
 
+                // 🎯 三種評價標籤樣式判斷
+                let evalTagClass = 'bg-x';
+                if (p.eval === 'O') evalTagClass = 'bg-o';
+                else if (p.eval === '△') evalTagClass = 'bg-delta';
+
                 const absoluteIndex = allDataItems.indexOf(p);
                 const isChecked = selectedItemIndices.has(absoluteIndex);
 
+                // 電腦版 Table
                 const tr = document.createElement('tr'); 
                 tr.className = `hover:bg-gray-50 transition ${isChecked ? 'bg-gray-100' : ''}`;
 
@@ -1425,19 +1914,21 @@
                     <td class="p-2 border-r border-gray-100 font-bold text-gray-800 truncate">${p.dept}</td>
                     <td class="p-2 border-r border-gray-100 font-medium text-gray-500 truncate">${p.section || '—'}</td>
                     <td class="p-2 border-r border-gray-100 text-center truncate"><span class="${tagClass}">${p.type}</span></td>
-                    <td class="p-2 border-r border-gray-100 font-medium text-gray-900 leading-tight break-words">${p.project}</td>
+                    <td class="p-2 border-r border-gray-100 font-medium text-gray-900 leading-tight whitespace-normal break-words">${p.project}</td>
                     <td class="p-2 border-r border-gray-100 text-center text-gray-500 truncate">${p.unit}</td>
-                    <td class="p-2 border-r border-gray-100 text-center text-gray-500 font-medium truncate">${safeDisplay(p.y25Actual, isPercentUnit, true)}</td>
-                    <td class="p-2 border-r border-gray-100 text-center text-gray-500 truncate">${safeDisplay(p.y26Target, isPercentUnit)}</td>
+                    <td class="p-2 border-r border-gray-100 text-center text-gray-500 font-medium whitespace-normal break-words">${safeDisplay(p.y25Actual, isPercentUnit, true)}</td>
+                    <td class="p-2 border-r border-gray-100 text-center text-gray-500 whitespace-normal break-words leading-tight">${safeDisplay(p.y26Target, isPercentUnit)}</td>
                     <td class="p-2 border-r border-gray-100 text-center font-semibold text-gray-700 truncate">${safeDisplay(p.targetAccum, isPercentUnit)}</td>
                     <td class="p-2 border-r border-gray-100 text-center font-black text-gray-900 truncate">${safeDisplay(p.actualAccum, isPercentUnit)}</td>
                     <td class="p-2 border-r border-gray-100 text-center text-gray-400 truncate">${safeDisplay(p.yoyActual, isPercentUnit)}</td>
                     <td class="p-2 border-r border-gray-100 text-center truncate">${dirTag}</td>
                     <td class="p-2 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 truncate">${safeDisplay(p.rate, true)}</td>
-                    <td class="p-2 text-center border-r border-gray-100 truncate"><span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold ${p.eval==='O'?'bg-o':'bg-x'}">${p.eval}</span></td>
+                    <td class="p-2 text-center border-r border-gray-100 truncate"><span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${p.eval}</span></td>
+                    <td class="p-2 border-r border-gray-100 text-gray-500 whitespace-normal break-words">${p.remark || '—'}</td>
                     ${actionCellHtml}`;
                 tableBody.appendChild(tr);
 
+                // 手機/平板版 卡片
                 const cardCheckboxHtml = isEditMode ? `
                     <div class="flex items-center space-x-2 pb-1.5 border-b border-gray-100">
                         <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-3.5 h-3.5 text-gray-700 rounded border-gray-300 focus:ring-gray-500 cursor-pointer">
@@ -1452,26 +1943,67 @@
                     </div>` : '';
 
                 const card = document.createElement('div');
-                card.className = `bg-white border rounded-lg p-3 sm:p-3.5 flex flex-col space-y-2 hover:shadow-sm transition ${isChecked ? 'border-gray-400 bg-gray-50 ring-1 ring-gray-300' : 'border-gray-200'}`;
+                card.className = `bg-white border rounded-lg p-3.5 flex flex-col space-y-2.5 hover:shadow-sm transition ${isChecked ? 'border-gray-400 bg-gray-50 ring-1 ring-gray-300' : 'border-gray-200'}`;
                 card.innerHTML = `
                     ${cardCheckboxHtml}
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-500">${p.month}</span>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${p.eval==='O'?'bg-o':'bg-x'}">${p.eval}</span>
+                    
+                    <div class="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="text-xs font-bold text-gray-600">${p.month}</span>
+                            <span class="${tagClass}">${p.type}</span>
+                        </div>
+                        <div class="flex items-center space-x-1.5">
+                            ${dirTag}
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${p.eval}</span>
+                        </div>
                     </div>
+
                     <div>
                         <h4 class="text-[11px] text-gray-500 font-bold mb-0.5">${p.center} · ${p.dept} ${p.section ? '· ' + p.section : ''}</h4>
-                        <p class="text-xs font-bold text-gray-800 leading-snug">${p.project}</p>
+                        <p class="text-xs font-bold text-gray-900 leading-snug">${p.project}</p>
                     </div>
-                    <div class="flex items-center justify-between pt-1.5 border-t border-gray-100 text-xs">
-                        <span class="font-bold text-gray-800">達成率: ${safeDisplay(p.rate, true)}</span>
+
+                    <div class="grid grid-cols-3 gap-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100 text-[10px]">
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
+                            <span class="block text-gray-400 font-medium">${CONFIG_PREV_YEAR}實績</span>
+                            <span class="font-bold text-gray-700">${safeDisplay(p.y25Actual, isPercentUnit, true)}</span>
+                        </div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
+                            <span class="block text-gray-400 font-medium">${CONFIG_TARGET_YEAR}目標</span>
+                            <span class="font-bold text-gray-700">${safeDisplay(p.y26Target, isPercentUnit)}</span>
+                        </div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
+                            <span class="block text-gray-400 font-medium">計算單位</span>
+                            <span class="font-bold text-gray-700">${p.unit}</span>
+                        </div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
+                            <span class="block text-gray-400 font-semibold text-gray-500">累計目標</span>
+                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, isPercentUnit)}</span>
+                        </div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
+                            <span class="block text-gray-400 font-semibold text-gray-900">累計實績</span>
+                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, isPercentUnit)}</span>
+                        </div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
+                            <span class="block text-gray-400 font-medium">去年同期</span>
+                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, isPercentUnit)}</span>
+                        </div>
                     </div>
+
+                    ${p.remark ? `<div class="text-[11px] text-gray-500 bg-gray-50 p-1.5 rounded border border-gray-100"><strong>備註：</strong>${p.remark}</div>` : ''}
+
+                    <div class="flex items-center justify-between pt-1 text-xs">
+                        <span class="text-gray-500 font-semibold">指標達成率</span>
+                        <span class="font-black text-sm text-gray-900 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">${safeDisplay(p.rate, true)}</span>
+                    </div>
+
                     ${cardActionsHtml}
                 `;
                 cardsGrid.appendChild(card);
             });
             setVal('visibleCount', filtered.length);
             updateBulkActionBarUI();
+            lucide.createIcons();
         }
 
         function getTrafficLight(data) {
@@ -1482,7 +2014,27 @@
         }
 
         function getRateColor(pct) { return pct >= 71 ? 'text-emerald-700' : (pct >= 61 ? 'text-amber-600' : 'text-rose-600'); }
-        function applyTypeFilter(t) { typeFilter = t; document.querySelectorAll('#f-all, #f-center, #f-plant').forEach(b => b.classList.remove('filter-active')); ui('f-'+(t==='all'?'all':(t==='中心'?'center':'plant'))).classList.add('filter-active'); renderMeasures(); }
+        
+        function applyTypeFilter(t) { 
+            typeFilter = t; 
+            measureCurrentPage = 1; 
+            document.querySelectorAll('#f-all, #f-center, #f-plant').forEach(b => b.classList.remove('filter-active')); 
+            ui('f-'+(t==='all'?'all':(t==='中心'?'center':'plant'))).classList.add('filter-active'); 
+            renderMeasures(); 
+        }
+
+        // 🎯 評價篩選按鈕觸發函式
+        function applyEvalFilter(ev) {
+            evalFilter = ev;
+            measureCurrentPage = 1;
+            document.querySelectorAll('#fe-all, #fe-o, #fe-x, #fe-delta').forEach(b => b.classList.remove('filter-active'));
+            let targetId = 'fe-all';
+            if (ev === 'O') targetId = 'fe-o';
+            else if (ev === 'X') targetId = 'fe-x';
+            else if (ev === '△') targetId = 'fe-delta';
+            ui(targetId).classList.add('filter-active');
+            renderMeasures();
+        }
         
         function applySearch() { 
             const q = ui('searchInput').value.toLowerCase(); 
@@ -1511,10 +2063,12 @@
                 ui('m_yoyActual').value = p.yoyActual;
                 ui('m_targetAccum').value = p.targetAccum;
                 ui('m_actualAccum').value = p.actualAccum;
+                ui('m_eval').value = p.eval || "auto";
+                ui('m_remark').value = p.remark || "";
             } else {
                 ui('modalTitle').innerText = "手動新增 KPI 指標";
                 ui('editIndex').value = "-1";
-                ui('m_month').value = selectedMonth === "all" ? "2026年06月" : selectedMonth;
+                ui('m_month').value = `${selectedYear}年06月`;
                 ui('m_type').value = "中心";
                 ui('m_center').value = "";
                 ui('m_dept').value = "";
@@ -1527,6 +2081,8 @@
                 ui('m_yoyActual').value = "";
                 ui('m_targetAccum').value = "";
                 ui('m_actualAccum').value = "";
+                ui('m_eval').value = "auto";
+                ui('m_remark').value = "";
             }
             lucide.createIcons();
         }
@@ -1548,6 +2104,8 @@
             const yoyActual = ui('m_yoyActual').value.trim();
             const targetAccum = ui('m_targetAccum').value.trim();
             const actualAccum = ui('m_actualAccum').value.trim();
+            const selectEval = ui('m_eval').value;
+            const remark = ui('m_remark').value.trim();
 
             if (!month || !center || !dept || !project || !targetAccum || !actualAccum) {
                 showToast("帶 * 號欄位為必填項目，請確認填寫！", "error");
@@ -1555,10 +2113,15 @@
             }
 
             const isPercentUnit = (unit !== "" && unit.includes("%"));
-            const computedRate = calculateRate(targetAccum, actualAccum, direction);
+            let computedRate = calculateRate(targetAccum, actualAccum, direction);
+
             let evalChar = "X";
-            let rNum = parseFloat(computedRate.replace(/%/g, ''));
-            if (!isNaN(rNum)) evalChar = rNum >= 100 ? "O" : "X";
+            if (selectEval !== "auto") {
+                evalChar = selectEval;
+            } else {
+                let rNum = parseFloat(computedRate.replace(/%/g, ''));
+                if (!isNaN(rNum)) evalChar = rNum >= 100 ? "O" : "X";
+            }
 
             const item = {
                 month, center, dept, section, type, project, unit,
@@ -1569,7 +2132,8 @@
                 yoyActual: safeDisplay(yoyActual, isPercentUnit),
                 direction,
                 rate: computedRate,
-                eval: evalChar
+                eval: evalChar,
+                remark: remark
             };
 
             if (index > -1) {
@@ -1614,28 +2178,28 @@
         function downloadTemplate() {
             try {
                 const csvContent = "\uFEFF" + 
-                    "2026年重點績效指標管理平台（系統標準匯入格式）,,,,,,,,,,,,,,,,,,,,,,,,,,\n" +
-                    "說明：1. 請保留第三行之欄位名稱。2. 子行群組順序與名稱必須完全符合『當月目標』、『當月實績』、『累計目標』、『累計實績』、『累計評價』及『去年實績』、『去年累計實績』。,,,,,,,,,,,,,,,,,,,,,,,,,,\n" +
-                    "MTS/AOP分類,中心,廠部,課別,指標分類,指定報告會議(T/K),重點績效評價項目,MTS/AOP編號,施策項目,↑/↓,基本定義,計算單位,2025實績,2026目標,項    目,1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月\n" +
-                    "M,管理中心,企管部,企管課,中心,T,O,B3-2-1,數位核心工程與集團AI智慧平台整合計畫,↑,專案進度定期回報,案,13,100%,當月目標,10,10,10,10,10,10,10,10,10,10,10,10\n" +
-                    ",,企管部,,,,,,,,,,,,,當月實績,10,10,10,9,10,,,,,,,\n" +
-                    ",,企管部,,,,,,,,,,,,,累計目標,10,20,30,40,50,60,70,80,90,100,110,120\n" +
-                    ",,企管部,,,,,,,,,,,,,累計實績,10,20,30,39,49,,,,,,,\n" +
-                    ",,企管部,,,,,,,,,,,,,累計評價,O,O,O,X,O,,,,,,,\n" +
-                    ",,企管部,,,,,,,,,,,,,去年實績,8,9,10,11,12,10,10,10,10,10,10,10\n" +
-                    ",,企管部,,,,,,,,,,,,,去年累計實績,8,17,27,38,50,60,70,80,90,100,110,120\n";
+                    `${CONFIG_TARGET_YEAR}年重點績效指標管理平台（系統標準匯入格式）,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n` +
+                    "說明：1. 請保留第三行之欄位名稱。2. 子行群組順序與名稱必須完全符合『當月目標』、『當月實績』、『累計目標』、『累計實績』、『累計評價』及『去年實績』、『去年累計實績』。,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n" +
+                    `MTS/AOP分類,中心,廠部,課別,指標分類,指定報告會議(T/K),重點績效評價項目,MTS/AOP編號,施策項目,↑/↓,基本定義,計算單位,${CONFIG_PREV_YEAR}實績,${CONFIG_TARGET_YEAR}目標,項    目,1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月,備註\n` +
+                    "M,管理中心,企管部,企管課,中心,T,O,B3-2-1,數位核心工程與集團AI智慧平台整合計畫,↑,專案進度定期回報,案,13,100%,當月目標,10,10,10,10,10,10,10,10,10,10,10,10,\n" +
+                    ",,企管部,,,,,,,,,,,,,當月實績,10,10,10,9,10,,,,,,,,\n" +
+                    ",,企管部,,,,,,,,,,,,,累計目標,10,20,30,40,50,60,70,80,90,100,110,120,\n" +
+                    ",,企管部,,,,,,,,,,,,,累計實績,10,20,30,39,49,,,,,,,,\n" +
+                    ",,企管部,,,,,,,,,,,,,累計評價,O,O,O,△,O,,,,,,,,\n" +
+                    ",,企管部,,,,,,,,,,,,,去年實績,8,9,10,11,12,10,10,10,10,10,10,10,\n" +
+                    ",,企管部,,,,,,,,,,,,,去年累計實績,8,17,27,38,50,60,70,80,90,100,110,120,\n";
 
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement("a");
                 link.setAttribute("href", url);
-                link.setAttribute("download", "2026_KPI_Master_Template.csv");
+                link.setAttribute("download", `${CONFIG_TARGET_YEAR}_KPI_Master_Template.csv`);
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
 
-                showToast("📄 範本下載成功！(已輸出為標準 CSV 格式)", "success");
+                showToast("範本下載成功！(已輸出為標準 CSV 格式)", "success");
             } catch (err) {
                 console.error(err);
                 showToast("❌ 下載失敗：" + err.message, "error");
@@ -1648,18 +2212,18 @@
                 return;
             }
             try {
-                const headers = ["年月份", "中心", "部門", "課別", "指標分類", "施策項目", "計算單位", "2025實績", "2026目標", "累計目標", "累計實績", "去年同期累計實績", "望大值/望小值方向", "達成率", "評價"];
+                const headers = ["年月份", "中心", "部門", "課別", "指標分類", "施策項目", "計算單位", `${CONFIG_PREV_YEAR}實績`, `${CONFIG_TARGET_YEAR}目標`, "累計目標", "累計實績", "去年同期累計實績", "望大值/望小值方向", "達成率", "評價", "備註"];
                 const dataRows = allDataItems.map(i => [
                     i.month, i.center, i.dept, i.section || "", i.type, i.project, i.unit, 
                     i.y25Actual, i.y26Target, i.targetAccum, i.actualAccum, i.yoyActual, 
-                    i.direction, i.rate, i.eval
+                    i.direction, i.rate, i.eval, i.remark || ""
                 ]);
                 const wsData = [headers, ...dataRows];
                 const wb = XLSX.book_new();
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
                 XLSX.utils.book_append_sheet(wb, ws, "Master_Database");
                 XLSX.writeFile(wb, `KPI_Master_Database_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
-                showToast("💾 總資料庫備份成功！已打包導出共 " + allDataItems.length + " 筆跨年月份數據。", "success");
+                showToast("已匯出檔案!", "success");
             } catch(e) {
                 console.error(e);
                 showToast("匯出 Excel 失敗，請確認瀏覽器支援度。", "error");
@@ -1667,29 +2231,30 @@
         }
 
         function confirmClearDatabase() {
-            const btn = ui('clearBtn');
-            const btnText = ui('clearBtnText');
-            if (!isClearConfirmPending) {
-                isClearConfirmPending = true;
-                btnText.innerText = "按第二次確認清空";
-                btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold bg-rose-600 text-white transition animate-pulse";
-                showToast("⚠️ 請再次點擊工具箱中的清除按鈕以確認清空雲端與地端資料庫。", "error");
-                setTimeout(() => {
+            checkAdminPermission(() => {
+                const btn = ui('clearBtn');
+                const btnText = ui('clearBtnText');
+                if (!isClearConfirmPending) {
+                    isClearConfirmPending = true;
+                    btnText.innerText = "按第二次確認清空";
+                    btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold bg-rose-600 text-white transition animate-pulse";
+                    showToast("⚠️ 請再次點擊權限選單中的清除按鈕以確認清空資料庫。", "error");
+                    setTimeout(() => {
+                        isClearConfirmPending = false;
+                        btnText.innerText = "清空雲端與地端資料庫";
+                        btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100";
+                    }, 4000);
+                } else {
+                    allDataItems = [];
+                    localStorage.removeItem('kpi_master_data');
+                    refreshDatabaseState();
+                    saveToCloud(); 
                     isClearConfirmPending = false;
                     btnText.innerText = "清空雲端與地端資料庫";
                     btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100";
-                }, 4000);
-            } else {
-                allDataItems = [];
-                selectedMonth = "all";
-                localStorage.removeItem('kpi_master_data');
-                refreshDatabaseState();
-                saveToCloud(); 
-                isClearConfirmPending = false;
-                btnText.innerText = "清空雲端與地端資料庫";
-                btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100";
-                showToast("🧹 雲端與本地暫存資料庫已完全清空！", "success");
-            }
+                    showToast("🧹 雲端與本地暫存資料庫已完全清空！", "success");
+                }
+            });
         }
 
         function showToast(message, type = 'info') {
@@ -1697,7 +2262,7 @@
             if (!toastContainer) {
                 toastContainer = document.createElement('div');
                 toastContainer.id = 'toast-container';
-                toastContainer.className = 'fixed bottom-5 right-5 z-[999] flex flex-col gap-2 pointer-events-none max-w-[90vw] sm:max-w-md';
+                toastContainer.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[999] flex flex-col gap-2 pointer-events-none max-w-[90vw] sm:max-w-md w-full items-center';
                 document.body.appendChild(toastContainer);
             }
             
@@ -1705,31 +2270,31 @@
             let bgColor = 'bg-f2 text-gray-800 border border-gray-300';
             let icon = 'info';
             if (type === 'success') {
-                bgColor = 'bg-emerald-700 text-white';
+                bgColor = 'bg-emerald-700 text-white shadow-emerald-900/20';
                 icon = 'check-circle';
             } else if (type === 'error') {
-                bgColor = 'bg-rose-700 text-white';
+                bgColor = 'bg-rose-700 text-white shadow-rose-900/20';
                 icon = 'alert-triangle';
             }
             
-            toast.className = `px-3.5 py-2.5 rounded-lg shadow-lg text-xs font-medium transition-all duration-300 transform translate-y-5 opacity-0 flex items-center gap-2 pointer-events-auto ${bgColor}`;
+            toast.className = `px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold transition-all duration-300 transform -translate-y-5 opacity-0 flex items-center gap-2 pointer-events-auto ${bgColor}`;
             toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 flex-shrink-0"></i><span>${message}</span>`;
             toastContainer.appendChild(toast);
             lucide.createIcons();
             
             setTimeout(() => {
-                toast.classList.remove('translate-y-5', 'opacity-0');
+                toast.classList.remove('-translate-y-5', 'opacity-0');
             }, 10);
             
             setTimeout(() => {
-                toast.classList.add('translate-y-5', 'opacity-0');
+                toast.classList.add('-translate-y-5', 'opacity-0');
                 setTimeout(() => { toast.remove(); }, 300);
             }, 3500);
         }
 
         window.onload = () => { 
             lucide.createIcons(); 
-            syncFromCloud();
+            syncFromCloud(true);
         };
     </script>
 </body>
