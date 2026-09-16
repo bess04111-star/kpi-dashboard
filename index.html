@@ -950,37 +950,41 @@
             return s;
         }
 
-        async function syncFromCloud(isAuto = false) {
-            if (!isAuto) showToast("正在連線至雲端資料庫同步資料...", "info");
-            try {
-                const response = await fetch(GOOGLE_API_URL);
-                const data = await response.json();
-                if (data && Array.isArray(data) && data.length > 0) {
-                    allDataItems = data.map(item => ({
-                        ...item,
-                        month: formatCleanMonth(item.month)
-                    }));
-                    localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
-                    refreshDatabaseState();
-                    if (!isAuto) showToast("✅ 已同步最新資料！", "success");
-                } else {
-                    if (!isAuto) showToast("雲端尚無數據，請先匯入 XLSX 資料。", "info");
-                    const savedData = localStorage.getItem('kpi_master_data');
-                    if (savedData) {
-                        allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
-                        refreshDatabaseState();
-                    }
-                }
-            } catch (err) {
-                console.error(err);
-                if (!isAuto) showToast("⚠️ 無法連線至伺服器，讀取本機暫存資料。", "error");
-                const savedData = localStorage.getItem('kpi_master_data');
-                if (savedData) {
-                    allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
-                    refreshDatabaseState();
-                }
+       async function syncFromCloud(isAuto = false) {
+    if (!isAuto) showToast("正在連線至雲端資料庫同步資料...", "info");
+    try {
+        // 帶上安全 Token 進行讀取驗證
+        const response = await fetch(`${GOOGLE_API_URL}?token=${API_SECRET_TOKEN}`);
+        const data = await response.json();
+        
+        if (data && Array.isArray(data) && data.length > 0) {
+            allDataItems = data.map(item => ({
+                ...item,
+                month: formatCleanMonth(item.month)
+            }));
+            localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
+            refreshDatabaseState();
+            if (!isAuto) showToast("✅ 已同步最新資料！", "success");
+        } else if (data && data.status === "unauthorized") {
+            if (!isAuto) showToast("❌ 雲端同步失敗：API 金鑰驗證不通過。", "error");
+        } else {
+            if (!isAuto) showToast("雲端尚無數據，請先匯入 XLSX 資料。", "info");
+            const savedData = localStorage.getItem('kpi_master_data');
+            if (savedData) {
+                allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
+                refreshDatabaseState();
             }
         }
+    } catch (err) {
+        console.error(err);
+        if (!isAuto) showToast("⚠️ 無法連線至伺服器，讀取本機暫存資料。", "error");
+        const savedData = localStorage.getItem('kpi_master_data');
+        if (savedData) {
+            allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
+            refreshDatabaseState();
+        }
+    }
+}
 
         async function saveToCloud() {
             localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
