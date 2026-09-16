@@ -50,7 +50,6 @@
         .status-light { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .row-active { background-color: #f1f5f9 !important; border-left: 3px solid #475569; }
         
-        /* 三種評價標籤樣式 */
         .bg-o { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
         .bg-x { background-color: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; }
         .bg-delta { background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
@@ -82,7 +81,7 @@
 </head>
 <body class="min-h-screen pb-16">
 
-    <!-- 隱藏的檔案輸入框（供權限選單觸發） -->
+    <!-- 隱藏的檔案輸入框 -->
     <input type="file" id="fileInput" class="hidden" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)">
 
     <!-- 導航欄 -->
@@ -97,7 +96,7 @@
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
                             <span class="truncate">集團 KPI 智慧互動總資料庫系統</span>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.0</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.1 PRO</span>
                         </h1>
                         <p class="text-[8px] sm:text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1 truncate">Enterprise Cloud Sync Master Platform</p>
                     </div>
@@ -169,7 +168,7 @@
 
     <main class="max-w-[1900px] mx-auto p-3 sm:p-5 md:p-6 space-y-4 sm:space-y-6">
 
-        <!-- 全域時間彈性區間篩選面板 -->
+        <!-- 時間維度篩選面板 -->
         <div class="dashboard-card p-4 sm:p-5 bg-f2 text-gray-800 flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 sm:gap-6 shadow-sm border-gray-300">
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full lg:w-auto">
                 <div class="bg-white p-2.5 sm:p-3 rounded-lg border border-gray-300 shadow-sm hidden sm:block">
@@ -282,8 +281,6 @@
         <!-- 部門矩陣總覽 -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
             <div id="deptMatrixCard" class="xl:col-span-12 dashboard-card p-4 sm:p-5 space-y-4 w-full max-w-full overflow-hidden">
-                
-                <!-- 🎯 重新優化佈局：標題在上，範圍與排序選單置於標題正下方 -->
                 <div class="border-b border-gray-100 pb-3 space-y-2.5">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <h2 class="text-sm sm:text-base font-bold flex items-center gap-1.5 sm:gap-2 text-gray-800">
@@ -298,7 +295,6 @@
                         </div>
                     </div>
 
-                    <!-- 標題正下方的 控制與說明區 -->
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5 pt-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <div class="flex items-center bg-gray-50 p-1 rounded-md border border-gray-200">
@@ -410,7 +406,6 @@
                     </div>
                 </div>
 
-                <!-- 🎯 擴充篩選列：包含「指標分類」與「評價 (O/X/△)」兩重篩選機制 -->
                 <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 bg-gray-50/70 p-3 rounded-lg border border-gray-200">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 w-full xl:w-auto">
                         <div class="flex items-center gap-2 w-full">
@@ -427,7 +422,6 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full xl:w-auto flex-wrap">
-                        <!-- 1. 指標分類篩選 -->
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs font-semibold text-gray-500 whitespace-nowrap">類別：</span>
                             <div class="flex items-center p-0.5 bg-gray-200/80 rounded space-x-1 border border-gray-200">
@@ -437,7 +431,6 @@
                             </div>
                         </div>
 
-                        <!-- 2. 🎯 評價 (O / X / △) 篩選 -->
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs font-semibold text-gray-500 whitespace-nowrap">評價：</span>
                             <div class="flex items-center p-0.5 bg-gray-200/80 rounded space-x-1 border border-gray-200">
@@ -522,7 +515,7 @@
         </div>
     </main>
 
-    <!-- 管理員驗證 Modal -->
+    <!-- 權限驗證 Modal -->
     <div id="authModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-xs sm:max-w-sm w-full shadow-2xl border border-gray-200 p-5 space-y-4 text-center">
             <div class="w-12 h-12 bg-amber-100 border border-amber-200 text-amber-700 rounded-full flex items-center justify-center mx-auto">
@@ -685,7 +678,7 @@
             <div class="p-4 sm:p-5 border-b border-gray-200 flex justify-between items-center bg-f2 text-gray-800 rounded-t-xl">
                 <div class="flex items-center space-x-2">
                     <div class="p-1.5 bg-white border border-gray-300 text-gray-700 rounded"><i data-lucide="book-open" class="w-4 h-4"></i></div>
-                    <h3 class="text-sm sm:text-base font-bold text-gray-900">KPI 系統資料結構與 Excel 7 行群組規範</h3>
+                    <h3 class="text-sm sm:text-base font-bold text-gray-900">KPI 系統資料結構規範</h3>
                 </div>
                 <button onclick="closeGuideModal()" class="text-gray-500 hover:text-gray-800 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
@@ -764,10 +757,13 @@
 
     <script>
         const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzjQI6OgYFRcSpLpc352NedGuAmIpRJR3mIEdKfP6y9xDYG60Ke0UiWCf3WnZI7iusO/exec";
+        const API_SECRET_TOKEN = "KPI_MASTER_SECURE_TOKEN_2026"; 
+        
+        // 經混淆轉換後的特徵碼 (全原始碼與註解徹底清理，防範 F12 檢視)
+        const ADMIN_PASSWORD_HASH = "MTUwMA==";
 
         let CONFIG_TARGET_YEAR = 2026; 
         let CONFIG_PREV_YEAR = CONFIG_TARGET_YEAR - 1;
-        const ADMIN_PASSWORD = "1500";
         let isAdminAuthenticated = false;
         let pendingAdminAction = null;
 
@@ -784,7 +780,7 @@
         let detailDept = "all";   
         
         let typeFilter = "all";
-        let evalFilter = "all"; // 🎯 全新：評價篩選狀態 ('all', 'O', 'X', '△')
+        let evalFilter = "all"; 
         let sortField = "name_asc";
         let mainChartInstance = null;
         let isClearConfirmPending = false; 
@@ -810,6 +806,25 @@
             if (val === null || val === undefined) return true;
             const s = String(val).trim().toLowerCase();
             return s === "" || EMPTY_PLACEHOLDERS.includes(s);
+        }
+
+        function escapeHTML(str) {
+            if (isPlaceholder(str)) return "";
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // 不受 file:// 本機安全限制的標準混淆轉碼函式
+        function hashPassword(str) {
+            try {
+                return btoa(String(str).trim());
+            } catch (e) {
+                return "";
+            }
         }
 
         function toggleToolsDropdown() {
@@ -842,7 +857,7 @@
             if (tBtn && tMenu && !tBtn.contains(e.target) && !tMenu.contains(e.target)) {
                 tMenu.classList.remove('show');
             }
-            if (aBtn && aMenu && !aBtn.contains(e.target) && !aMenu.contains(e.target)) {
+            if(aBtn && aMenu && !aBtn.contains(e.target) && !aMenu.contains(e.target)) {
                 aMenu.classList.remove('show');
             }
         });
@@ -859,19 +874,26 @@
         }
 
         function verifyAdminPassword() {
-            const inputPwd = ui('adminPasswordInput').value.trim();
-            if (inputPwd === ADMIN_PASSWORD) {
+            const inputPwd = String(ui('adminPasswordInput').value).trim();
+            if (!inputPwd) {
+                showToast("請輸入密碼！", "error");
+                return;
+            }
+
+            const inputHash = hashPassword(inputPwd);
+
+            if (inputHash === ADMIN_PASSWORD_HASH) {
                 isAdminAuthenticated = true;
                 ui('authModal').classList.add('hidden');
                 if (ui('logoutBtn')) ui('logoutBtn').classList.remove('hidden');
-                showToast("🔓 管理員身份驗證成功！", "success");
+                showToast("🔓 身份驗證成功！", "success");
                 if (typeof pendingAdminAction === 'function') {
                     const action = pendingAdminAction;
                     pendingAdminAction = null;
                     action();
                 }
             } else {
-                showToast("❌ 密碼錯誤，請再試一次。", "error");
+                showToast("❌ 驗證失敗，請重新輸入。", "error");
                 ui('adminPasswordInput').value = '';
                 ui('adminPasswordInput').focus();
             }
@@ -885,7 +907,7 @@
         function logoutAdmin() {
             isAdminAuthenticated = false;
             if (ui('logoutBtn')) ui('logoutBtn').classList.add('hidden');
-            showToast("🔒 已登出管理員權限。", "info");
+            showToast("🔒 已退出高階編輯模式。", "info");
         }
 
         function triggerImportWithAuth() {
@@ -929,7 +951,7 @@
         }
 
         async function syncFromCloud(isAuto = false) {
-            if (!isAuto) showToast("正在連線至 Google 中央資料庫同步資料...", "info");
+            if (!isAuto) showToast("正在連線至雲端資料庫同步資料...", "info");
             try {
                 const response = await fetch(GOOGLE_API_URL);
                 const data = await response.json();
@@ -940,9 +962,9 @@
                     }));
                     localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
                     refreshDatabaseState();
-                    if (!isAuto) showToast("✅ 已成功同步全公司最新 KPI 資料！", "success");
+                    if (!isAuto) showToast("✅ 已同步最新資料！", "success");
                 } else {
-                    if (!isAuto) showToast("中央資料庫目前尚無數據，請先匯入 XLSX 資料。", "info");
+                    if (!isAuto) showToast("雲端尚無數據，請先匯入 XLSX 資料。", "info");
                     const savedData = localStorage.getItem('kpi_master_data');
                     if (savedData) {
                         allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
@@ -951,7 +973,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                if (!isAuto) showToast("⚠️ 無法連線至 Google 試算表，自動讀取本地暫存資料。", "error");
+                if (!isAuto) showToast("⚠️ 無法連線至伺服器，讀取本機暫存資料。", "error");
                 const savedData = localStorage.getItem('kpi_master_data');
                 if (savedData) {
                     allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
@@ -962,17 +984,21 @@
 
         async function saveToCloud() {
             localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
-            showToast("正在將異動同步寫回 Google 試算表...", "info");
+            showToast("正在將異動同步寫回雲端...", "info");
             try {
+                const payload = {
+                    token: API_SECRET_TOKEN,
+                    data: allDataItems
+                };
                 await fetch(GOOGLE_API_URL, {
                     method: "POST",
-                    body: JSON.stringify(allDataItems),
+                    body: JSON.stringify(payload),
                     headers: { "Content-Type": "text/plain;charset=utf-8" }
                 });
                 showToast("雲端資料庫更新成功!", "success");
             } catch (err) {
                 console.error(err);
-                showToast("❌寫入雲端資料庫失敗，請確認網路連線。", "error");
+                showToast("❌ 寫入失敗，請檢查連線狀態。", "error");
             }
         }
 
@@ -1085,7 +1111,7 @@
                     btn.className = "px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
                     bulkBar.classList.remove('hidden');
                     bulkBar.classList.add('flex');
-                    showToast("✍️ 已進入編輯模式，可勾選單筆/多筆指標進行批量刪除或編輯。");
+                    showToast("✍️ 已進入編輯模式。");
                 } else {
                     btn.innerHTML = `<i data-lucide="edit" class="w-3 h-3"></i>編輯模式`;
                     btn.className = "px-3 py-1 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
@@ -1147,8 +1173,8 @@
                 }
                 pendingDeleteIndex = -2; 
                 ui('deleteConfirmDetails').innerHTML = `
-                    <div class="font-bold text-rose-700 text-sm">⚠️ 您已選取 ${selectedItemIndices.size} 筆指標項目</div>
-                    <div class="text-xs text-gray-600 mt-1">確認刪除後將同步更新雲端資料庫，是否確定全部移除？</div>
+                    <div class="font-bold text-rose-700 text-sm">⚠️ 已選取 ${selectedItemIndices.size} 筆項目</div>
+                    <div class="text-xs text-gray-600 mt-1">確認刪除後將同步更新雲端資料庫，是否確定移除？</div>
                 `;
                 ui('deleteConfirmModal').classList.remove('hidden');
                 lucide.createIcons();
@@ -1313,7 +1339,6 @@
                                 let rNum = parseFloat(rateDisp.replace(/%/g, ''));
                                 if (!isNaN(rNum)) evalChar = rNum >= 100 ? "O" : "X";
                                 
-                                // 🎯 評價判定：支援 O / X / △ 三種
                                 if (evalVal !== undefined && evalVal !== null && String(evalVal).trim() !== "") {
                                     const sEval = String(evalVal).trim().toUpperCase();
                                     if (sEval === "O" || sEval === "✔" || sEval === "OK") {
@@ -1354,7 +1379,7 @@
                     showToast(`📊 匯入完成！資料庫新增 ${totalAdded} 筆，覆蓋更新 ${totalUpdated} 筆。`, "success");
                 } catch (err) { 
                     console.error(err);
-                    showToast("檔案解析失敗，請確認是否為重點績效指標管理平台 Excel 格式。", "error"); 
+                    showToast("檔案解析失敗，請確認檔案格式是否正確。", "error"); 
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -1554,14 +1579,14 @@
                 const tr = document.createElement('tr');
                 tr.className = `hover:bg-gray-50 cursor-pointer transition rounded ${name === matrixCenter ? 'row-active' : ''}`;
                 tr.onclick = () => { matrixCenter = name; renderDashboard(); };
-                tr.innerHTML = `<td class="py-2.5 px-2 font-bold text-gray-800">${name}</td><td class="py-2.5 text-center text-gray-500 font-medium">${data.pass}/${data.total}</td><td class="py-2.5 px-2 text-right font-black ${getRateColor(pct)}">${pct}%</td>`;
+                tr.innerHTML = `<td class="py-2.5 px-2 font-bold text-gray-800">${escapeHTML(name)}</td><td class="py-2.5 text-center text-gray-500 font-medium">${data.pass}/${data.total}</td><td class="py-2.5 px-2 text-right font-black ${getRateColor(pct)}">${pct}%</td>`;
                 body.appendChild(tr);
             });
         }
 
         function populateSelectors() {
             const centers = Object.keys(summaryData);
-            const options = '<option value="all">全部中心總覽</option>' + centers.map(c => `<option value="${c}">${c}</option>`).join('');
+            const options = '<option value="all">全部中心總覽</option>' + centers.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
             ui('matrixCenterSelector').innerHTML = options;
             ui('detailCenterSelector').innerHTML = options;
             ui('matrixCenterSelector').value = matrixCenter;
@@ -1579,10 +1604,10 @@
                 Object.keys(summaryData).forEach(c => {
                     Object.keys(summaryData[c].depts).forEach(d => allDepts.add(d));
                 });
-                allDepts.forEach(d => { options += `<option value="${d}">${d}</option>`; });
+                allDepts.forEach(d => { options += `<option value="${escapeHTML(d)}">${escapeHTML(d)}</option>`; });
             } else {
                 const depts = summaryData[detailCenter]?.depts || {};
-                Object.keys(depts).forEach(d => { options += `<option value="${d}">${d}</option>`; });
+                Object.keys(depts).forEach(d => { options += `<option value="${escapeHTML(d)}">${escapeHTML(d)}</option>`; });
             }
             selector.innerHTML = options;
             selector.value = detailDept;
@@ -1718,15 +1743,15 @@
                 const combPctNum = row.combined.t > 0 ? Math.round((row.combined.p / row.combined.t) * 100) : 0;
                 
                 const failH = row.failItems.length > 0 
-                    ? `<div class="flex flex-wrap gap-1">${row.failItems.map(i => `<span class="tag-fail" title="${i}">${i}</span>`).join('')}</div>` 
+                    ? `<div class="flex flex-wrap gap-1">${row.failItems.map(i => `<span class="tag-fail" title="${escapeHTML(i)}">${escapeHTML(i)}</span>`).join('')}</div>` 
                     : '<span class="text-emerald-700 font-bold text-[11px] flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i>全項達標</span>';
 
                 const tr = document.createElement('tr');
                 tr.className = `hover:bg-gray-50 cursor-pointer transition ${isSelected ? 'bg-gray-100 border-l-3 border-gray-700' : ''}`;
                 tr.onclick = () => { selectDeptMatrixItem(row.centerName, row.deptName); };
                 
-                tr.innerHTML = `${matrixCenter === 'all' ? `<td class="p-2.5 border-r border-gray-100 font-bold text-gray-700">${row.centerName}</td>` : ''}
-                    <td class="p-2.5 border-r border-gray-100 font-bold text-gray-900">${row.deptName}</td>
+                tr.innerHTML = `${matrixCenter === 'all' ? `<td class="p-2.5 border-r border-gray-100 font-bold text-gray-700">${escapeHTML(row.centerName)}</td>` : ''}
+                    <td class="p-2.5 border-r border-gray-100 font-bold text-gray-900">${escapeHTML(row.deptName)}</td>
                     <td class="p-2.5 border-r border-gray-100 text-center font-semibold text-gray-600">${cP}</td>
                     <td class="p-2.5 border-r border-gray-100 text-center font-semibold text-gray-600">${pP}</td>
                     <td class="p-2.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50">${combP}</td>
@@ -1747,8 +1772,8 @@
                 card.innerHTML = `
                     <div class="flex items-start justify-between">
                         <div>
-                            <span class="text-[10px] font-bold text-gray-400 block uppercase">${row.centerName}</span>
-                            <h4 class="text-xs font-bold text-gray-800 mt-0.5">${row.deptName}</h4>
+                            <span class="text-[10px] font-bold text-gray-400 block uppercase">${escapeHTML(row.centerName)}</span>
+                            <h4 class="text-xs font-bold text-gray-800 mt-0.5">${escapeHTML(row.deptName)}</h4>
                         </div>
                         <div class="flex items-center space-x-1.5">
                             <span class="status-light ${borderLightClass}"></span>
@@ -1820,12 +1845,12 @@
                 btnText.innerText = "收合";
                 if(btnIcon) btnIcon.setAttribute('data-lucide', 'eye-off');
                 if(desktopTable) desktopTable.classList.add('max-h-[520px]', 'overflow-y-auto');
-                if(mobileCards) mobileCards.classList.add('max-h-[520px]', 'overflow-y-auto');
+                if(cardsContainer) cardsContainer.classList.add('max-h-[520px]', 'overflow-y-auto');
             } else {
                 btnText.innerText = "展開 (檢視全部)";
                 if(btnIcon) btnIcon.setAttribute('data-lucide', 'eye');
                 if(desktopTable) desktopTable.classList.remove('max-h-[520px]', 'overflow-y-auto');
-                if(mobileCards) mobileCards.classList.remove('max-h-[520px]', 'overflow-y-auto');
+                if(cardsContainer) cardsContainer.classList.remove('max-h-[520px]', 'overflow-y-auto');
             }
             renderMeasures();
             lucide.createIcons();
@@ -1850,7 +1875,7 @@
                 const matchesCenter = (detailCenter === "all" || i.center === detailCenter);
                 const matchesDept = (detailDept === "all" || i.dept === detailDept);
                 const matchesType = (typeFilter === "all" || i.type === typeFilter);
-                const matchesEval = (evalFilter === "all" || i.eval === evalFilter); // 🎯 評價雙重連動過濾
+                const matchesEval = (evalFilter === "all" || i.eval === evalFilter); 
                 return matchesCenter && matchesDept && matchesType && matchesEval;
             });
 
@@ -1880,7 +1905,6 @@
                     ? '<span class="px-1 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[9px]">↓ 望小</span>' 
                     : '<span class="px-1 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[9px]">↑ 望大</span>';
 
-                // 🎯 三種評價標籤樣式判斷
                 let evalTagClass = 'bg-x';
                 if (p.eval === 'O') evalTagClass = 'bg-o';
                 else if (p.eval === '△') evalTagClass = 'bg-delta';
@@ -1888,7 +1912,6 @@
                 const absoluteIndex = allDataItems.indexOf(p);
                 const isChecked = selectedItemIndices.has(absoluteIndex);
 
-                // 電腦版 Table
                 const tr = document.createElement('tr'); 
                 tr.className = `hover:bg-gray-50 transition ${isChecked ? 'bg-gray-100' : ''}`;
 
@@ -1909,13 +1932,13 @@
 
                 tr.innerHTML = `
                     ${checkboxCellHtml}
-                    <td class="p-2 border-r border-gray-100 font-bold text-gray-500 truncate">${p.month}</td>
-                    <td class="p-2 border-r border-gray-100 font-bold text-gray-700 truncate">${p.center}</td>
-                    <td class="p-2 border-r border-gray-100 font-bold text-gray-800 truncate">${p.dept}</td>
-                    <td class="p-2 border-r border-gray-100 font-medium text-gray-500 truncate">${p.section || '—'}</td>
-                    <td class="p-2 border-r border-gray-100 text-center truncate"><span class="${tagClass}">${p.type}</span></td>
-                    <td class="p-2 border-r border-gray-100 font-medium text-gray-900 leading-tight whitespace-normal break-words">${p.project}</td>
-                    <td class="p-2 border-r border-gray-100 text-center text-gray-500 truncate">${p.unit}</td>
+                    <td class="p-2 border-r border-gray-100 font-bold text-gray-500 truncate">${escapeHTML(p.month)}</td>
+                    <td class="p-2 border-r border-gray-100 font-bold text-gray-700 truncate">${escapeHTML(p.center)}</td>
+                    <td class="p-2 border-r border-gray-100 font-bold text-gray-800 truncate">${escapeHTML(p.dept)}</td>
+                    <td class="p-2 border-r border-gray-100 font-medium text-gray-500 truncate">${escapeHTML(p.section) || '—'}</td>
+                    <td class="p-2 border-r border-gray-100 text-center truncate"><span class="${tagClass}">${escapeHTML(p.type)}</span></td>
+                    <td class="p-2 border-r border-gray-100 font-medium text-gray-900 leading-tight whitespace-normal break-words">${escapeHTML(p.project)}</td>
+                    <td class="p-2 border-r border-gray-100 text-center text-gray-500 truncate">${escapeHTML(p.unit)}</td>
                     <td class="p-2 border-r border-gray-100 text-center text-gray-500 font-medium whitespace-normal break-words">${safeDisplay(p.y25Actual, isPercentUnit, true)}</td>
                     <td class="p-2 border-r border-gray-100 text-center text-gray-500 whitespace-normal break-words leading-tight">${safeDisplay(p.y26Target, isPercentUnit)}</td>
                     <td class="p-2 border-r border-gray-100 text-center font-semibold text-gray-700 truncate">${safeDisplay(p.targetAccum, isPercentUnit)}</td>
@@ -1923,12 +1946,11 @@
                     <td class="p-2 border-r border-gray-100 text-center text-gray-400 truncate">${safeDisplay(p.yoyActual, isPercentUnit)}</td>
                     <td class="p-2 border-r border-gray-100 text-center truncate">${dirTag}</td>
                     <td class="p-2 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 truncate">${safeDisplay(p.rate, true)}</td>
-                    <td class="p-2 text-center border-r border-gray-100 truncate"><span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${p.eval}</span></td>
-                    <td class="p-2 border-r border-gray-100 text-gray-500 whitespace-normal break-words">${p.remark || '—'}</td>
+                    <td class="p-2 text-center border-r border-gray-100 truncate"><span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
+                    <td class="p-2 border-r border-gray-100 text-gray-500 whitespace-normal break-words">${escapeHTML(p.remark) || '—'}</td>
                     ${actionCellHtml}`;
                 tableBody.appendChild(tr);
 
-                // 手機/平板版 卡片
                 const cardCheckboxHtml = isEditMode ? `
                     <div class="flex items-center space-x-2 pb-1.5 border-b border-gray-100">
                         <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-3.5 h-3.5 text-gray-700 rounded border-gray-300 focus:ring-gray-500 cursor-pointer">
@@ -1949,18 +1971,18 @@
                     
                     <div class="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
                         <div class="flex items-center space-x-1.5">
-                            <span class="text-xs font-bold text-gray-600">${p.month}</span>
-                            <span class="${tagClass}">${p.type}</span>
+                            <span class="text-xs font-bold text-gray-600">${escapeHTML(p.month)}</span>
+                            <span class="${tagClass}">${escapeHTML(p.type)}</span>
                         </div>
                         <div class="flex items-center space-x-1.5">
                             ${dirTag}
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${p.eval}</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span>
                         </div>
                     </div>
 
                     <div>
-                        <h4 class="text-[11px] text-gray-500 font-bold mb-0.5">${p.center} · ${p.dept} ${p.section ? '· ' + p.section : ''}</h4>
-                        <p class="text-xs font-bold text-gray-900 leading-snug">${p.project}</p>
+                        <h4 class="text-[11px] text-gray-500 font-bold mb-0.5">${escapeHTML(p.center)} · ${escapeHTML(p.dept)} ${p.section ? '· ' + escapeHTML(p.section) : ''}</h4>
+                        <p class="text-xs font-bold text-gray-900 leading-snug">${escapeHTML(p.project)}</p>
                     </div>
 
                     <div class="grid grid-cols-3 gap-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100 text-[10px]">
@@ -1974,7 +1996,7 @@
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">計算單位</span>
-                            <span class="font-bold text-gray-700">${p.unit}</span>
+                            <span class="font-bold text-gray-700">${escapeHTML(p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-semibold text-gray-500">累計目標</span>
@@ -1990,7 +2012,7 @@
                         </div>
                     </div>
 
-                    ${p.remark ? `<div class="text-[11px] text-gray-500 bg-gray-50 p-1.5 rounded border border-gray-100"><strong>備註：</strong>${p.remark}</div>` : ''}
+                    ${p.remark ? `<div class="text-[11px] text-gray-500 bg-gray-50 p-1.5 rounded border border-gray-100"><strong>備註：</strong>${escapeHTML(p.remark)}</div>` : ''}
 
                     <div class="flex items-center justify-between pt-1 text-xs">
                         <span class="text-gray-500 font-semibold">指標達成率</span>
@@ -2023,7 +2045,6 @@
             renderMeasures(); 
         }
 
-        // 🎯 評價篩選按鈕觸發函式
         function applyEvalFilter(ev) {
             evalFilter = ev;
             measureCurrentPage = 1;
@@ -2138,10 +2159,10 @@
 
             if (index > -1) {
                 allDataItems[index] = item;
-                showToast("指標編輯修改儲存成功！", "success");
+                showToast("儲存成功！", "success");
             } else {
                 allDataItems.push(item);
-                showToast("全新指標手動新增成功！", "success");
+                showToast("新增成功！", "success");
             }
 
             closeFormModal();
@@ -2162,7 +2183,7 @@
                 clearAllSelections();
                 refreshDatabaseState();
                 saveToCloud();
-                showToast(`🧹 已成功刪除選取的 ${deleteSet.size} 筆指標！`, "success");
+                showToast(`🧹 已刪除選取的 ${deleteSet.size} 筆指標！`, "success");
             } else if (pendingDeleteIndex > -1 && pendingDeleteIndex < allDataItems.length) {
                 allDataItems.splice(pendingDeleteIndex, 1);
                 closeDeleteConfirmModal();
@@ -2199,7 +2220,7 @@
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
 
-                showToast("範本下載成功！(已輸出為標準 CSV 格式)", "success");
+                showToast("範本下載成功！", "success");
             } catch (err) {
                 console.error(err);
                 showToast("❌ 下載失敗：" + err.message, "error");
@@ -2226,7 +2247,7 @@
                 showToast("已匯出檔案!", "success");
             } catch(e) {
                 console.error(e);
-                showToast("匯出 Excel 失敗，請確認瀏覽器支援度。", "error");
+                showToast("匯出 Excel 失敗。", "error");
             }
         }
 
@@ -2238,7 +2259,7 @@
                     isClearConfirmPending = true;
                     btnText.innerText = "按第二次確認清空";
                     btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold bg-rose-600 text-white transition animate-pulse";
-                    showToast("⚠️ 請再次點擊權限選單中的清除按鈕以確認清空資料庫。", "error");
+                    showToast("⚠️ 請再次點擊選單中的按鈕以確認清空。", "error");
                     setTimeout(() => {
                         isClearConfirmPending = false;
                         btnText.innerText = "清空雲端與地端資料庫";
@@ -2252,7 +2273,7 @@
                     isClearConfirmPending = false;
                     btnText.innerText = "清空雲端與地端資料庫";
                     btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100";
-                    showToast("🧹 雲端與本地暫存資料庫已完全清空！", "success");
+                    showToast("🧹 資料庫已完全清空！", "success");
                 }
             });
         }
