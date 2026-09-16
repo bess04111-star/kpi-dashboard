@@ -755,11 +755,20 @@
         </div>
     </div>
 
-<script>
-    const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbxrCPwQllExDWZuMIzpWA-bgklDKimhwVacG0W2d9BgmODfYe5Qi2hHIlFuK-OoMEx5/exec";
-    const API_SECRET_TOKEN = "KPI_MASTER_SECURE_TOKEN_2026";
-        
-        // 處理
+    <!-- 1. 優先引入地端獨立設定檔 (此檔案不傳至 GitHub) -->
+    <script src="config.js"></script>
+
+    <!-- 2. 主程式邏輯與防呆機制 -->
+    <script>
+        // 備援防呆機制：若 config.js 讀取失敗（例如在 GitHub 上開啟），則預設空字串
+        const GOOGLE_API_URL = window.GOOGLE_API_URL || "";
+        const API_SECRET_TOKEN = window.API_SECRET_TOKEN || "";
+
+        // 檢查 API 連線狀態
+        if (!GOOGLE_API_URL || !API_SECRET_TOKEN) {
+            console.warn("⚠️ 未偵測到有效的 config.js 設定檔，雲端同步功能目前停用。");
+        }
+
         const ADMIN_PASSWORD_HASH = "MTUwMA==";
 
         let CONFIG_TARGET_YEAR = 2026; 
@@ -950,41 +959,41 @@
             return s;
         }
 
-       async function syncFromCloud(isAuto = false) {
-    if (!isAuto) showToast("正在連線至雲端資料庫同步資料...", "info");
-    try {
-        // 帶上安全 Token 進行讀取驗證
-        const response = await fetch(`${GOOGLE_API_URL}?token=${API_SECRET_TOKEN}`);
-        const data = await response.json();
-        
-        if (data && Array.isArray(data) && data.length > 0) {
-            allDataItems = data.map(item => ({
-                ...item,
-                month: formatCleanMonth(item.month)
-            }));
-            localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
-            refreshDatabaseState();
-            if (!isAuto) showToast("✅ 已同步最新資料！", "success");
-        } else if (data && data.status === "unauthorized") {
-            if (!isAuto) showToast("❌ 雲端同步失敗：API 金鑰驗證不通過。", "error");
-        } else {
-            if (!isAuto) showToast("雲端尚無數據，請先匯入 XLSX 資料。", "info");
-            const savedData = localStorage.getItem('kpi_master_data');
-            if (savedData) {
-                allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
-                refreshDatabaseState();
+        async function syncFromCloud(isAuto = false) {
+            if (!isAuto) showToast("正在連線至雲端資料庫同步資料...", "info");
+            try {
+                // 帶上安全 Token 進行讀取驗證
+                const response = await fetch(`${GOOGLE_API_URL}?token=${API_SECRET_TOKEN}`);
+                const data = await response.json();
+                
+                if (data && Array.isArray(data) && data.length > 0) {
+                    allDataItems = data.map(item => ({
+                        ...item,
+                        month: formatCleanMonth(item.month)
+                    }));
+                    localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
+                    refreshDatabaseState();
+                    if (!isAuto) showToast("✅ 已同步最新資料！", "success");
+                } else if (data && data.status === "unauthorized") {
+                    if (!isAuto) showToast("❌ 雲端同步失敗：API 金鑰驗證不通過。", "error");
+                } else {
+                    if (!isAuto) showToast("雲端尚無數據，請先匯入 XLSX 資料。", "info");
+                    const savedData = localStorage.getItem('kpi_master_data');
+                    if (savedData) {
+                        allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
+                        refreshDatabaseState();
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                if (!isAuto) showToast("⚠️ 無法連線至伺服器，讀取本機暫存資料。", "error");
+                const savedData = localStorage.getItem('kpi_master_data');
+                if (savedData) {
+                    allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
+                    refreshDatabaseState();
+                }
             }
         }
-    } catch (err) {
-        console.error(err);
-        if (!isAuto) showToast("⚠️ 無法連線至伺服器，讀取本機暫存資料。", "error");
-        const savedData = localStorage.getItem('kpi_master_data');
-        if (savedData) {
-            allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
-            refreshDatabaseState();
-        }
-    }
-}
 
         async function saveToCloud() {
             localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
@@ -1249,7 +1258,7 @@
                                     else if (s.includes("目標")) colIndices["y26Target"] = c;
                                     else if (s.includes("↑/↓") || s.includes("方向")) colIndices["direction"] = c;
                                     else if (s.includes("備註")) colIndices["remark"] = c;
-                                    else if (s.includes("項目") || s.includes("項    目")) colIndices["subItem"] = c;
+                                    else if (s.includes("項目") || s.includes("項   目")) colIndices["subItem"] = c;
                                     
                                     for (let m = 1; m <= 12; m++) {
                                         if (s === `${m}月`) colIndices[`m${m}`] = c;
@@ -1849,12 +1858,12 @@
                 btnText.innerText = "收合";
                 if(btnIcon) btnIcon.setAttribute('data-lucide', 'eye-off');
                 if(desktopTable) desktopTable.classList.add('max-h-[520px]', 'overflow-y-auto');
-                if(cardsContainer) cardsContainer.classList.add('max-h-[520px]', 'overflow-y-auto');
+                if(mobileCards) mobileCards.classList.add('max-h-[520px]', 'overflow-y-auto');
             } else {
                 btnText.innerText = "展開 (檢視全部)";
                 if(btnIcon) btnIcon.setAttribute('data-lucide', 'eye');
                 if(desktopTable) desktopTable.classList.remove('max-h-[520px]', 'overflow-y-auto');
-                if(cardsContainer) cardsContainer.classList.remove('max-h-[520px]', 'overflow-y-auto');
+                if(mobileCards) mobileCards.classList.remove('max-h-[520px]', 'overflow-y-auto');
             }
             renderMeasures();
             lucide.createIcons();
@@ -2205,7 +2214,7 @@
                 const csvContent = "\uFEFF" + 
                     `${CONFIG_TARGET_YEAR}年重點績效指標管理平台（系統標準匯入格式）,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n` +
                     "說明：1. 請保留第三行之欄位名稱。2. 子行群組順序與名稱必須完全符合『當月目標』、『當月實績』、『累計目標』、『累計實績』、『累計評價』及『去年實績』、『去年累計實績』。,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n" +
-                    `MTS/AOP分類,中心,廠部,課別,指標分類,指定報告會議(T/K),重點績效評價項目,MTS/AOP編號,施策項目,↑/↓,基本定義,計算單位,${CONFIG_PREV_YEAR}實績,${CONFIG_TARGET_YEAR}目標,項    目,1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月,備註\n` +
+                    `MTS/AOP分類,中心,廠部,課別,指標分類,指定報告會議(T/K),重點績效評價項目,MTS/AOP編號,施策項目,↑/↓,基本定義,計算單位,${CONFIG_PREV_YEAR}實績,${CONFIG_TARGET_YEAR}目標,項   目,1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月,備註\n` +
                     "M,管理中心,企管部,企管課,中心,T,O,B3-2-1,數位核心工程與集團AI智慧平台整合計畫,↑,專案進度定期回報,案,13,100%,當月目標,10,10,10,10,10,10,10,10,10,10,10,10,\n" +
                     ",,企管部,,,,,,,,,,,,,當月實績,10,10,10,9,10,,,,,,,,\n" +
                     ",,企管部,,,,,,,,,,,,,累計目標,10,20,30,40,50,60,70,80,90,100,110,120,\n" +
