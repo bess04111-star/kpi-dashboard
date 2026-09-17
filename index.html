@@ -824,7 +824,7 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;")
-                .replace(/\n/g, "<br>"); // 🟢 完整支援 Excel 內的換行呈現在畫面上
+                .replace(/\n/g, "<br>"); // 🟢 完整保留換行符號
         }
 
         function loadLocalCache() {
@@ -1038,7 +1038,6 @@
             }
         }
 
-        // 🟢 專屬於「2025實績」與「2026目標」的文字與數字保留呈現 logic (對應第 3 項條件)
         function formatTargetOrActualText(val) {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
@@ -1051,7 +1050,25 @@
             return escapeHTML(s);
         }
 
-        // 🟢 專屬於「累計欄位」畫面的格式化函式 (對應第 1 項條件，徹底解決 0.498 變成 0.50% 問題)
+        // 🟢 專屬數值解析器：精準提取數字，正確處理 % 與 小數
+        function parseCleanNumber(val) {
+            if (isPlaceholder(val)) return NaN;
+            let s = String(val).trim().replace(/,/g, '');
+            let isPct = s.includes('%');
+            
+            // 抓出浮點數部分
+            let match = s.match(/[-+]?\d*\.?\d+/);
+            if (!match) return NaN;
+            
+            let num = parseFloat(match[0]);
+            // 若帶有 % 符號且數字大於 1 (例如 0.812%)，轉為小數進一步運算
+            if (isPct) {
+                return num / 100;
+            }
+            return num;
+        }
+
+        // 🟢 專屬於「累計欄位」畫面的格式化函式
         function safeDisplay(val, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
@@ -1060,39 +1077,32 @@
             const isPercentUnit = unitStr === "%" || s.includes('%');
             const isIntegerUnit = /千元|仟元|千|仟|元/.test(unitStr) || /千元|仟元|千|仟|元/.test(s);
 
-            let cleanNumStr = s.replace(/[^0-9.-]/g, '');
-            let num = parseFloat(cleanNumStr);
+            let cleanNum = parseCleanNumber(s);
 
-            if (isNaN(num)) return escapeHTML(s);
+            if (isNaN(cleanNum)) return escapeHTML(s);
 
-            // 1-1. 單位為 % 時的處理
+            // 1-1. 單位為 % 時
             if (isPercentUnit) {
-                // 如果 Excel 傳進來的是 < 1 的小數 (例如 0.498 代表 49.8%)，自動乘以 100 恢復真實百分比
-                if (!s.includes('%') && Math.abs(num) <= 1.0) {
-                    num = num * 100;
-                }
-                return num.toFixed(2) + "%";
+                let pctValue = cleanNum * 100;
+                return pctValue.toFixed(2) + "%";
             }
 
             // 1-2. 單位有 千/仟/元 時，呈現千分位整數
             if (isIntegerUnit) {
-                return Math.round(num).toLocaleString('en-US');
+                return Math.round(cleanNum).toLocaleString('en-US');
             }
 
-            return Number.isInteger(num) 
-                ? num.toLocaleString('en-US') 
-                : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return Number.isInteger(cleanNum) 
+                ? cleanNum.toLocaleString('en-US') 
+                : cleanNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // 🟢 專屬於達成率計算的函式 (對應第 2 項條件：直球拿純數值相除，輸出結果為小數 ratio，例如 1.2937 或 1.0)
+        // 🟢 重構：高精度達成率計算函式
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
-            let tStr = String(targetVal).trim().replace(/,/g, '').replace(/[^0-9.-]/g, '');
-            let aStr = String(actualVal).trim().replace(/,/g, '').replace(/[^0-9.-]/g, '');
-
-            let tNum = parseFloat(tStr);
-            let aNum = parseFloat(aStr);
+            let tNum = parseCleanNumber(targetVal);
+            let aNum = parseCleanNumber(actualVal);
 
             if (isNaN(tNum) || isNaN(aNum)) return "—";
 
@@ -1114,7 +1124,7 @@
                 }
             }
 
-            return rateVal; // 回傳純小數，交給畫面統一乘 100 並呈現 %
+            return rateVal; // 回傳純小數 (例如 0.516 代表 51.60%)
         }
 
         function getMonthsWithActualData() {
@@ -1126,8 +1136,7 @@
                 const hasRealData = monthItems.some(item => {
                     if (!item.actualAccum) return false;
                     if (isPlaceholder(item.actualAccum)) return false;
-                    const cleanVal = String(item.actualAccum).trim().replace(/%/g, '');
-                    const num = parseFloat(cleanVal.replace(/,/g, ''));
+                    const num = parseCleanNumber(item.actualAccum);
                     if (!isNaN(num) && num === 0) return false; 
                     return true;
                 });
@@ -1217,6 +1226,7 @@
             });
         }
 
+        // 🟢 徹底解決問題 1：直接抓取 Excel 的 formatted 顯示文字與換行
         function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1224,7 +1234,6 @@
             reader.onload = (event) => {
                 try {
                     const data = new Uint8Array(event.target.result);
-                    // 🟢 使用 { raw: false, formatted: true } 取得 Excel 精準儲存格呈現文字
                     const wb = XLSX.read(data, { type: 'array', cellText: true, cellDates: true });
                     
                     let totalAdded = 0;
@@ -1235,7 +1244,26 @@
                         if (sheetState && sheetState.Hidden && sheetState.Hidden !== 0) return;
 
                         const worksheet = wb.Sheets[sheetName];
-                        const grid = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
+                        
+                        // 提取精準 Raw Cell 值與文字 (解決多行文字與 % 截斷)
+                        const grid = [];
+                        const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+                        for (let R = range.s.r; R <= range.e.r; ++R) {
+                            const row = [];
+                            for (let C = range.s.c; C <= range.e.c; ++C) {
+                                const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+                                const cell = worksheet[cellRef];
+                                if (!cell) {
+                                    row.push('');
+                                } else {
+                                    // 🟢 優先讀取 formatted text (w)，若無才用 v
+                                    let textVal = cell.w !== undefined ? cell.w : String(cell.v || '');
+                                    row.push(textVal);
+                                }
+                            }
+                            grid.push(row);
+                        }
+
                         if (grid.length === 0) return;
                         
                         const wsRows = worksheet['!rows']; 
@@ -1965,20 +1993,15 @@
                 const absoluteIndex = allDataItems.indexOf(p);
                 const isChecked = selectedItemIndices.has(absoluteIndex);
 
-                // 🟢 達成率 (rate) 強制乘以 100 並補上 % 符號 (徹底解決 1 或 1.2937 問題)
+                // 🟢 高精度達成率呈現：將小數乘以 100 並呈現至小數點第 2 位
                 let displayRate = "—";
                 if (!isPlaceholder(p.rate)) {
-                    let rawStr = String(p.rate).trim().replace(/,/g, '');
-                    if (rawStr.endsWith('%')) {
-                        let num = parseFloat(rawStr.replace(/%/g, ''));
-                        displayRate = isNaN(num) ? rawStr : num.toFixed(2) + "%";
+                    let rawNum = typeof p.rate === "number" ? p.rate : parseFloat(String(p.rate).replace(/%/g, ''));
+                    if (!isNaN(rawNum)) {
+                        let pctVal = rawNum <= 2.0 && rawNum > 0 ? rawNum * 100 : rawNum;
+                        displayRate = pctVal.toFixed(2) + "%";
                     } else {
-                        let num = parseFloat(rawStr);
-                        if (!isNaN(num)) {
-                            displayRate = (num * 100).toFixed(2) + "%";
-                        } else {
-                            displayRate = rawStr;
-                        }
+                        displayRate = escapeHTML(p.rate);
                     }
                 }
 
@@ -2009,15 +2032,15 @@
                     <td class="p-1.5 border-r border-gray-100 text-center break-words"><span class="${tagClass}">${escapeHTML(p.type)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 font-medium text-gray-900 leading-tight break-words">${escapeHTML(p.project)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.unit)}</td>
-                    <!-- 🟢 第 3 項：2025實績與2026目標完整呈現在畫面上，包含換行與千分位 -->
+                    <!-- 🟢 2025實績與2026目標：完整保留換行與原始字串 -->
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${formatTargetOrActualText(p.y25Actual)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${formatTargetOrActualText(p.y26Target)}</td>
-                    <!-- 🟢 第 1 項：累計欄位經過 safeDisplay 自動補 % 與千分位 -->
+                    <!-- 🟢 累計欄位：高精度 safeDisplay 轉換 -->
                     <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center break-words">${dirTag}</td>
-                    <!-- 🟢 第 2 項：達成率呈現 % 取小數點 2 位 -->
+                    <!-- 🟢 精準達成率顯示 -->
                     <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${displayRate}</td>
                     <td class="p-1.5 text-center border-r border-gray-100 whitespace-nowrap"><span class="px-1 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 text-gray-500 break-words">${escapeHTML(p.remark) || '—'}</td>
@@ -2363,7 +2386,7 @@
 
                 showToast("✅ 已成功匯出 Excel 總資料庫檔案！", "success");
             } catch (e) {
-                console.error("匯出失敗詳細錯誤：", e);
+                console.error("匯出詳細錯誤：", e);
                 showToast("❌ 匯出 Excel 失敗");
             }
         }
