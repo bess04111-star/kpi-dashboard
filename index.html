@@ -823,7 +823,8 @@
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
+                .replace(/'/g, "&#039;")
+                .replace(/\n/g, "<br>"); // 🟢 完整支援 Excel 內的換行呈現在畫面上
         }
 
         function loadLocalCache() {
@@ -1037,7 +1038,20 @@
             }
         }
 
-        // 🟢 專屬於畫面輸出的格式化函式 (對應第 1 項條件)
+        // 🟢 專屬於「2025實績」與「2026目標」的文字與數字保留呈現 logic (對應第 3 項條件)
+        function formatTargetOrActualText(val) {
+            if (isPlaceholder(val)) return "—";
+            let s = String(val).trim();
+            
+            // 若為純整數，自動補上千分位（例如 75000 -> 75,000）
+            if (/^-?\d+$/.test(s)) {
+                let num = parseInt(s, 10);
+                return num.toLocaleString('en-US');
+            }
+            return escapeHTML(s);
+        }
+
+        // 🟢 專屬於「累計欄位」畫面的格式化函式 (對應第 1 項條件，徹底解決 0.498 變成 0.50% 問題)
         function safeDisplay(val, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
@@ -1046,33 +1060,34 @@
             const isPercentUnit = unitStr === "%" || s.includes('%');
             const isIntegerUnit = /千元|仟元|千|仟|元/.test(unitStr) || /千元|仟元|千|仟|元/.test(s);
 
-            // 提取純數字部分
             let cleanNumStr = s.replace(/[^0-9.-]/g, '');
             let num = parseFloat(cleanNumStr);
 
-            if (isNaN(num)) return s;
+            if (isNaN(num)) return escapeHTML(s);
 
-            // 1-1. 單位為 % 時，顯示 % 並帶 2 位小數
+            // 1-1. 單位為 % 時的處理
             if (isPercentUnit) {
-                return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+                // 如果 Excel 傳進來的是 < 1 的小數 (例如 0.498 代表 49.8%)，自動乘以 100 恢復真實百分比
+                if (!s.includes('%') && Math.abs(num) <= 1.0) {
+                    num = num * 100;
+                }
+                return num.toFixed(2) + "%";
             }
 
-            // 1-2. 單位有 千/仟/元 時，強制進行四捨五入並呈現千分位（無小數點、不帶文字單位）
+            // 1-2. 單位有 千/仟/元 時，呈現千分位整數
             if (isIntegerUnit) {
-                return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
+                return Math.round(num).toLocaleString('en-US');
             }
 
-            // 常規數值格式化
             return Number.isInteger(num) 
                 ? num.toLocaleString('en-US') 
                 : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // 🟢 專屬於達成率計算的函式 (對應第 2 項條件：直球拿純數字相除，防止雙重除以 100 變成 1)
+        // 🟢 專屬於達成率計算的函式 (對應第 2 項條件：直球拿純數值相除，輸出結果為小數 ratio，例如 1.2937 或 1.0)
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
-            // 純化數值：只抓數字與小數點 (去掉 %, 千位分號, 文字)
             let tStr = String(targetVal).trim().replace(/,/g, '').replace(/[^0-9.-]/g, '');
             let aStr = String(actualVal).trim().replace(/,/g, '').replace(/[^0-9.-]/g, '');
 
@@ -1099,8 +1114,7 @@
                 }
             }
 
-            // 呈現 % 取小數點 2 位
-            return (rateVal * 100).toFixed(2) + "%";
+            return rateVal; // 回傳純小數，交給畫面統一乘 100 並呈現 %
         }
 
         function getMonthsWithActualData() {
@@ -1210,7 +1224,8 @@
             reader.onload = (event) => {
                 try {
                     const data = new Uint8Array(event.target.result);
-                    const wb = XLSX.read(data, { type: 'array' });
+                    // 🟢 使用 { raw: false, formatted: true } 取得 Excel 精準儲存格呈現文字
+                    const wb = XLSX.read(data, { type: 'array', cellText: true, cellDates: true });
                     
                     let totalAdded = 0;
                     let totalUpdated = 0;
@@ -1220,7 +1235,7 @@
                         if (sheetState && sheetState.Hidden && sheetState.Hidden !== 0) return;
 
                         const worksheet = wb.Sheets[sheetName];
-                        const grid = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                        const grid = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
                         if (grid.length === 0) return;
                         
                         const wsRows = worksheet['!rows']; 
@@ -1299,8 +1314,8 @@
                                     type: String(row[colIndices["type"]] || '').trim(),
                                     project: cellProject,
                                     unit: String(row[colIndices["unit"]] || '').trim(),
-                                    y25Actual: String(row[colIndices["y25Actual"]] || '').trim(),
-                                    y26Target: String(row[colIndices["y26Target"]] || '').trim(),
+                                    y25Actual: row[colIndices["y25Actual"]] !== undefined ? String(row[colIndices["y25Actual"]] || '').trim() : "—",
+                                    y26Target: row[colIndices["y26Target"]] !== undefined ? String(row[colIndices["y26Target"]] || '').trim() : "—",
                                     direction: String(row[colIndices["direction"]] || '↑').trim(),
                                     remark: colIndices["remark"] !== undefined ? String(row[colIndices["remark"]] || '').trim() : "",
                                     subRows: {}
@@ -1336,7 +1351,6 @@
                             const project = item.project;
                             const unit = item.unit || "—";
                             
-                            // 💡 規則 3：完整保留 2025實績 與 2026目標 的原始文字
                             const rawY25Actual = item.y25Actual || "—"; 
                             const rawY26Target = item.y26Target || "—";
 
@@ -1357,13 +1371,11 @@
                                 const actualDisp = (actualVal !== null && actualVal !== undefined && String(actualVal).trim() !== "") ? String(actualVal).trim() : "—";
                                 const yoyDisp = (lastYearAccumVal || lastYearVal) ? String(lastYearAccumVal || lastYearVal).trim() : "—";
                                 
-                                // 計算達成率 (直接對純數值做運算，不污染原始儲存值)
-                                let rateDisp = calculateRate(targetDisp, actualDisp, direction);
+                                let rateVal = calculateRate(targetDisp, actualDisp, direction);
 
                                 let evalChar = "X";
-                                let rNum = parseFloat(String(rateDisp).replace(/%/g, ''));
-                                if (!isNaN(rNum)) {
-                                    evalChar = rNum >= 100 ? "O" : "X";
+                                if (typeof rateVal === "number" && !isNaN(rateVal)) {
+                                    evalChar = rateVal >= 1.0 ? "O" : "X";
                                 }
 
                                 if (evalVal !== undefined && evalVal !== null && String(evalVal).trim() !== "") {
@@ -1387,7 +1399,7 @@
                                     actualAccum: actualDisp, 
                                     yoyActual: yoyDisp, 
                                     direction: direction, 
-                                    rate: rateDisp, 
+                                    rate: rateVal, 
                                     eval: evalChar,
                                     remark: remark
                                 };
@@ -1953,6 +1965,23 @@
                 const absoluteIndex = allDataItems.indexOf(p);
                 const isChecked = selectedItemIndices.has(absoluteIndex);
 
+                // 🟢 達成率 (rate) 強制乘以 100 並補上 % 符號 (徹底解決 1 或 1.2937 問題)
+                let displayRate = "—";
+                if (!isPlaceholder(p.rate)) {
+                    let rawStr = String(p.rate).trim().replace(/,/g, '');
+                    if (rawStr.endsWith('%')) {
+                        let num = parseFloat(rawStr.replace(/%/g, ''));
+                        displayRate = isNaN(num) ? rawStr : num.toFixed(2) + "%";
+                    } else {
+                        let num = parseFloat(rawStr);
+                        if (!isNaN(num)) {
+                            displayRate = (num * 100).toFixed(2) + "%";
+                        } else {
+                            displayRate = rawStr;
+                        }
+                    }
+                }
+
                 const tr = document.createElement('tr'); 
                 tr.className = `hover:bg-gray-50 transition ${isChecked ? 'bg-gray-100' : ''}`;
 
@@ -1980,16 +2009,16 @@
                     <td class="p-1.5 border-r border-gray-100 text-center break-words"><span class="${tagClass}">${escapeHTML(p.type)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 font-medium text-gray-900 leading-tight break-words">${escapeHTML(p.project)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.unit)}</td>
-                    <!-- 第3項：2025實績與2026目標完整呈現文字 -->
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${escapeHTML(p.y25Actual) || '—'}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.y26Target) || '—'}</td>
-                    <!-- 第1項：累計欄位經過 safeDisplay 套用對應單位格式 -->
+                    <!-- 🟢 第 3 項：2025實績與2026目標完整呈現在畫面上，包含換行與千分位 -->
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${formatTargetOrActualText(p.y25Actual)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${formatTargetOrActualText(p.y26Target)}</td>
+                    <!-- 🟢 第 1 項：累計欄位經過 safeDisplay 自動補 % 與千分位 -->
                     <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center break-words">${dirTag}</td>
-                    <!-- 第2項：達成率呈現 % 取小數點2位 -->
-                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${p.rate}</td>
+                    <!-- 🟢 第 2 項：達成率呈現 % 取小數點 2 位 -->
+                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${displayRate}</td>
                     <td class="p-1.5 text-center border-r border-gray-100 whitespace-nowrap"><span class="px-1 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 text-gray-500 break-words">${escapeHTML(p.remark) || '—'}</td>
                     ${actionCellHtml}`;
@@ -2032,11 +2061,11 @@
                     <div class="grid grid-cols-3 gap-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100 text-[10px]">
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_PREV_YEAR}實績</span>
-                            <span class="font-bold text-gray-700">${escapeHTML(p.y25Actual) || '—'}</span>
+                            <span class="font-bold text-gray-700">${formatTargetOrActualText(p.y25Actual)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_TARGET_YEAR}目標</span>
-                            <span class="font-bold text-gray-700">${escapeHTML(p.y26Target) || '—'}</span>
+                            <span class="font-bold text-gray-700">${formatTargetOrActualText(p.y26Target)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">計算單位</span>
@@ -2060,7 +2089,7 @@
 
                     <div class="flex items-center justify-between pt-1 text-xs">
                         <span class="text-gray-500 font-semibold">指標達成率</span>
-                        <span class="font-black text-sm text-gray-900 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">${p.rate}</span>
+                        <span class="font-black text-sm text-gray-900 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">${displayRate}</span>
                     </div>
 
                     ${cardActionsHtml}
@@ -2184,8 +2213,9 @@
             if (selectEval !== "auto") {
                 evalChar = selectEval;
             } else {
-                let rNum = parseFloat(computedRate.replace(/%/g, ''));
-                if (!isNaN(rNum)) evalChar = rNum >= 100 ? "O" : "X";
+                if (typeof computedRate === "number" && !isNaN(computedRate)) {
+                    evalChar = computedRate >= 1.0 ? "O" : "X";
+                }
             }
 
             const item = {
@@ -2287,24 +2317,30 @@
                     "指標達成率", "評價狀態", "備註說明"
                 ];
 
-                const dataRows = allDataItems.map(i => [
-                    i.month || "",
-                    i.center || "",
-                    i.dept || "",
-                    i.section || "",
-                    i.type || "",
-                    i.project || "",
-                    i.unit || "",
-                    i.y25Actual || "",
-                    i.y26Target || "",
-                    i.targetAccum || "",
-                    i.actualAccum || "",
-                    i.yoyActual || "",
-                    i.direction || "↑",
-                    i.rate || "",
-                    i.eval || "",
-                    i.remark || ""
-                ]);
+                const dataRows = allDataItems.map(i => {
+                    let dispRate = i.rate;
+                    if (typeof i.rate === "number") {
+                        dispRate = (i.rate * 100).toFixed(2) + "%";
+                    }
+                    return [
+                        i.month || "",
+                        i.center || "",
+                        i.dept || "",
+                        i.section || "",
+                        i.type || "",
+                        i.project || "",
+                        i.unit || "",
+                        i.y25Actual || "",
+                        i.y26Target || "",
+                        i.targetAccum || "",
+                        i.actualAccum || "",
+                        i.yoyActual || "",
+                        i.direction || "↑",
+                        dispRate || "",
+                        i.eval || "",
+                        i.remark || ""
+                    ];
+                });
 
                 const wsData = [headers, ...dataRows];
                 const wb = XLSX.book_new();
