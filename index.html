@@ -316,7 +316,7 @@
                     </div>
                 </div>
 
-                <!-- 電腦版 Table (修正點 3：表頭名稱改為「廠部」) -->
+                <!-- 電腦版 Table -->
                 <div id="deptMatrixTableContainer" class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg w-full bg-white transition-all duration-300">
                     <table class="w-full text-xs text-left border-collapse min-w-[1000px]">
                         <thead class="bg-f2 text-gray-800 font-bold border-b border-gray-300 uppercase sticky top-0 z-20 shadow-sm">
@@ -453,7 +453,7 @@
                     </span>
                 </div>
 
-                <!-- 電腦版 Table (修正點 1 & 2：廠部 (部門) 改為 廠部；評價標題加入 whitespace-nowrap 強制不換行) -->
+                <!-- 電腦版 Table -->
                 <div id="desktopTableContainer" class="hidden lg:block overflow-x-hidden border border-gray-200 rounded-lg bg-white w-full transition-all duration-300">
                     <table class="w-full text-[11px] text-left border-collapse table-fixed">
                         <thead class="sticky top-0 bg-f2 text-gray-800 font-bold border-b border-gray-300 z-20 shadow-sm">
@@ -755,17 +755,14 @@
         </div>
     </div>
 
-    <!-- 1. 優先引入地端獨立設定檔 (此檔案不傳至 GitHub) -->
-    <script src="config.js"></script>
+    <!-- 1. 載入動態生成的 config.js (若 GitHub Actions 注入成功則啟用) -->
+    <script src="config.js" onerror="console.warn('⚠️ 未發現 config.js 設定檔，雲端同步功能停用。')"></script>
 
     <!-- 2. 主程式邏輯與防呆機制 -->
     <script>
-        const GOOGLE_API_URL = window.GOOGLE_API_URL || "";
-        const API_SECRET_TOKEN = window.API_SECRET_TOKEN || "";
-
-        if (!GOOGLE_API_URL || !API_SECRET_TOKEN) {
-            console.warn("⚠️ 未偵測到有效的 config.js 設定檔，雲端同步功能目前停用。");
-        }
+        // 安全讀取由 GitHub Actions 注入或本機宣告的 CONFIG 物件
+        const GAS_API_URL = (typeof CONFIG !== 'undefined' && CONFIG.GAS_API_URL) ? CONFIG.GAS_API_URL : "";
+        const API_SECRET_TOKEN = (typeof CONFIG !== 'undefined' && CONFIG.API_TOKEN) ? CONFIG.API_TOKEN : "";
 
         const ADMIN_PASSWORD_HASH = "MTUwMA==";
 
@@ -831,6 +828,19 @@
             } catch (e) {
                 return "";
             }
+        }
+
+        function loadLocalCache() {
+            const savedData = localStorage.getItem('kpi_master_data');
+            if (savedData) {
+                try {
+                    allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
+                    refreshDatabaseState();
+                } catch(e) {
+                    console.error("解析本機暫存資料失敗：", e);
+                }
+            }
+            return allDataItems;
         }
 
         function toggleToolsDropdown() {
@@ -958,10 +968,31 @@
             return s.replace(/\D/g, '');
         }
 
+        // 🛡️ 增強版雲端同步（防止 JSON 解析 HTML 崩潰與詳細 Log 紀錄）
         async function syncFromCloud(isAuto = false) {
+            if (!GAS_API_URL) {
+                if (!isAuto) showToast("⚠️ 未偵測到有效的網址，已讀取本機資料。", "warning");
+                return loadLocalCache();
+            }
+
             if (!isAuto) showToast("正在連線至雲端資料庫同步資料...", "info");
+
             try {
-                const response = await fetch(`${GOOGLE_API_URL}?token=${API_SECRET_TOKEN}`);
+                const requestUrl = `${GAS_API_URL}?token=${encodeURIComponent(API_SECRET_TOKEN)}`;
+                const response = await fetch(requestUrl, { method: 'GET', redirect: 'follow' });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP 狀態碼異常：${response.status}`);
+                }
+
+                // 檢查 Content-Type 避免解析 GAS 回傳的 HTML 登入/錯誤頁面
+                const contentType = response.headers.get("content-type") || "";
+                if (contentType.includes("text/html")) {
+                    const htmlText = await response.text();
+                    console.error("❌ GAS 回傳了 HTML 頁面（可能權限未開放或網址錯誤）：", htmlText.substring(0, 150));
+                    throw new Error("伺服器回傳了網頁而非 JSON 資料，請確認 GAS 權限已開啟為「所有人」。");
+                }
+
                 const data = await response.json();
                 
                 if (data && Array.isArray(data) && data.length > 0) {
@@ -971,37 +1002,34 @@
                     }));
                     localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
                     refreshDatabaseState();
-                    if (!isAuto) showToast("✅ 已同步最新資料！", "success");
+                    if (!isAuto) showToast("☁️ 雲端資料同步成功！", "success");
                 } else if (data && data.status === "unauthorized") {
                     if (!isAuto) showToast("❌ 雲端同步失敗：API 金鑰驗證不通過。", "error");
                 } else {
-                    if (!isAuto) showToast("雲端尚無數據，請先匯入 XLSX 資料。", "info");
-                    const savedData = localStorage.getItem('kpi_master_data');
-                    if (savedData) {
-                        allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
-                        refreshDatabaseState();
-                    }
+                    if (!isAuto) showToast("雲端尚無數據，已讀取本機暫存。", "info");
+                    loadLocalCache();
                 }
             } catch (err) {
-                console.error(err);
-                if (!isAuto) showToast("⚠️ 無法連線至伺服器，讀取本機暫存資料。", "error");
-                const savedData = localStorage.getItem('kpi_master_data');
-                if (savedData) {
-                    allDataItems = JSON.parse(savedData).map(item => ({ ...item, month: formatCleanMonth(item.month) }));
-                    refreshDatabaseState();
-                }
+                console.error("雲端同步失敗：", err);
+                if (!isAuto) showToast(`⚠️ 同步異常：${err.message}，已載入本機資料。`, "error");
+                loadLocalCache();
             }
         }
 
         async function saveToCloud() {
             localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
+            if (!GAS_API_URL) {
+                showToast("已存入本機快照（未設定雲端 API 網址）。", "info");
+                return;
+            }
+
             showToast("正在將異動同步寫回雲端...", "info");
             try {
                 const payload = {
                     token: API_SECRET_TOKEN,
                     data: allDataItems
                 };
-                await fetch(GOOGLE_API_URL, {
+                await fetch(GAS_API_URL, {
                     method: "POST",
                     body: JSON.stringify(payload),
                     headers: { "Content-Type": "text/plain;charset=utf-8" }
@@ -1941,7 +1969,6 @@
                         </div>
                     </td>` : '';
 
-                // 修正點 1：評價欄位 `td` 加入 `whitespace-nowrap` 強制不換行
                 tr.innerHTML = `
                     ${checkboxCellHtml}
                     <td class="p-1.5 border-r border-gray-100 font-bold text-gray-600 text-center break-words">${escapeHTML(p.month)}</td>
@@ -2240,7 +2267,6 @@
             }
         }
 
-        // 匯出功能對應表頭同步改為「廠部」
         function exportMasterDatabase() {
             if (!allDataItems || allDataItems.length === 0) {
                 showToast("目前資料庫中尚無資料，無法匯出！", "error");
@@ -2347,6 +2373,9 @@
             } else if (type === 'error') {
                 bgColor = 'bg-rose-700 text-white shadow-rose-900/20';
                 icon = 'alert-triangle';
+            } else if (type === 'warning') {
+                bgColor = 'bg-amber-600 text-white shadow-amber-900/20';
+                icon = 'alert-octagon';
             }
             
             toast.className = `px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold transition-all duration-300 transform -translate-y-5 opacity-0 flex items-center gap-2 pointer-events-auto ${bgColor}`;
