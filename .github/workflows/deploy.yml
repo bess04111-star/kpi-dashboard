@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # 當推送到 main 分支時觸發（若你的預設分支是 master 請自行修改）
+      - main  # 當推送到 main 分支時觸發
 
   # 允許在 GitHub 頁面上手動觸發部署
   workflow_dispatch:
@@ -31,12 +31,10 @@ jobs:
 
       - name: ⚙️ 自動生成 config.js（注入 GOOGLE_API_URL 與 API_SECRET_TOKEN）
         run: |
-          echo "const CONFIG = {" > config.js
-          echo "    GAS_API_URL: '${{ secrets.GOOGLE_API_URL }}'," >> config.js
-          echo "    API_TOKEN: '${{ secrets.API_SECRET_TOKEN }}'" >> config.js
-          echo "};" >> config.js
+          echo "window.GOOGLE_API_URL = '${{ secrets.GOOGLE_API_URL }}';" > config.js
+          echo "window.API_SECRET_TOKEN = '${{ secrets.API_SECRET_TOKEN }}';" >> config.js
           echo "✅ config.js 生成成功！內容架構如下："
-          cat config.js | sed 's/${{ secrets.API_SECRET_TOKEN }}/***HIDDEN***/g' # 隱藏敏感情資防洩漏
+          cat config.js | sed 's/${{ secrets.API_SECRET_TOKEN }}/***HIDDEN***/g'
 
       - name: 🔧 設定 GitHub Pages 資源環境
         uses: actions/configure-pages@v5
