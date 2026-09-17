@@ -69,7 +69,7 @@
             background-size: 1rem;
         }
 
-        th { white-space: nowrap; }
+        th { white-space: normal; word-break: break-all; }
 
         .dropdown-menu { display: none; }
         .dropdown-menu.show { display: block; animation: fadeIn 0.15s ease-out; }
@@ -96,7 +96,7 @@
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
                             <span class="truncate">集團 KPI 智慧互動總資料庫系統</span>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.1 PRO</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.3 PRO</span>
                         </h1>
                         <p class="text-[8px] sm:text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1 truncate">Enterprise Cloud Sync Master Platform</p>
                     </div>
@@ -316,13 +316,13 @@
                     </div>
                 </div>
 
-                <!-- 電腦版 Table -->
+                <!-- 電腦版 Table (修正點 3：表頭名稱改為「廠部」) -->
                 <div id="deptMatrixTableContainer" class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg w-full bg-white transition-all duration-300">
                     <table class="w-full text-xs text-left border-collapse min-w-[1000px]">
                         <thead class="bg-f2 text-gray-800 font-bold border-b border-gray-300 uppercase sticky top-0 z-20 shadow-sm">
                             <tr>
                                 <th id="th-center" class="p-2.5 border-r border-gray-300 xl:w-[15%] bg-f2" rowspan="2">中心單位</th>
-                                <th class="p-2.5 border-r border-gray-300 xl:w-[15%] bg-f2" rowspan="2">執行部門 (廠部)</th>
+                                <th class="p-2.5 border-r border-gray-300 xl:w-[15%] bg-f2" rowspan="2">廠部</th>
                                 <th class="p-2 border-r border-gray-300 text-center bg-f2 xl:w-[25%]" colspan="3">達標比例 (%)</th>
                                 <th class="p-2 text-center bg-f2 xl:w-[15%]" colspan="3">警示燈號指標</th>
                                 <th class="p-2.5 text-left bg-f2 xl:w-[30%]" rowspan="2">未達標明細 (異常/注意清單)</th>
@@ -453,31 +453,31 @@
                     </span>
                 </div>
 
-                <!-- 電腦版 Table -->
-                <div id="desktopTableContainer" class="hidden lg:block overflow-x-auto custom-scroll border border-gray-200 rounded-lg bg-white w-full transition-all duration-300">
+                <!-- 電腦版 Table (修正點 1 & 2：廠部 (部門) 改為 廠部；評價標題加入 whitespace-nowrap 強制不換行) -->
+                <div id="desktopTableContainer" class="hidden lg:block overflow-x-hidden border border-gray-200 rounded-lg bg-white w-full transition-all duration-300">
                     <table class="w-full text-[11px] text-left border-collapse table-fixed">
                         <thead class="sticky top-0 bg-f2 text-gray-800 font-bold border-b border-gray-300 z-20 shadow-sm">
                             <tr>
-                                <th id="th-checkbox" class="p-2 text-center border-r border-gray-300 w-[3%] hidden">
+                                <th id="th-checkbox" class="p-1.5 text-center border-r border-gray-300 w-[2%] hidden">
                                     <input type="checkbox" id="selectAllCheckbox" onchange="handleSelectAllChange(this.checked)" class="w-3.5 h-3.5 text-gray-700 rounded border-gray-300 focus:ring-gray-500 cursor-pointer">
                                 </th>
-                                <th class="p-2 border-r border-gray-300 w-[5%]">年月份</th>
-                                <th class="p-2 border-r border-gray-300 w-[6%]">中心單位</th>
-                                <th class="p-2 border-r border-gray-300 w-[6%]">廠部 (部門)</th>
-                                <th class="p-2 border-r border-gray-300 w-[5%]">課別</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[4%]">類別</th>
-                                <th class="p-2 border-r border-gray-300 w-[14%]">具體施策計畫項目</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[4%]">單位</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[7%]" id="lbl_y25Actual">2025實績</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[7%]" id="lbl_y26Target">2026目標</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[5%]">累計目標</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[5%]">累計實績</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[5%]">去年同期</th>
-                                <th class="p-2 border-r border-gray-300 text-center w-[5%]">方向</th>
-                                <th class="p-2 border-r border-gray-300 text-center font-bold text-gray-900 w-[5%]">達成率</th>
-                                <th class="p-2 text-center border-r border-gray-300 w-[4%]">評價</th>
-                                <th class="p-2 border-r border-gray-300 w-[6%]">備註</th>
-                                <th id="th-edit-op" class="p-2 text-center w-[5%] hidden">操作</th>
+                                <th class="p-1.5 border-r border-gray-300 w-[6%] text-center">年月</th>
+                                <th class="p-1.5 border-r border-gray-300 w-[6%]">中心單位</th>
+                                <th class="p-1.5 border-r border-gray-300 w-[6%]">廠部</th>
+                                <th class="p-1.5 border-r border-gray-300 w-[5%]">課別</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center w-[4%]">類別</th>
+                                <th class="p-1.5 border-r border-gray-300 w-[20%]">具體施策計畫項目</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center w-[4%]">單位</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center w-[6%]" id="lbl_y25Actual">2025實績</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center w-[6%]" id="lbl_y26Target">2026目標</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center w-[6%]">累計目標</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center w-[6%]">累計實績</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center w-[6%]">去年同期</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center w-[5%]">方向</th>
+                                <th class="p-1.5 border-r border-gray-300 text-center font-bold text-gray-900 w-[6%]">達成率</th>
+                                <th class="p-1.5 text-center border-r border-gray-300 w-[3%] whitespace-nowrap">評價</th>
+                                <th class="p-1.5 border-r border-gray-300 w-[5%]">備註</th>
+                                <th id="th-edit-op" class="p-1.5 text-center w-[4%] hidden">操作</th>
                             </tr>
                         </thead>
                         <tbody id="measureTableBody" class="divide-y divide-gray-100 bg-white"></tbody>
@@ -554,8 +554,8 @@
                 <input type="hidden" id="editIndex">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">年月份 *</label>
-                        <input type="text" id="m_month" placeholder="例如: 2026年06月" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
+                        <label class="block font-semibold text-gray-700 mb-1">年月 (YYYYMM) *</label>
+                        <input type="text" id="m_month" placeholder="例如: 202606" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
                         <label class="block font-semibold text-gray-700 mb-1">指標分類 *</label>
@@ -572,7 +572,7 @@
                         <input type="text" id="m_center" placeholder="例如: 管理中心" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">執行部門 (廠部) *</label>
+                        <label class="block font-semibold text-gray-700 mb-1">廠部 *</label>
                         <input type="text" id="m_dept" placeholder="例如: 企管部" class="w-full px-3 py-1.5 border border-gray-300 rounded text-xs outline-none focus:ring-1 focus:ring-gray-400">
                     </div>
                     <div>
@@ -760,11 +760,9 @@
 
     <!-- 2. 主程式邏輯與防呆機制 -->
     <script>
-        // 備援防呆機制：若 config.js 讀取失敗（例如在 GitHub 上開啟），則預設空字串
         const GOOGLE_API_URL = window.GOOGLE_API_URL || "";
         const API_SECRET_TOKEN = window.API_SECRET_TOKEN || "";
 
-        // 檢查 API 連線狀態
         if (!GOOGLE_API_URL || !API_SECRET_TOKEN) {
             console.warn("⚠️ 未偵測到有效的 config.js 設定檔，雲端同步功能目前停用。");
         }
@@ -827,7 +825,6 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // 不受 file:// 本機安全限制的標準混淆轉碼函式
         function hashPassword(str) {
             try {
                 return btoa(String(str).trim());
@@ -939,30 +936,31 @@
         }
 
         function formatCleanMonth(rawMonth) {
-            if (!rawMonth || isPlaceholder(rawMonth)) return "未知月份";
+            if (!rawMonth || isPlaceholder(rawMonth)) return "000000";
             let s = String(rawMonth).trim();
             
+            if (/^\d{6}$/.test(s)) return s;
+
             if (s.includes('T') || s.includes('Z')) {
                 let d = new Date(s);
                 if (!isNaN(d.getTime())) {
                     let dLoc = new Date(d.getTime() + (8 * 3600000));
                     let y = dLoc.getUTCFullYear();
                     let m = String(dLoc.getUTCMonth() + 1).padStart(2, '0');
-                    return `${y}年${m}月`;
+                    return `${y}${m}`;
                 }
             }
             
             let match = s.match(/(\d{4})[年/-]?(\d{1,2})/);
             if (match) {
-                return `${match[1]}年${String(match[2]).padStart(2, '0')}月`;
+                return `${match[1]}${String(match[2]).padStart(2, '0')}`;
             }
-            return s;
+            return s.replace(/\D/g, '');
         }
 
         async function syncFromCloud(isAuto = false) {
             if (!isAuto) showToast("正在連線至雲端資料庫同步資料...", "info");
             try {
-                // 帶上安全 Token 進行讀取驗證
                 const response = await fetch(`${GOOGLE_API_URL}?token=${API_SECRET_TOKEN}`);
                 const data = await response.json();
                 
@@ -1226,13 +1224,13 @@
                         }
                         fallbackCenter = fallbackCenter.replace(/\s+/g, '');
                         
-                        let year = `${CONFIG_TARGET_YEAR}年`;
+                        let year = `${CONFIG_TARGET_YEAR}`;
                         for (let r = 0; r < Math.min(5, grid.length); r++) {
                             if (wsRows && wsRows[r] && wsRows[r].hidden) continue;
                             const row = grid[r];
                             if (!row) continue;
                             const match = row.join(' ').match(/(\d{4})\s*年/);
-                            if (match) { year = match[1] + "年"; break; }
+                            if (match) { year = match[1]; break; }
                         }
                         
                         let headerRowIndex = -1;
@@ -1363,7 +1361,7 @@
                                     }
                                 }
                                 
-                                const monthStr = `${year}${String(m).padStart(2, '0')}月`;
+                                const monthStr = `${year}${String(m).padStart(2, '0')}`;
                                 
                                 const newItem = {
                                     month: monthStr, center, dept, section, type, project, unit,
@@ -1423,7 +1421,7 @@
             const yearSet = new Set();
             
             validMonths.forEach(m => {
-                const match = m.match(/(\d{4})年/);
+                const match = m.match(/^(\d{4})/);
                 if (match) yearSet.add(match[1]);
             });
             
@@ -1484,12 +1482,12 @@
 
             activeDataItems = allDataItems.filter(item => {
                 if (!validMonths.includes(item.month)) return false;
-                if (!item.month.startsWith(`${selectedYear}年`)) return false;
+                if (!item.month.startsWith(`${selectedYear}`)) return false;
                 if (monthStartFilter === 0 && monthEndFilter === 0) return true;
 
-                const match = item.month.match(/(\d{2})月/);
-                if (!match) return false;
-                const m = parseInt(match[1]);
+                const mStr = item.month.slice(4, 6);
+                const m = parseInt(mStr);
+                if (isNaN(m)) return false;
 
                 return m >= monthStartFilter && m <= monthEndFilter;
             });
@@ -1915,8 +1913,8 @@
                 const tagClass = p.type === '中心' ? 'tag-center' : 'tag-plant';
                 
                 const dirTag = p.direction === '↓' 
-                    ? '<span class="px-1 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[9px]">↓ 望小</span>' 
-                    : '<span class="px-1 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[9px]">↑ 望大</span>';
+                    ? '<span class="px-1 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[9px] inline-block">↓ 望小</span>' 
+                    : '<span class="px-1 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[9px] inline-block">↑ 望大</span>';
 
                 let evalTagClass = 'bg-x';
                 if (p.eval === 'O') evalTagClass = 'bg-o';
@@ -1929,38 +1927,39 @@
                 tr.className = `hover:bg-gray-50 transition ${isChecked ? 'bg-gray-100' : ''}`;
 
                 const checkboxCellHtml = isEditMode ? `
-                    <td class="p-2 text-center border-r border-gray-100">
+                    <td class="p-1.5 text-center border-r border-gray-100">
                         <input type="checkbox" data-index="${absoluteIndex}" ${isChecked ? 'checked' : ''} onchange="handleSelectItem(${absoluteIndex}, this.checked)" class="item-checkbox w-3.5 h-3.5 text-gray-700 rounded border-gray-300 focus:ring-gray-500 cursor-pointer">
                     </td>` : '';
 
                 const actionCellHtml = isEditMode ? `
-                    <td class="p-2 text-center whitespace-nowrap bg-gray-50">
+                    <td class="p-1.5 text-center bg-gray-50 break-words">
                         <div class="flex items-center justify-center space-x-1">
-                            <button onclick="openFormModal(true, ${absoluteIndex})" class="px-2 py-0.5 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded transition font-semibold text-[10px] flex items-center gap-1 border border-gray-300" title="編輯">
+                            <button onclick="openFormModal(true, ${absoluteIndex})" class="px-1.5 py-0.5 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded transition font-semibold text-[10px] flex items-center gap-0.5 border border-gray-300" title="編輯">
                                 <i data-lucide="edit-3" class="w-3 h-3 text-gray-600"></i>
                                 <span>編輯</span>
                             </button>
                         </div>
                     </td>` : '';
 
+                // 修正點 1：評價欄位 `td` 加入 `whitespace-nowrap` 強制不換行
                 tr.innerHTML = `
                     ${checkboxCellHtml}
-                    <td class="p-2 border-r border-gray-100 font-bold text-gray-500 truncate">${escapeHTML(p.month)}</td>
-                    <td class="p-2 border-r border-gray-100 font-bold text-gray-700 truncate">${escapeHTML(p.center)}</td>
-                    <td class="p-2 border-r border-gray-100 font-bold text-gray-800 truncate">${escapeHTML(p.dept)}</td>
-                    <td class="p-2 border-r border-gray-100 font-medium text-gray-500 truncate">${escapeHTML(p.section) || '—'}</td>
-                    <td class="p-2 border-r border-gray-100 text-center truncate"><span class="${tagClass}">${escapeHTML(p.type)}</span></td>
-                    <td class="p-2 border-r border-gray-100 font-medium text-gray-900 leading-tight whitespace-normal break-words">${escapeHTML(p.project)}</td>
-                    <td class="p-2 border-r border-gray-100 text-center text-gray-500 truncate">${escapeHTML(p.unit)}</td>
-                    <td class="p-2 border-r border-gray-100 text-center text-gray-500 font-medium whitespace-normal break-words">${safeDisplay(p.y25Actual, isPercentUnit, true)}</td>
-                    <td class="p-2 border-r border-gray-100 text-center text-gray-500 whitespace-normal break-words leading-tight">${safeDisplay(p.y26Target, isPercentUnit)}</td>
-                    <td class="p-2 border-r border-gray-100 text-center font-semibold text-gray-700 truncate">${safeDisplay(p.targetAccum, isPercentUnit)}</td>
-                    <td class="p-2 border-r border-gray-100 text-center font-black text-gray-900 truncate">${safeDisplay(p.actualAccum, isPercentUnit)}</td>
-                    <td class="p-2 border-r border-gray-100 text-center text-gray-400 truncate">${safeDisplay(p.yoyActual, isPercentUnit)}</td>
-                    <td class="p-2 border-r border-gray-100 text-center truncate">${dirTag}</td>
-                    <td class="p-2 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 truncate">${safeDisplay(p.rate, true)}</td>
-                    <td class="p-2 text-center border-r border-gray-100 truncate"><span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
-                    <td class="p-2 border-r border-gray-100 text-gray-500 whitespace-normal break-words">${escapeHTML(p.remark) || '—'}</td>
+                    <td class="p-1.5 border-r border-gray-100 font-bold text-gray-600 text-center break-words">${escapeHTML(p.month)}</td>
+                    <td class="p-1.5 border-r border-gray-100 font-bold text-gray-700 break-words">${escapeHTML(p.center)}</td>
+                    <td class="p-1.5 border-r border-gray-100 font-bold text-gray-800 break-words">${escapeHTML(p.dept)}</td>
+                    <td class="p-1.5 border-r border-gray-100 font-medium text-gray-500 break-words">${escapeHTML(p.section) || '—'}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center break-words"><span class="${tagClass}">${escapeHTML(p.type)}</span></td>
+                    <td class="p-1.5 border-r border-gray-100 font-medium text-gray-900 leading-tight break-words">${escapeHTML(p.project)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${safeDisplay(p.y25Actual, isPercentUnit, true)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${safeDisplay(p.y26Target, isPercentUnit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, isPercentUnit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, isPercentUnit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, isPercentUnit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center break-words">${dirTag}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${safeDisplay(p.rate, true)}</td>
+                    <td class="p-1.5 text-center border-r border-gray-100 whitespace-nowrap"><span class="px-1 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
+                    <td class="p-1.5 border-r border-gray-100 text-gray-500 break-words">${escapeHTML(p.remark) || '—'}</td>
                     ${actionCellHtml}`;
                 tableBody.appendChild(tr);
 
@@ -2102,7 +2101,7 @@
             } else {
                 ui('modalTitle').innerText = "手動新增 KPI 指標";
                 ui('editIndex').value = "-1";
-                ui('m_month').value = `${selectedYear}年06月`;
+                ui('m_month').value = `${selectedYear}06`;
                 ui('m_type').value = "中心";
                 ui('m_center').value = "";
                 ui('m_dept').value = "";
@@ -2125,7 +2124,8 @@
 
         function saveIndicator() {
             const index = parseInt(ui('editIndex').value);
-            const month = ui('m_month').value.trim();
+            const rawMonth = ui('m_month').value.trim();
+            const month = formatCleanMonth(rawMonth);
             const center = ui('m_center').value.trim().replace(/\s+/g, '');
             const dept = ui('m_dept').value.trim().replace(/\s+/g, '');
             const section = ui('m_section').value.trim().replace(/\s+/g, '');
@@ -2240,27 +2240,65 @@
             }
         }
 
+        // 匯出功能對應表頭同步改為「廠部」
         function exportMasterDatabase() {
-            if (allDataItems.length === 0) {
+            if (!allDataItems || allDataItems.length === 0) {
                 showToast("目前資料庫中尚無資料，無法匯出！", "error");
                 return;
             }
+            
             try {
-                const headers = ["年月份", "中心", "部門", "課別", "指標分類", "施策項目", "計算單位", `${CONFIG_PREV_YEAR}實績`, `${CONFIG_TARGET_YEAR}目標`, "累計目標", "累計實績", "去年同期累計實績", "望大值/望小值方向", "達成率", "評價", "備註"];
+                showToast("正在準備匯出總資料庫...", "info");
+
+                const headers = [
+                    "年月", "中心單位", "廠部", "課別單位", "指標分類", 
+                    "具體施策計畫項目", "計算單位", `${CONFIG_PREV_YEAR}實績`, `${CONFIG_TARGET_YEAR}目標`, 
+                    "累計目標", "累計實績", "去年同期累計實績", "望大值/望小值方向", 
+                    "指標達成率", "評價狀態", "備註說明"
+                ];
+
                 const dataRows = allDataItems.map(i => [
-                    i.month, i.center, i.dept, i.section || "", i.type, i.project, i.unit, 
-                    i.y25Actual, i.y26Target, i.targetAccum, i.actualAccum, i.yoyActual, 
-                    i.direction, i.rate, i.eval, i.remark || ""
+                    i.month || "",
+                    i.center || "",
+                    i.dept || "",
+                    i.section || "",
+                    i.type || "",
+                    i.project || "",
+                    i.unit || "",
+                    i.y25Actual || "",
+                    i.y26Target || "",
+                    i.targetAccum || "",
+                    i.actualAccum || "",
+                    i.yoyActual || "",
+                    i.direction || "↑",
+                    i.rate || "",
+                    i.eval || "",
+                    i.remark || ""
                 ]);
+
                 const wsData = [headers, ...dataRows];
                 const wb = XLSX.book_new();
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
-                XLSX.utils.book_append_sheet(wb, ws, "Master_Database");
-                XLSX.writeFile(wb, `KPI_Master_Database_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
-                showToast("已匯出檔案!", "success");
-            } catch(e) {
-                console.error(e);
-                showToast("匯出 Excel 失敗。", "error");
+
+                const colWidths = headers.map((h, idx) => {
+                    let maxLen = h.length;
+                    dataRows.forEach(row => {
+                        const valStr = String(row[idx] || '');
+                        if (valStr.length > maxLen) maxLen = Math.min(valStr.length, 30);
+                    });
+                    return { wch: Math.max(maxLen * 2, 12) };
+                });
+                ws['!cols'] = colWidths;
+
+                XLSX.utils.book_append_sheet(wb, ws, "KPI_Master_Database");
+
+                const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                XLSX.writeFile(wb, `KPI_Master_Database_Export_${dateStr}.xlsx`);
+
+                showToast("✅ 已成功匯出 Excel 總資料庫檔案！", "success");
+            } catch (e) {
+                console.error("匯出失敗詳細錯誤：", e);
+                showToast("❌ 匯出 Excel 失敗，請開啟 F12 Console 查看具體原因。", "error");
             }
         }
 
