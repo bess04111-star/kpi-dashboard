@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>集團 KPI 智慧互動總資料庫系統 PRO (全裝置響應式版)</title>
+    <title>集團績效指標管理平台</title>
 
     <!-- 1. 優先載入 config.js (加入防快取參數，確保隨時抓取最新 GitHub Secrets) -->
     <script src="config.js?v=41.3" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
@@ -99,10 +99,9 @@
                     </div>
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
-                            <span class="truncate">集團 KPI 智慧互動總資料庫系統</span>
+                            <span class="truncate">集團績效指標管理平台</span>
                             <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.3 PRO</span>
                         </h1>
-                        <p class="text-[8px] sm:text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1 truncate">Enterprise Cloud Sync Master Platform</p>
                     </div>
                 </div>
             </div>
@@ -929,7 +928,7 @@
         function logoutAdmin() {
             isAdminAuthenticated = false;
             if (ui('logoutBtn')) ui('logoutBtn').classList.add('hidden');
-            showToast("🔒 已退出高階編輯模式。", "info");
+            showToast("🔒 已退出編輯模式。", "info");
         }
 
         function triggerImportWithAuth() {
@@ -974,7 +973,7 @@
             return s.replace(/\D/g, '');
         }
 
-        // 🛡️ 增強版雲端同步（防止 JSON 解析 HTML 崩潰與詳細 Log 紀錄）
+        // 🛡️ 增強版雲端同步
         async function syncFromCloud(isAuto = false) {
             console.log("🔍 [除錯日誌] 目前讀取到的 API 網址：", GAS_API_URL);
 
@@ -993,7 +992,6 @@
                     throw new Error(`HTTP 狀態碼異常：${response.status}`);
                 }
 
-                // 檢查 Content-Type 避免解析 GAS 回傳的 HTML 登入/錯誤頁面
                 const contentType = response.headers.get("content-type") || "";
                 if (contentType.includes("text/html")) {
                     const htmlText = await response.text();
@@ -1010,7 +1008,7 @@
                     }));
                     localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
                     refreshDatabaseState();
-                    if (!isAuto) showToast("☁️ 雲端資料同步成功！", "success");
+                    if (!isAuto) showToast("✅ 已順利同步最新雲端資料！", "success");
                 } else if (data && data.status === "unauthorized") {
                     if (!isAuto) showToast("❌ 雲端同步失敗：API 金鑰驗證不通過。", "error");
                 } else {
@@ -1049,44 +1047,35 @@
             }
         }
 
+        // 🟢 升級版 safeDisplay：原樣保留非數字內容，不強制乘以 100 或補 %
         function safeDisplay(val, isPct = false, noDecimal = false) {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
             let cleanS = s.replace(/,/g, ''); 
-            
-            if (isPct) {
-                if (s.includes("%")) {
-                    let numPart = parseFloat(cleanS.replace(/%/g, ''));
-                    if (!isNaN(numPart)) return numPart.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
-                    return s;
-                }
-                if (!isNaN(cleanS) && cleanS !== "") {
-                    let num = parseFloat(cleanS);
-                    if (num > 0 && num <= 2.0) {
-                        return (num * 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
-                    }
-                    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
-                }
-                return s;
-            } else {
-                if (!isNaN(cleanS) && cleanS !== "") {
-                    let num = parseFloat(cleanS);
-                    if (noDecimal) {
-                        return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
-                    }
-                    return num.toLocaleString('en-US', { maximumFractionDigits: 2 });
-                }
-                let match = cleanS.match(/^([+-]?\d*(?:\.\d+)?)\s*(.*)$/);
-                if (match && match[1] && !isNaN(match[1]) && match[1] !== "") {
-                    let num = parseFloat(match[1]);
-                    let unitPart = match[2] ? " " + match[2] : "";
-                    if (noDecimal) {
-                        return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 }) + unitPart;
-                    }
-                    return num.toLocaleString('en-US', { maximumFractionDigits: 2 }) + unitPart;
-                }
+
+            if (s.includes("%")) {
                 return s;
             }
+
+            if (!isNaN(cleanS) && cleanS !== "") {
+                let num = parseFloat(cleanS);
+                if (noDecimal) {
+                    return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
+                }
+                return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            let match = cleanS.match(/^([+-]?\d*(?:\.\d+)?)\s*(.*)$/);
+            if (match && match[1] && !isNaN(match[1]) && match[1] !== "") {
+                let num = parseFloat(match[1]);
+                let unitPart = match[2] ? " " + match[2] : "";
+                if (noDecimal) {
+                    return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 }) + unitPart;
+                }
+                return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + unitPart;
+            }
+
+            return s;
         }
 
         function calculateRate(targetVal, actualVal, direction) {
@@ -1375,10 +1364,9 @@
                                 if (targetVal === undefined && actualVal === undefined) continue;
                                 if (targetVal === null && actualVal === null) continue;
                                 
-                                const isPercentUnit = (unit !== "—" && unit.includes("%"));
-                                const targetDisp = safeDisplay(targetVal, isPercentUnit);
-                                const actualDisp = safeDisplay(actualVal, isPercentUnit);
-                                const yoyDisp = safeDisplay(lastYearAccumVal || lastYearVal, isPercentUnit);
+                                const targetDisp = (targetVal !== null && targetVal !== undefined && String(targetVal).trim() !== "") ? String(targetVal).trim() : "—";
+                                const actualDisp = (actualVal !== null && actualVal !== undefined && String(actualVal).trim() !== "") ? String(actualVal).trim() : "—";
+                                const yoyDisp = (lastYearAccumVal || lastYearVal) ? String(lastYearAccumVal || lastYearVal).trim() : "—";
                                 
                                 let rateDisp = calculateRate(targetVal, actualVal, direction);
                                 let evalChar = "X";
@@ -1401,9 +1389,12 @@
                                 
                                 const newItem = {
                                     month: monthStr, center, dept, section, type, project, unit,
-                                    y25Actual: safeDisplay(rawY25Actual, isPercentUnit, true), 
-                                    y26Target: y26Target, targetAccum: targetDisp, actualAccum: actualDisp, 
-                                    yoyActual: yoyDisp, direction: direction, rate: rateDisp, eval: evalChar,
+                                    y25Actual: safeDisplay(rawY25Actual, false, true), 
+                                    y26Target: safeDisplay(y26Target, false), 
+                                    targetAccum: safeDisplay(targetDisp, false), 
+                                    actualAccum: safeDisplay(actualDisp, false), 
+                                    yoyActual: safeDisplay(yoyDisp, false), 
+                                    direction: direction, rate: rateDisp, eval: evalChar,
                                     remark: remark
                                 };
                                 
@@ -1452,6 +1443,7 @@
             return { start: 0, end: 0 };
         }
 
+        // 🟢 自動預設最新年份與最新月份
         function populateTimeSelectors() {
             const validMonths = getMonthsWithActualData();
             const yearSet = new Set();
@@ -1462,20 +1454,33 @@
             });
             
             const years = Array.from(yearSet).sort().reverse();
-            if (years.length > 0 && (!selectedYear || !years.includes(selectedYear))) {
-                selectedYear = years[0];
-            } else if (years.length === 0) {
-                selectedYear = `${CONFIG_TARGET_YEAR}`;
+            
+            if (validMonths.length > 0) {
+                const latestYYYYMM = validMonths.sort().slice(-1)[0]; 
+                const latestYear = latestYYYYMM.substring(0, 4);
+                const latestMonth = parseInt(latestYYYYMM.substring(4, 6), 10);
+
+                if (!selectedYear || !years.includes(selectedYear)) {
+                    selectedYear = latestYear;
+                }
+
+                if (monthStartFilter === 0 && monthEndFilter === 0 && ui('singleMonthInput')) {
+                    monthStartFilter = latestMonth;
+                    monthEndFilter = latestMonth;
+                    ui('singleMonthInput').value = `${latestMonth}`;
+                }
+            } else {
+                if (years.length > 0 && (!selectedYear || !years.includes(selectedYear))) {
+                    selectedYear = years[0];
+                } else if (years.length === 0) {
+                    selectedYear = `${CONFIG_TARGET_YEAR}`;
+                }
             }
 
             let yearOptions = years.map(y => `<option value="${y}">📅 ${y} 年</option>`).join('');
             if (years.length === 0) yearOptions = `<option value="${CONFIG_TARGET_YEAR}">📅 ${CONFIG_TARGET_YEAR} 年</option>`;
             ui('globalYearSelector').innerHTML = yearOptions;
             ui('globalYearSelector').value = selectedYear;
-
-            if (ui('singleMonthInput') && ui('singleMonthInput').value === '') {
-                ui('singleMonthInput').value = '0';
-            }
         }
 
         function handleSingleMonthChange() {
@@ -1945,7 +1950,6 @@
             }
             
             displayList.forEach(p => {
-                const isPercentUnit = (p.unit !== "—" && p.unit.includes("%"));
                 const tagClass = p.type === '中心' ? 'tag-center' : 'tag-plant';
                 
                 const dirTag = p.direction === '↓' 
@@ -1986,11 +1990,11 @@
                     <td class="p-1.5 border-r border-gray-100 text-center break-words"><span class="${tagClass}">${escapeHTML(p.type)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 font-medium text-gray-900 leading-tight break-words">${escapeHTML(p.project)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${safeDisplay(p.y25Actual, isPercentUnit, true)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${safeDisplay(p.y26Target, isPercentUnit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, isPercentUnit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, isPercentUnit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, isPercentUnit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${safeDisplay(p.y25Actual, false, true)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${safeDisplay(p.y26Target, false)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, false)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, false)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, false)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center break-words">${dirTag}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${safeDisplay(p.rate, true)}</td>
                     <td class="p-1.5 text-center border-r border-gray-100 whitespace-nowrap"><span class="px-1 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
@@ -2035,11 +2039,11 @@
                     <div class="grid grid-cols-3 gap-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100 text-[10px]">
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_PREV_YEAR}實績</span>
-                            <span class="font-bold text-gray-700">${safeDisplay(p.y25Actual, isPercentUnit, true)}</span>
+                            <span class="font-bold text-gray-700">${safeDisplay(p.y25Actual, false, true)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_TARGET_YEAR}目標</span>
-                            <span class="font-bold text-gray-700">${safeDisplay(p.y26Target, isPercentUnit)}</span>
+                            <span class="font-bold text-gray-700">${safeDisplay(p.y26Target, false)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">計算單位</span>
@@ -2047,15 +2051,15 @@
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-semibold text-gray-500">累計目標</span>
-                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, isPercentUnit)}</span>
+                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, false)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-semibold text-gray-900">累計實績</span>
-                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, isPercentUnit)}</span>
+                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, false)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">去年同期</span>
-                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, isPercentUnit)}</span>
+                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, false)}</span>
                         </div>
                     </div>
 
@@ -2181,7 +2185,6 @@
                 return;
             }
 
-            const isPercentUnit = (unit !== "" && unit.includes("%"));
             let computedRate = calculateRate(targetAccum, actualAccum, direction);
 
             let evalChar = "X";
@@ -2194,11 +2197,11 @@
 
             const item = {
                 month, center, dept, section, type, project, unit,
-                y25Actual: safeDisplay(y25Actual, isPercentUnit, true),
-                y26Target: safeDisplay(y26Target, isPercentUnit),
-                targetAccum: safeDisplay(targetAccum, isPercentUnit),
-                actualAccum: safeDisplay(actualAccum, isPercentUnit),
-                yoyActual: safeDisplay(yoyActual, isPercentUnit),
+                y25Actual: safeDisplay(y25Actual, false, true),
+                y26Target: safeDisplay(y26Target, false),
+                targetAccum: safeDisplay(targetAccum, false),
+                actualAccum: safeDisplay(actualAccum, false),
+                yoyActual: safeDisplay(yoyActual, false),
                 direction,
                 rate: computedRate,
                 eval: evalChar,
