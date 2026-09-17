@@ -973,7 +973,7 @@
             return s.replace(/\D/g, '');
         }
 
-        // 🛡️ 增強版雲端同步
+        // 🛡️ 增強版雲端同步（極速防 404 重定向與 CORS 異常版）
         async function syncFromCloud(isAuto = false) {
             console.log("🔍 [除錯日誌] 目前讀取到的 API 網址：", GAS_API_URL);
 
@@ -986,7 +986,15 @@
 
             try {
                 const requestUrl = `${GAS_API_URL}?token=${encodeURIComponent(API_SECRET_TOKEN)}`;
-                const response = await fetch(requestUrl, { method: 'GET', redirect: 'follow' });
+                
+                const response = await fetch(requestUrl, { 
+                    method: 'GET',
+                    mode: 'cors',
+                    redirect: 'follow',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
                 
                 if (!response.ok) {
                     throw new Error(`HTTP 狀態碼異常：${response.status}`);
@@ -995,8 +1003,8 @@
                 const contentType = response.headers.get("content-type") || "";
                 if (contentType.includes("text/html")) {
                     const htmlText = await response.text();
-                    console.error("❌網址或權限錯誤）：", htmlText.substring(0, 150));
-                    throw new Error("伺服器錯誤。");
+                    console.error("❌ 伺服器回傳 HTML 頁面：", htmlText.substring(0, 150));
+                    throw new Error("伺服器回應格式異常。");
                 }
 
                 const data = await response.json();
