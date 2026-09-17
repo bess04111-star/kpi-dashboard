@@ -1,0 +1,3 @@
+// config.example.js
+window.GOOGLE_API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+window.API_SECRET_TOKEN = "YOUR_SECRET_TOKEN_HERE";
