@@ -1,26 +1,48 @@
-name: Deploy KPI Dashboard to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main     # 💡 若您的預設分支名稱是 master，請改為 master
+      - main  # 當推送到 main 分支時觸發（若你的預設分支是 master 請自行修改）
+
+  # 允許在 GitHub 頁面上手動觸發部署
+  workflow_dispatch:
+
+# 設定 GitHub Token 的寫入權限，用於發布至 GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 確保同一時間只有一個部署流程在執行
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v3
+      - name: 📥 檢出程式碼 (Checkout)
+        uses: actions/checkout@v4
 
-      - name: Generate config.js from Secrets
+      - name: ⚙️ 自動生成 config.js
         run: |
-          echo "window.GOOGLE_API_URL = '${{ secrets.GOOGLE_API_URL }}';" > config.js
-          echo "window.API_SECRET_TOKEN = '${{ secrets.API_SECRET_TOKEN }}';" >> config.js
-          echo "✅雲端匯入完成！"
+          echo "const CONFIG = { GAS_API_URL: '${{ secrets.GAS_API_URL }}' };" > config.js
+          echo "✅  建立成功！"
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: 🔧 設定 GitHub Pages 資源環境
+        uses: actions/configure-pages@v5
+
+      - name: 📦 上傳靜態檔案構建 (Upload Artifact)
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
+          # 預設打包專案根目錄的所有內容
+          path: '.'
+
+      - name: 🚀 部署至 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
