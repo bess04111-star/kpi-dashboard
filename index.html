@@ -6,7 +6,7 @@
     <title>集團績效指標管理平台</title>
 
     <!-- 1. 優先載入 config.js -->
-    <script src="config.js?v=41.8" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
+    <script src="config.js?v=41.9" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
 
     <!-- 引入專業開發庫 -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,7 +100,7 @@
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
                             <span class="truncate">集團績效指標管理平台</span>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.8 PRO</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.9 PRO</span>
                         </h1>
                     </div>
                 </div>
@@ -1037,61 +1037,49 @@
             }
         }
 
-        // 🟢 數值與單位顯示修正：僅適用累計目標、累計實績、去年同期 (完美符合使用者 3 大原則)
-        function safeDisplay(val, isPct = false, noDecimal = false, unitContext = "") {
+        // 🟢 專屬於畫面輸出的格式化函式 (對應第 1 項條件)
+        function safeDisplay(val, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
 
             const unitStr = String(unitContext || "").trim();
-            const isPercentUnit = isPct || unitStr === "%" || s.includes('%');
+            const isPercentUnit = unitStr === "%" || s.includes('%');
             const isIntegerUnit = /千元|仟元|千|仟|元/.test(unitStr) || /千元|仟元|千|仟|元/.test(s);
 
-            // 抽取純數字部分
+            // 提取純數字部分
             let cleanNumStr = s.replace(/[^0-9.-]/g, '');
             let num = parseFloat(cleanNumStr);
 
             if (isNaN(num)) return s;
 
-            // 💡 規則 1：單位為 % 時，必須完整呈現 % 符號
+            // 1-1. 單位為 % 時，顯示 % 並帶 2 位小數
             if (isPercentUnit) {
-                if (Math.abs(num) <= 1 && num !== 0 && !s.includes('%')) {
-                    num = num * 100;
-                }
                 return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
             }
 
-            // 💡 規則 2：單位有 千/仟/元 時，呈現千分位且不要有小數點（無單位）
+            // 1-2. 單位有 千/仟/元 時，強制進行四捨五入並呈現千分位（無小數點、不帶文字單位）
             if (isIntegerUnit) {
                 return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
             }
 
-            // 其他單位（如：案、項...）的常態格式化
-            if (noDecimal) {
-                return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
-            }
-
+            // 常規數值格式化
             return Number.isInteger(num) 
                 ? num.toLocaleString('en-US') 
                 : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // 🟢 達成率計算：呈現 % 並且取小數點 2 位
+        // 🟢 專屬於達成率計算的函式 (對應第 2 項條件：直球拿純數字相除，防止雙重除以 100 變成 1)
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
-            let tStr = String(targetVal).trim().replace(/,/g, '');
-            let aStr = String(actualVal).trim().replace(/,/g, '');
+            // 純化數值：只抓數字與小數點 (去掉 %, 千位分號, 文字)
+            let tStr = String(targetVal).trim().replace(/,/g, '').replace(/[^0-9.-]/g, '');
+            let aStr = String(actualVal).trim().replace(/,/g, '').replace(/[^0-9.-]/g, '');
 
-            let isTargetPct = tStr.includes('%');
-            let isActualPct = aStr.includes('%');
-
-            let tNum = parseFloat(tStr.replace(/[^0-9.-]/g, ''));
-            let aNum = parseFloat(aStr.replace(/[^0-9.-]/g, ''));
+            let tNum = parseFloat(tStr);
+            let aNum = parseFloat(aStr);
 
             if (isNaN(tNum) || isNaN(aNum)) return "—";
-
-            if (isTargetPct && Math.abs(tNum) > 1) tNum = tNum / 100;
-            if (isActualPct && Math.abs(aNum) > 1) aNum = aNum / 100;
 
             let dir = String(direction).trim();
             if (dir !== "↓") dir = "↑"; 
@@ -1111,8 +1099,8 @@
                 }
             }
 
-            let percentage = rateVal * 100;
-            return percentage.toFixed(2) + "%";
+            // 呈現 % 取小數點 2 位
+            return (rateVal * 100).toFixed(2) + "%";
         }
 
         function getMonthsWithActualData() {
@@ -1348,7 +1336,7 @@
                             const project = item.project;
                             const unit = item.unit || "—";
                             
-                            // 💡 規則 3：2025實績 與 2026目標 的數值資料要完整呈現出來，不更動原始文字
+                            // 💡 規則 3：完整保留 2025實績 與 2026目標 的原始文字
                             const rawY25Actual = item.y25Actual || "—"; 
                             const rawY26Target = item.y26Target || "—";
 
@@ -1369,14 +1357,8 @@
                                 const actualDisp = (actualVal !== null && actualVal !== undefined && String(actualVal).trim() !== "") ? String(actualVal).trim() : "—";
                                 const yoyDisp = (lastYearAccumVal || lastYearVal) ? String(lastYearAccumVal || lastYearVal).trim() : "—";
                                 
-                                let rateDisp = calculateRate(targetVal, actualVal, direction);
-                                
-                                if (rateDisp !== "—" && !rateDisp.endsWith('%')) {
-                                    let rNum = parseFloat(rateDisp);
-                                    if (!isNaN(rNum)) {
-                                        rateDisp = rNum.toFixed(2) + "%";
-                                    }
-                                }
+                                // 計算達成率 (直接對純數值做運算，不污染原始儲存值)
+                                let rateDisp = calculateRate(targetDisp, actualDisp, direction);
 
                                 let evalChar = "X";
                                 let rNum = parseFloat(String(rateDisp).replace(/%/g, ''));
@@ -1401,9 +1383,9 @@
                                     month: monthStr, center, dept, section, type, project, unit,
                                     y25Actual: rawY25Actual, 
                                     y26Target: rawY26Target, 
-                                    targetAccum: safeDisplay(targetDisp, false, false, unit), 
-                                    actualAccum: safeDisplay(actualDisp, false, false, unit), 
-                                    yoyActual: safeDisplay(yoyDisp, false, false, unit), 
+                                    targetAccum: targetDisp, 
+                                    actualAccum: actualDisp, 
+                                    yoyActual: yoyDisp, 
                                     direction: direction, 
                                     rate: rateDisp, 
                                     eval: evalChar,
@@ -1998,12 +1980,15 @@
                     <td class="p-1.5 border-r border-gray-100 text-center break-words"><span class="${tagClass}">${escapeHTML(p.type)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 font-medium text-gray-900 leading-tight break-words">${escapeHTML(p.project)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${escapeHTML(p.y25Actual)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.y26Target)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, false, false, p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, false, false, p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, false, false, p.unit)}</td>
+                    <!-- 第3項：2025實績與2026目標完整呈現文字 -->
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${escapeHTML(p.y25Actual) || '—'}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.y26Target) || '—'}</td>
+                    <!-- 第1項：累計欄位經過 safeDisplay 套用對應單位格式 -->
+                    <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center break-words">${dirTag}</td>
+                    <!-- 第2項：達成率呈現 % 取小數點2位 -->
                     <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${p.rate}</td>
                     <td class="p-1.5 text-center border-r border-gray-100 whitespace-nowrap"><span class="px-1 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 text-gray-500 break-words">${escapeHTML(p.remark) || '—'}</td>
@@ -2047,11 +2032,11 @@
                     <div class="grid grid-cols-3 gap-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100 text-[10px]">
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_PREV_YEAR}實績</span>
-                            <span class="font-bold text-gray-700">${escapeHTML(p.y25Actual)}</span>
+                            <span class="font-bold text-gray-700">${escapeHTML(p.y25Actual) || '—'}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_TARGET_YEAR}目標</span>
-                            <span class="font-bold text-gray-700">${escapeHTML(p.y26Target)}</span>
+                            <span class="font-bold text-gray-700">${escapeHTML(p.y26Target) || '—'}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">計算單位</span>
@@ -2059,15 +2044,15 @@
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-semibold text-gray-500">累計目標</span>
-                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, false, false, p.unit)}</span>
+                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-semibold text-gray-900">累計實績</span>
-                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, false, false, p.unit)}</span>
+                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">去年同期</span>
-                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, false, false, p.unit)}</span>
+                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, p.unit)}</span>
                         </div>
                     </div>
 
@@ -2207,9 +2192,9 @@
                 month, center, dept, section, type, project, unit,
                 y25Actual,
                 y26Target,
-                targetAccum: safeDisplay(targetAccum, false, false, unit),
-                actualAccum: safeDisplay(actualAccum, false, false, unit),
-                yoyActual: safeDisplay(yoyActual, false, false, unit),
+                targetAccum,
+                actualAccum,
+                yoyActual,
                 direction,
                 rate: computedRate,
                 eval: evalChar,
