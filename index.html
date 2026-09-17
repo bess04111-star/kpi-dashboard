@@ -887,7 +887,7 @@
             }
         }
 
-        // 🟢 修正版驗證邏輯：透過 Base64 編碼，既防 F12 偷看，又保證 100% 安定解鎖
+        // 🟢 修正版驗證邏輯：透過 Base64 編碼解鎖
         function verifyAdminPassword() {
             const inputPwd = String(ui('adminPasswordInput').value).trim();
             if (!inputPwd) {
@@ -1051,88 +1051,55 @@
             }
         }
 
-        // 🟢 嚴謹版 safeDisplay：支援「1%2000千元」這類混合格式
-        function safeDisplay(val, isPct = false, noDecimal = false, unitContext = "") {
+        // 🟢 數字格式化：目標與實績預設為整數、無小數點（如 19,498）
+        function safeDisplay(val, isPct = false, noDecimal = true, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
-            let cleanS = s.replace(/,/g, ''); 
 
             const isPctUnit = isPct || (unitContext && String(unitContext).trim() === "%");
 
-            // 💡 特殊混合格式處理：如 "1%2000千元"、"1% 2000千元"
-            if (s.includes("%") && /[^\s%]+/.test(s.split("%")[1])) {
-                return s;
+            // 1. 抽取字串中主要的數字部分
+            let cleanNumStr = s.replace(/[^0-9.]/g, '');
+            let num = parseFloat(cleanNumStr);
+
+            if (isNaN(num)) return s;
+
+            // 2. 判斷是否為 Excel 讀進來的比例小數（如 0.58 轉 58%）
+            if (isPctUnit && Math.abs(num) <= 1 && num !== 0 && !s.includes('%')) {
+                num = num * 100;
             }
 
-            // 標準帶有 % 的純數值 (如 "58%")
-            if (s.includes("%")) {
-                let numPart = parseFloat(s.replace(/%/g, ''));
-                if (!isNaN(numPart)) {
-                    return noDecimal 
-                        ? Math.round(numPart) + "%" 
-                        : numPart.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
-                }
-                return s;
+            // 3. 提取非數字的單位部分（例如 "千元"、"萬元"）
+            let unitPart = s.replace(/[0-9.,%\s]/g, '');
+
+            // 4. 格式化數字：預設整數、無小數點
+            let formattedNum = noDecimal 
+                ? Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 })
+                : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            if (unitPart) {
+                return formattedNum + " " + unitPart;
             }
-
-            // 純數字處理 (如 0.58 轉成 58%，或是 8000 保持 8000)
-            if (!isNaN(cleanS) && cleanS !== "") {
-                let num = parseFloat(cleanS);
-
-                if (isPctUnit && Math.abs(num) <= 1 && num !== 0) {
-                    num = num * 100;
-                }
-
-                let formattedNum = noDecimal 
-                    ? Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 })
-                    : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                    
-                return isPctUnit ? formattedNum + "%" : formattedNum;
-            }
-
-            // 帶有單位的文字數值提取 (如 "2000千元")
-            let match = cleanS.match(/^([+-]?\d*(?:\.\d+)?)\s*(.*)$/);
-            if (match && match[1] && !isNaN(match[1]) && match[1] !== "") {
-                let num = parseFloat(match[1]);
-                if (isPctUnit && Math.abs(num) <= 1 && num !== 0) {
-                    num = num * 100;
-                }
-                let unitPart = match[2] ? " " + match[2] : (isPctUnit ? "%" : "");
-                let formattedNum = noDecimal 
-                    ? Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 })
-                    : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                return formattedNum + unitPart;
-            }
-
-            return isPctUnit ? s + "%" : s;
+            return isPctUnit ? formattedNum + "%" : formattedNum;
         }
 
-        // 🟢 健壯版 calculateRate：防止大數（8000/19498）與混合字串（1%2000千元）造成計算失真
+        // 🟢 達成率計算：嚴謹區分純數字與百分比，強制輸出 2 位小數 (如 243.73%)
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
             let tStr = String(targetVal).trim().replace(/,/g, '');
             let aStr = String(actualVal).trim().replace(/,/g, '');
 
-            function extractFirstNumber(str) {
-                if (str.includes("%") && !/[^\s%]+/.test(str.split("%")[1])) {
-                    let n = parseFloat(str.replace(/%/g, ''));
-                    return isNaN(n) ? null : n / 100;
-                }
-                let match = str.match(/([+-]?\d*(?:\.\d+)?)/);
-                if (match && match[1] && !isNaN(parseFloat(match[1]))) {
-                    let n = parseFloat(match[1]);
-                    if (str.includes("%") && Math.abs(n) <= 1) return n;
-                    if (str.includes("%")) return n / 100;
-                    return n;
-                }
-                return null;
-            }
+            let isTargetPct = tStr.includes('%');
+            let isActualPct = aStr.includes('%');
 
-            let tNum = extractFirstNumber(tStr);
-            let aNum = extractFirstNumber(aStr);
+            let tNum = parseFloat(tStr.replace(/[^0-9.]/g, ''));
+            let aNum = parseFloat(aStr.replace(/[^0-9.]/g, ''));
 
-            if (tNum === null || aNum === null) return "—";
+            if (isNaN(tNum) || isNaN(aNum)) return "—";
+
+            if (isTargetPct) tNum = tNum / 100;
+            if (isActualPct) aNum = aNum / 100;
 
             let dir = String(direction).trim();
             if (dir !== "↓") dir = "↑"; 
@@ -1429,10 +1396,10 @@
                                 const newItem = {
                                     month: monthStr, center, dept, section, type, project, unit,
                                     y25Actual: safeDisplay(rawY25Actual, false, true, unit), 
-                                    y26Target: safeDisplay(y26Target, false, false, unit), 
-                                    targetAccum: safeDisplay(targetDisp, false, false, unit), 
-                                    actualAccum: safeDisplay(actualDisp, false, false, unit), 
-                                    yoyActual: safeDisplay(yoyDisp, false, false, unit), 
+                                    y26Target: safeDisplay(y26Target, false, true, unit), 
+                                    targetAccum: safeDisplay(targetDisp, false, true, unit), 
+                                    actualAccum: safeDisplay(actualDisp, false, true, unit), 
+                                    yoyActual: safeDisplay(yoyDisp, false, true, unit), 
                                     direction: direction, rate: rateDisp, eval: evalChar,
                                     remark: remark
                                 };
@@ -1482,7 +1449,6 @@
             return { start: 0, end: 0 };
         }
 
-        // 🟢 預設自動尋找最新數據月份（僅在尚未設定月份時自動寫入）
         function populateTimeSelectors() {
             const validMonths = getMonthsWithActualData();
             const yearSet = new Set();
@@ -2027,12 +1993,12 @@
                     <td class="p-1.5 border-r border-gray-100 font-medium text-gray-900 leading-tight break-words">${escapeHTML(p.project)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${safeDisplay(p.y25Actual, false, true, p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${safeDisplay(p.y26Target, false, false, p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, false, false, p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, false, false, p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, false, false, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${safeDisplay(p.y26Target, false, true, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, false, true, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, false, true, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, false, true, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center break-words">${dirTag}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${safeDisplay(p.rate, true)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${p.rate}</td>
                     <td class="p-1.5 text-center border-r border-gray-100 whitespace-nowrap"><span class="px-1 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 text-gray-500 break-words">${escapeHTML(p.remark) || '—'}</td>
                     ${actionCellHtml}`;
@@ -2079,7 +2045,7 @@
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_TARGET_YEAR}目標</span>
-                            <span class="font-bold text-gray-700">${safeDisplay(p.y26Target, false, false, p.unit)}</span>
+                            <span class="font-bold text-gray-700">${safeDisplay(p.y26Target, false, true, p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">計算單位</span>
@@ -2087,15 +2053,15 @@
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-semibold text-gray-500">累計目標</span>
-                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, false, false, p.unit)}</span>
+                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, false, true, p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-semibold text-gray-900">累計實績</span>
-                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, false, false, p.unit)}</span>
+                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, false, true, p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">去年同期</span>
-                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, false, false, p.unit)}</span>
+                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, false, true, p.unit)}</span>
                         </div>
                     </div>
 
@@ -2103,7 +2069,7 @@
 
                     <div class="flex items-center justify-between pt-1 text-xs">
                         <span class="text-gray-500 font-semibold">指標達成率</span>
-                        <span class="font-black text-sm text-gray-900 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">${safeDisplay(p.rate, true)}</span>
+                        <span class="font-black text-sm text-gray-900 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">${p.rate}</span>
                     </div>
 
                     ${cardActionsHtml}
@@ -2234,10 +2200,10 @@
             const item = {
                 month, center, dept, section, type, project, unit,
                 y25Actual: safeDisplay(y25Actual, false, true, unit),
-                y26Target: safeDisplay(y26Target, false, false, unit),
-                targetAccum: safeDisplay(targetAccum, false, false, unit),
-                actualAccum: safeDisplay(actualAccum, false, false, unit),
-                yoyActual: safeDisplay(yoyActual, false, false, unit),
+                y26Target: safeDisplay(y26Target, false, true, unit),
+                targetAccum: safeDisplay(targetAccum, false, true, unit),
+                actualAccum: safeDisplay(actualAccum, false, true, unit),
+                yoyActual: safeDisplay(yoyActual, false, true, unit),
                 direction,
                 rate: computedRate,
                 eval: evalChar,
