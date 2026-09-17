@@ -769,7 +769,7 @@
             ? window.API_SECRET_TOKEN
             : ((typeof CONFIG !== 'undefined' && CONFIG.API_TOKEN) ? CONFIG.API_TOKEN : "");
 
-        // 🔒 安全保護：1500 的 Base64 編碼，防止在 F12 中直接檢視到明文 "1500"
+        // 🔒 安全保護：1500 的 Base64 編碼，防止在 F12 中直接檢視到明文 "1500"[cite: 3]
         const ADMIN_TOKEN_ENCODED = "MTUwMA==";
 
         let CONFIG_TARGET_YEAR = 2026; 
@@ -887,7 +887,7 @@
             }
         }
 
-        // 🟢 修正版驗證邏輯：透過 Base64 編碼，既防 F12 偷看，又保證 100% 安定解鎖
+        // 🟢 修正版驗證邏輯：透過 Base64 編碼，既防 F12 偷看，又保證 100% 安定解鎖[cite: 3]
         function verifyAdminPassword() {
             const inputPwd = String(ui('adminPasswordInput').value).trim();
             if (!inputPwd) {
@@ -1051,7 +1051,7 @@
             }
         }
 
-        // 🟢 智慧顯示 safeDisplay
+        // 🟢 智慧顯示 safeDisplay (含 Excel 小數轉百分比修正)
         function safeDisplay(val, isPct = false, noDecimal = false, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
@@ -1059,21 +1059,38 @@
 
             const isPctUnit = isPct || (unitContext && String(unitContext).trim() === "%");
 
+            // 狀況 1：原本就帶有 % 符號 (如 "58%")
             if (s.includes("%")) {
+                let numPart = parseFloat(s.replace(/%/g, ''));
+                if (!isNaN(numPart)) {
+                    return noDecimal 
+                        ? Math.round(numPart) + "%" 
+                        : numPart.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+                }
                 return s;
             }
 
+            // 狀況 2：純數字處理 (自動把 Excel 讀入的 0.58 轉成 58%)
             if (!isNaN(cleanS) && cleanS !== "") {
                 let num = parseFloat(cleanS);
+
+                if (isPctUnit && Math.abs(num) <= 1 && num !== 0) {
+                    num = num * 100;
+                }
+
                 let formattedNum = noDecimal 
                     ? Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 })
                     : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                 return isPctUnit ? formattedNum + "%" : formattedNum;
             }
 
+            // 狀況 3：帶有文字單位的數值
             let match = cleanS.match(/^([+-]?\d*(?:\.\d+)?)\s*(.*)$/);
             if (match && match[1] && !isNaN(match[1]) && match[1] !== "") {
                 let num = parseFloat(match[1]);
+                if (isPctUnit && Math.abs(num) <= 1 && num !== 0) {
+                    num = num * 100;
+                }
                 let unitPart = match[2] ? " " + match[2] : (isPctUnit ? "%" : "");
                 let formattedNum = noDecimal 
                     ? Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 })
@@ -1084,7 +1101,7 @@
             return isPctUnit ? s + "%" : s;
         }
 
-        // 🟢 達成率計算
+        // 🟢 達成率計算 (含 Excel 小數放大修正)
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
@@ -1099,8 +1116,12 @@
 
             if (isNaN(tNum) || isNaN(aNum)) return "—";
 
-            if (isTargetPct) tNum = tNum / 100;
-            if (isActualPct) aNum = aNum / 100;
+            // 自動將 0.58 類型的百分比小數先轉換為 58 再進行計算
+            if (!isTargetPct && Math.abs(tNum) <= 1 && tNum !== 0) tNum = tNum * 100;
+            if (!isActualPct && Math.abs(aNum) <= 1 && aNum !== 0) aNum = aNum * 100;
+
+            tNum = tNum / 100;
+            aNum = aNum / 100;
 
             let dir = String(direction).trim();
             if (dir !== "↓") dir = "↑"; 
