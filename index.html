@@ -921,7 +921,7 @@
         function logoutAdmin() {
             isAdminAuthenticated = false;
             if (ui('logoutBtn')) ui('logoutBtn').classList.add('hidden');
-            showToast("已退出編輯模式。", "info");
+            showToast("🔒 已退出編輯模式。", "info");
         }
 
         function triggerImportWithAuth() {
@@ -940,7 +940,7 @@
             if(ui('lbl_y25Actual')) ui('lbl_y25Actual').innerText = `${CONFIG_PREV_YEAR}實績`;
             if(ui('lbl_y26Target')) ui('lbl_y26Target').innerText = `${CONFIG_TARGET_YEAR}目標`;
             if(ui('m_lbl_y25Actual')) ui('m_lbl_y25Actual').innerText = `${CONFIG_PREV_YEAR}實績`;
-            if(ui('m_lbl_y26Target')) ui('m_lbl_y26Target').innerText = `${CONFIG_TARGET_YEAR}目標`;
+            if(ui('m_lbl_y26Target')) ui('m_lbl_y26Target').innerText = `${CONFIG_PREV_YEAR}目標`;
         }
 
         function formatCleanMonth(rawMonth) {
@@ -1037,12 +1037,11 @@
             }
         }
 
-        // 🟢 數值與單位顯示修正：單位含「千元/仟元/元」強制顯示整數，單位含「%」保留 2 位小數
+        // 🟢 safeDisplay 修正：千元/仟元/元直接「無條件捨去小數點」 (例如 19498.5 ➔ 19,498)
         function safeDisplay(val, isPct = false, noDecimal = false, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
 
-            // 保留原始複合文字（例如 1%2000千元）
             const hasComplexText = /[^\d.,%\-\s]/.test(s) && !/^\d+(\.\d+)?\s*(千元|仟元|元)$/.test(s);
             if (hasComplexText && (s.includes('%') || s.length > 8)) {
                 return s;
@@ -1052,24 +1051,21 @@
             const isPercentUnit = isPct || unitStr === "%" || s.includes('%');
             const isIntegerUnit = /千元|仟元|元/.test(unitStr) || /千元|仟元|元/.test(s);
 
-            // 抽取數字部分
             let cleanNumStr = s.replace(/[^0-9.-]/g, '');
             let num = parseFloat(cleanNumStr);
 
             if (isNaN(num)) return s;
 
-            // Excel 比率小數處理 (如 0.58 轉 58%)
             if (isPercentUnit && Math.abs(num) <= 1 && num !== 0 && !s.includes('%')) {
                 num = num * 100;
             }
 
             let formattedNum = "";
-            
-            // 單位含「千元/仟元/元」或指定無小數 ➔ 強制取整數，不留小數點
+
+            // 💡 若為 千元/仟元/元 單位：無條件捨去小數點 (Math.floor)
             if (isIntegerUnit || noDecimal) {
-                formattedNum = Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
+                formattedNum = Math.floor(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
             }
-            // 極小小數處理 (如 0.001345 ➔ 0.0013)
             else if (Math.abs(num) > 0 && Math.abs(num) < 0.01 && !Number.isInteger(num)) {
                 let numStr = num.toString();
                 if (numStr.includes('.')) {
@@ -1083,7 +1079,6 @@
                     formattedNum = num.toString();
                 }
             } 
-            // 百分比單位 % ➔ 保留 2 位小數
             else if (isPercentUnit) {
                 formattedNum = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             } 
@@ -1093,7 +1088,6 @@
                     : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
-            // 提取並組合單位文字
             let unitPart = s.replace(/[0-9.,%\-\s]/g, '');
             if (!unitPart && isIntegerUnit) {
                 const match = unitStr.match(/(千元|仟元|元)/);
@@ -1106,7 +1100,7 @@
             return isPercentUnit && !formattedNum.includes('%') ? `${formattedNum}%` : formattedNum;
         }
 
-        // 🟢 達成率計算修正：強制輸出帶有 % 的字串並保留 2 位小數 (例如 243.73%)
+        // 🟢 calculateRate 修正：支援輸入 100% / 100% 解析，並穩定輸出 2 位數 % 字串 (如 100.00%)
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
@@ -1121,6 +1115,7 @@
 
             if (isNaN(tNum) || isNaN(aNum)) return "—";
 
+            // 若輸入本身帶有 % (如 100.00% 或 100%)，將其正規化為小數進行比例運算
             if (isTargetPct) tNum = tNum / 100;
             if (isActualPct) aNum = aNum / 100;
 
@@ -1183,7 +1178,7 @@
                     bulkBar.classList.add('hidden');
                     bulkBar.classList.remove('flex');
                     clearAllSelections();
-                    showToast("已退出編輯模式。");
+                    showToast("💾 已退出編輯模式。");
                 }
                 renderMeasures();
                 lucide.createIcons();
@@ -1238,7 +1233,7 @@
                 }
                 pendingDeleteIndex = -2; 
                 ui('deleteConfirmDetails').innerHTML = `
-                    <div class="font-bold text-rose-700 text-sm">F已選取 ${selectedItemIndices.size} 筆項目</div>
+                    <div class="font-bold text-rose-700 text-sm">⚠️ 已選取 ${selectedItemIndices.size} 筆項目</div>
                     <div class="text-xs text-gray-600 mt-1">確認刪除後將同步更新雲端資料庫，是否確定移除？</div>
                 `;
                 ui('deleteConfirmModal').classList.remove('hidden');
