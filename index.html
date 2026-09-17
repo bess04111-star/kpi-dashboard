@@ -6,7 +6,7 @@
     <title>集團績效指標管理平台</title>
 
     <!-- 1. 優先載入 config.js -->
-    <script src="config.js?v=42.0" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
+    <script src="config.js?v=42.1" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
 
     <!-- 引入專業開發庫 -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,7 +100,7 @@
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
                             <span class="truncate">集團績效指標管理平台</span>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v42.0 PRO</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v42.1 PRO</span>
                         </h1>
                     </div>
                 </div>
@@ -824,7 +824,7 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;")
-                .replace(/\n/g, "<br>"); // 🟢 完整保留換行符號
+                .replace(/\n/g, "<br>");
         }
 
         function loadLocalCache() {
@@ -947,9 +947,7 @@
         function formatCleanMonth(rawMonth) {
             if (!rawMonth || isPlaceholder(rawMonth)) return "000000";
             let s = String(rawMonth).trim();
-            
             if (/^\d{6}$/.test(s)) return s;
-
             if (s.includes('T') || s.includes('Z')) {
                 let d = new Date(s);
                 if (!isNaN(d.getTime())) {
@@ -959,7 +957,6 @@
                     return `${y}${m}`;
                 }
             }
-            
             let match = s.match(/(\d{4})[年/-]?(\d{1,2})/);
             if (match) {
                 return `${match[1]}${String(match[2]).padStart(2, '0')}`;
@@ -977,7 +974,6 @@
 
             try {
                 const requestUrl = `${GAS_API_URL}?token=${encodeURIComponent(API_SECRET_TOKEN)}`;
-                
                 const response = await fetch(requestUrl, { 
                     method: 'GET',
                     mode: 'cors',
@@ -986,12 +982,10 @@
                 });
                 
                 if (!response.ok) throw new Error(`HTTP 狀態碼異常：${response.status}`);
-
                 const contentType = response.headers.get("content-type") || "";
                 if (contentType.includes("text/html")) throw new Error("伺服器回應格式異常。");
 
                 const data = await response.json();
-                
                 if (data && Array.isArray(data) && data.length > 0) {
                     allDataItems = data.map(item => ({
                         ...item,
@@ -1000,8 +994,6 @@
                     localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
                     refreshDatabaseState();
                     if (!isAuto) showToast("✅ 已順利同步最新雲端資料！", "success");
-                } else if (data && data.status === "unauthorized") {
-                    if (!isAuto) showToast("❌ 雲端同步失敗：API 金鑰驗證不通過。", "error");
                 } else {
                     if (!isAuto) showToast("雲端尚無數據，已讀取本機暫存。", "info");
                     loadLocalCache();
@@ -1015,42 +1007,37 @@
 
         async function saveToCloud() {
             localStorage.setItem('kpi_master_data', JSON.stringify(allDataItems));
-            if (!GAS_API_URL) {
-                showToast("已存入本機快照（未設定雲端 API 網址）。", "info");
-                return;
-            }
-
-            showToast("正在將異動同步寫回雲端...", "info");
+            if (!GAS_API_URL) return;
             try {
-                const payload = {
-                    token: API_SECRET_TOKEN,
-                    data: allDataItems
-                };
+                const payload = { token: API_SECRET_TOKEN, data: allDataItems };
                 await fetch(GAS_API_URL, {
                     method: "POST",
                     body: JSON.stringify(payload),
                     headers: { "Content-Type": "text/plain;charset=utf-8" }
                 });
-                showToast("雲端資料庫更新成功!", "success");
             } catch (err) {
                 console.error(err);
-                showToast("❌ 寫入失敗，請檢查連線狀態。", "error");
             }
         }
 
+        // 🟢 智慧格式化 2025實績：若為小數且小於 1，自動乘 100 轉回百分比顯示格式
         function formatTargetOrActualText(val) {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
             
-            // 如果是純整數，補上千分位
+            // 如果是純小數（如從 Excel 讀出來的 0.01562），自動補正為 1.562%
+            let num = parseFloat(s);
+            if (!isNaN(num) && num > 0 && num < 1 && !s.includes('%') && !s.includes('案') && !s.includes('仟元')) {
+                return (num * 100).toFixed(3) + "%";
+            }
+
             if (/^-?\d+$/.test(s)) {
-                let num = parseInt(s, 10);
-                return num.toLocaleString('en-US');
+                return parseInt(s, 10).toLocaleString('en-US');
             }
             return escapeHTML(s);
         }
 
-        // 🟢 高精度數值解析器：完美處理 % 與帶有多行文字的數值
+        // 🟢 高精度數值解析器：完美解析百分比與小數
         function parseCleanNumber(val) {
             if (isPlaceholder(val)) return NaN;
             let s = String(val).trim().replace(/,/g, '');
@@ -1075,12 +1062,10 @@
             const isIntegerUnit = /千元|仟元|千|仟|元/.test(unitStr) || /千元|仟元|千|仟|元/.test(s);
 
             let cleanNum = parseCleanNumber(s);
-
             if (isNaN(cleanNum)) return escapeHTML(s);
 
             if (isPercentUnit) {
-                let pctValue = cleanNum * 100;
-                return pctValue.toFixed(2) + "%";
+                return (cleanNum * 100).toFixed(2) + "%";
             }
 
             if (isIntegerUnit) {
@@ -1092,7 +1077,7 @@
                 : cleanNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // 🟢 高精度達成率計算：支援百分比還原與真實比例除法
+        // 🟢 高精度達成率計算函式
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
@@ -1106,34 +1091,27 @@
 
             let rateVal = 0;
             if (tNum === 0) {
-                if (aNum === 0) {
-                    rateVal = 1.0; 
-                } else {
-                    rateVal = (dir === "↑") ? 2.0 : 0.0; 
-                }
+                if (aNum === 0) rateVal = 1.0; 
+                else rateVal = (dir === "↑") ? 2.0 : 0.0; 
             } else {
                 if (dir === "↓") {
                     rateVal = 1 + (tNum - aNum) / Math.abs(tNum);
                 } else {
-                    rateVal = aNum / tNum;
+                    rateVal = aNum / tNum; // 純浮點數精準相除
                 }
             }
-
             return rateVal; 
         }
 
         function getMonthsWithActualData() {
             const validMonths = new Set();
             const uniqueMonths = [...new Set(allDataItems.map(i => i.month))];
-            
             uniqueMonths.forEach(m => {
                 const monthItems = allDataItems.filter(i => i.month === m);
                 const hasRealData = monthItems.some(item => {
-                    if (!item.actualAccum) return false;
-                    if (isPlaceholder(item.actualAccum)) return false;
+                    if (!item.actualAccum || isPlaceholder(item.actualAccum)) return false;
                     const num = parseCleanNumber(item.actualAccum);
-                    if (!isNaN(num) && num === 0) return false; 
-                    return true;
+                    return !isNaN(num) && num !== 0;
                 });
                 if (hasRealData) validMonths.add(m);
             });
@@ -1145,20 +1123,17 @@
                 isEditMode = !isEditMode;
                 const btn = ui('editModeBtn');
                 const bulkBar = ui('bulkActionBar');
-                
                 if (isEditMode) {
                     btn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i>完成編輯`;
                     btn.className = "px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
                     bulkBar.classList.remove('hidden');
                     bulkBar.classList.add('flex');
-                    showToast("✍️ 已進入編輯模式。");
                 } else {
                     btn.innerHTML = `<i data-lucide="edit" class="w-3 h-3"></i>編輯模式`;
                     btn.className = "px-3 py-1 bg-f2 border border-gray-300 hover:bg-gray-200 text-gray-800 text-xs font-semibold rounded transition flex items-center gap-1 shadow-sm";
                     bulkBar.classList.add('hidden');
                     bulkBar.classList.remove('flex');
                     clearAllSelections();
-                    showToast("💾 已退出編輯模式。");
                 }
                 renderMeasures();
                 lucide.createIcons();
@@ -1166,17 +1141,12 @@
         }
 
         function handleSelectItem(index, isChecked) {
-            if (isChecked) {
-                selectedItemIndices.add(index);
-            } else {
-                selectedItemIndices.delete(index);
-            }
+            if (isChecked) selectedItemIndices.add(index);
+            else selectedItemIndices.delete(index);
             updateBulkActionBarUI();
         }
 
-        function handleSelectAllChange(isChecked) {
-            toggleSelectAllVisible(isChecked);
-        }
+        function handleSelectAllChange(isChecked) { toggleSelectAllVisible(isChecked); }
 
         function toggleSelectAllVisible(isChecked) {
             const checkboxes = document.querySelectorAll('.item-checkbox');
@@ -1201,9 +1171,7 @@
             updateBulkActionBarUI();
         }
 
-        function updateBulkActionBarUI() {
-            setVal('selectedCountText', selectedItemIndices.size);
-        }
+        function updateBulkActionBarUI() { setVal('selectedCountText', selectedItemIndices.size); }
 
         function askBulkDelete() {
             checkAdminPermission(() => {
@@ -1221,7 +1189,7 @@
             });
         }
 
-        // 🟢 強制完整抓取儲存格顯示文字 (w) 或強制字串轉換，解決多行與單位混和問題
+        // 🟢 強制完整讀取顯示字串 (w) 或直接抓值
         function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1239,7 +1207,6 @@
                         if (sheetState && sheetState.Hidden && sheetState.Hidden !== 0) return;
 
                         const worksheet = wb.Sheets[sheetName];
-                        
                         const grid = [];
                         const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
                         for (let R = range.s.r; R <= range.e.r; ++R) {
@@ -1250,7 +1217,6 @@
                                 if (!cell) {
                                     row.push('');
                                 } else {
-                                    // 確保強制抓取顯示字串 w，若無才抓 v
                                     let textVal = cell.w !== undefined ? String(cell.w) : String(cell.v || '');
                                     row.push(textVal);
                                 }
@@ -1259,17 +1225,13 @@
                         }
 
                         if (grid.length === 0) return;
-                        
                         const wsRows = worksheet['!rows']; 
 
                         let fallbackCenter = "未定義單位";
                         const cleanSheet = sheetName.replace(/\s+/g, '');
                         const matchCenter = cleanSheet.match(/([^\-_]+中心)/);
-                        if (matchCenter) {
-                            fallbackCenter = matchCenter[1];
-                        } else {
-                            fallbackCenter = sheetName.split('-')[0].split('_')[0].trim();
-                        }
+                        if (matchCenter) fallbackCenter = matchCenter[1];
+                        else fallbackCenter = sheetName.split('-')[0].split('_')[0].trim();
                         fallbackCenter = fallbackCenter.replace(/\s+/g, '');
                         
                         let year = `${CONFIG_TARGET_YEAR}`;
@@ -1285,7 +1247,6 @@
                         let colIndices = {};
                         for (let r = 0; r < grid.length; r++) {
                             if (wsRows && wsRows[r] && wsRows[r].hidden) continue;
-
                             const row = grid[r];
                             if (!row) continue;
                             const rowStr = row.map(v => String(v || '').replace(/\s+/g, '')).join('|');
@@ -1321,7 +1282,6 @@
                         
                         for (let r = headerRowIndex + 1; r < grid.length; r++) {
                             if (wsRows && wsRows[r] && wsRows[r].hidden) continue;
-
                             const row = grid[r];
                             if (!row || row.length === 0) continue;
                             
@@ -1372,10 +1332,8 @@
                             const type = item.type || "中心";
                             const project = item.project;
                             const unit = item.unit || "—";
-                            
                             const rawY25Actual = item.y25Actual || "—"; 
                             const rawY26Target = item.y26Target || "—";
-
                             const direction = item.direction || "↑";
                             const remark = item.remark || "";
                             
@@ -1402,17 +1360,12 @@
 
                                 if (evalVal !== undefined && evalVal !== null && String(evalVal).trim() !== "") {
                                     const sEval = String(evalVal).trim().toUpperCase();
-                                    if (sEval === "O" || sEval === "✔" || sEval === "OK") {
-                                        evalChar = "O";
-                                    } else if (sEval === "△" || sEval === "Δ" || sEval === "DELTA") {
-                                        evalChar = "△";
-                                    } else {
-                                        evalChar = "X";
-                                    }
+                                    if (sEval === "O" || sEval === "✔" || sEval === "OK") evalChar = "O";
+                                    else if (sEval === "△" || sEval === "Δ" || sEval === "DELTA") evalChar = "△";
+                                    else evalChar = "X";
                                 }
                                 
                                 const monthStr = `${year}${String(m).padStart(2, '0')}`;
-                                
                                 const newItem = {
                                     month: monthStr, center, dept, section, type, project, unit,
                                     y25Actual: rawY25Actual, 
@@ -1453,9 +1406,7 @@
         }
 
         function parseMonthInput(rawVal) {
-            if (!rawVal || rawVal.trim() === '' || rawVal.trim() === '0') {
-                return { start: 0, end: 0 };
-            }
+            if (!rawVal || rawVal.trim() === '' || rawVal.trim() === '0') return { start: 0, end: 0 };
             const s = rawVal.trim();
             const matchRange = s.match(/^(\d{1,2})\s*[-~._]\s*(\d{1,2})$/);
             if (matchRange) {
@@ -1465,21 +1416,17 @@
                 return { start: Math.max(1, Math.min(12, start)), end: Math.max(1, Math.min(12, end)) };
             }
             const singleNum = parseInt(s);
-            if (!isNaN(singleNum) && singleNum >= 1 && singleNum <= 12) {
-                return { start: singleNum, end: singleNum };
-            }
+            if (!isNaN(singleNum) && singleNum >= 1 && singleNum <= 12) return { start: singleNum, end: singleNum };
             return { start: 0, end: 0 };
         }
 
         function populateTimeSelectors() {
             const validMonths = getMonthsWithActualData();
             const yearSet = new Set();
-            
             validMonths.forEach(m => {
                 const match = m.match(/^(\d{4})/);
                 if (match) yearSet.add(match[1]);
             });
-            
             const years = Array.from(yearSet).sort().reverse();
             
             if (validMonths.length > 0) {
@@ -1487,21 +1434,15 @@
                 const latestYear = latestYYYYMM.substring(0, 4);
                 const latestMonth = parseInt(latestYYYYMM.substring(4, 6), 10);
 
-                if (!selectedYear || !years.includes(selectedYear)) {
-                    selectedYear = latestYear;
-                }
-
+                if (!selectedYear || !years.includes(selectedYear)) selectedYear = latestYear;
                 if (monthStartFilter === -1 && monthEndFilter === -1 && ui('singleMonthInput')) {
                     monthStartFilter = latestMonth;
                     monthEndFilter = latestMonth;
                     ui('singleMonthInput').value = `${latestMonth}`;
                 }
             } else {
-                if (years.length > 0 && (!selectedYear || !years.includes(selectedYear))) {
-                    selectedYear = years[0];
-                } else if (years.length === 0) {
-                    selectedYear = `${CONFIG_TARGET_YEAR}`;
-                }
+                if (years.length > 0 && (!selectedYear || !years.includes(selectedYear))) selectedYear = years[0];
+                else if (years.length === 0) selectedYear = `${CONFIG_TARGET_YEAR}`;
                 if (monthStartFilter === -1) {
                     monthStartFilter = 0;
                     monthEndFilter = 0;
@@ -1521,23 +1462,15 @@
             monthStartFilter = start;
             monthEndFilter = end;
 
-            if (start === 0 && end === 0) {
-                ui('singleMonthInput').value = '0';
-                showToast(`已切換檢視範圍：${selectedYear}年 (全年度)`);
-            } else if (start === end) {
-                ui('singleMonthInput').value = `${start}`;
-                showToast(`已切換檢視範圍：${selectedYear}年 (${start}月)`);
-            } else {
-                ui('singleMonthInput').value = `${start}-${end}`;
-                showToast(`已切換檢視範圍：${selectedYear}年 (${start}~${end}月)`);
-            }
+            if (start === 0 && end === 0) ui('singleMonthInput').value = '0';
+            else if (start === end) ui('singleMonthInput').value = `${start}`;
+            else ui('singleMonthInput').value = `${start}-${end}`;
             refreshDatabaseState();
         }
 
         function handleYearChange(val) {
             selectedYear = val;
             refreshDatabaseState();
-            showToast(`已切換至 ${val} 年資料維度`);
         }
 
         function refreshDatabaseState() {
@@ -1667,14 +1600,12 @@
             ui('detailCenterSelector').innerHTML = options;
             ui('matrixCenterSelector').value = matrixCenter;
             ui('detailCenterSelector').value = detailCenter;
-            
             populateDeptSelector();
         }
 
         function populateDeptSelector() {
             const selector = ui('detailDeptSelector');
             let options = '<option value="all">全部部門</option>';
-            
             if (detailCenter === "all") {
                 const allDepts = new Set();
                 Object.keys(summaryData).forEach(c => {
@@ -1689,32 +1620,10 @@
             selector.value = detailDept;
         }
 
-        function handleMatrixCenterChange(val) { 
-            matrixCenter = val; 
-            matrixCurrentPage = 1; 
-            renderDeptMatrix(); 
-            renderRanking(); 
-        }
-
-        function handleDetailCenterChange(val) { 
-            detailCenter = val; 
-            detailDept = "all"; 
-            measureCurrentPage = 1; 
-            populateDeptSelector(); 
-            renderMeasures(); 
-        }
-
-        function handleDetailDeptChange(val) { 
-            detailDept = val; 
-            measureCurrentPage = 1; 
-            renderMeasures(); 
-        }
-
-        function handleSortChange(val) { 
-            sortField = val; 
-            matrixCurrentPage = 1; 
-            renderDeptMatrix(); 
-        }
+        function handleMatrixCenterChange(val) { matrixCenter = val; matrixCurrentPage = 1; renderDeptMatrix(); renderRanking(); }
+        function handleDetailCenterChange(val) { detailCenter = val; detailDept = "all"; measureCurrentPage = 1; populateDeptSelector(); renderMeasures(); }
+        function handleDetailDeptChange(val) { detailDept = val; measureCurrentPage = 1; renderMeasures(); }
+        function handleSortChange(val) { sortField = val; matrixCurrentPage = 1; renderDeptMatrix(); }
         
         function resetDetailsFilter() {
             detailCenter = "all"; detailDept = "all"; typeFilter = "all"; evalFilter = "all";
@@ -1730,8 +1639,6 @@
             if(e) e.preventDefault();
             matrixCurrentPage += delta;
             renderDeptMatrix();
-            const card = ui('deptMatrixCard');
-            if(card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function toggleMatrixShowAll(e) {
@@ -1755,8 +1662,6 @@
             }
             renderDeptMatrix();
             lucide.createIcons();
-            const card = ui('deptMatrixCard');
-            if(card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function renderDeptMatrix() {
@@ -1781,14 +1686,6 @@
                 if (sortField === "name_asc") return a.centerName.localeCompare(b.centerName, 'zh-Hant') || a.deptName.localeCompare(b.deptName, 'zh-Hant');
                 if (sortField === "comb_desc") return getPct(b) - getPct(a);
                 if (sortField === "comb_asc") return getPct(a) - getPct(b);
-                if (sortField === "center_desc") {
-                    const getCenterPct = (x) => x.center.t > 0 ? (x.center.p / x.center.t) : 0;
-                    return getCenterPct(b) - getCenterPct(a);
-                }
-                if (sortField === "plant_desc") {
-                    const getPlantPct = (x) => x.plant.t > 0 ? (x.plant.p / x.plant.t) : 0;
-                    return getPlantPct(b) - getPlantPct(a);
-                }
                 return 0;
             });
 
@@ -1812,7 +1709,6 @@
 
             displayList.forEach(row => {
                 const isSelected = row.deptName === detailDept && row.centerName === detailCenter;
-                
                 const cP = row.center.t > 0 ? Math.round((row.center.p / row.center.t) * 100) + "%" : "N/A";
                 const pP = row.plant.t > 0 ? Math.round((row.plant.p / row.plant.t) * 100) + "%" : "N/A";
                 const combP = row.combined.t > 0 ? Math.round((row.combined.p / row.combined.t) * 100) + "%" : "N/A";
@@ -1838,13 +1734,10 @@
                 body.appendChild(tr);
 
                 const card = document.createElement('div');
-                card.className = `p-3 sm:p-3.5 border rounded-lg flex flex-col justify-between space-y-2 cursor-pointer transition ${
-                    isSelected ? 'bg-gray-100 border-gray-400 ring-1 ring-gray-300' : 'bg-white hover:bg-gray-50 border-gray-200'
-                }`;
+                card.className = `p-3 sm:p-3.5 border rounded-lg flex flex-col justify-between space-y-2 cursor-pointer transition ${isSelected ? 'bg-gray-100 border-gray-400 ring-1 ring-gray-300' : 'bg-white hover:bg-gray-50 border-gray-200'}`;
                 card.onclick = () => { selectDeptMatrixItem(row.centerName, row.deptName); };
 
                 const borderLightClass = combPctNum >= 71 ? 'bg-emerald-500' : (combPctNum >= 61 ? 'bg-amber-400' : 'bg-rose-500');
-
                 card.innerHTML = `
                     <div class="flex items-start justify-between">
                         <div>
@@ -1856,27 +1749,14 @@
                             <span class="text-xs font-black ${getRateColor(combPctNum)}">${combP}</span>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-3 gap-1 bg-gray-50 p-1.5 rounded border border-gray-100 text-center">
-                        <div>
-                            <span class="block text-[9px] text-gray-400 font-semibold">中心指標</span>
-                            <span class="text-[10px] font-bold text-gray-700">${cP}</span>
-                        </div>
-                        <div>
-                            <span class="block text-[9px] text-gray-400 font-semibold">廠部指標</span>
-                            <span class="text-[10px] font-bold text-gray-700">${pP}</span>
-                        </div>
-                        <div>
-                            <span class="block text-[9px] text-gray-400 font-semibold">中心+廠部</span>
-                            <div class="flex justify-center items-center mt-0.5">${getTrafficLight(row.combined)}</div>
-                        </div>
+                        <div><span class="block text-[9px] text-gray-400 font-semibold">中心指標</span><span class="text-[10px] font-bold text-gray-700">${cP}</span></div>
+                        <div><span class="block text-[9px] text-gray-400 font-semibold">廠部指標</span><span class="text-[10px] font-bold text-gray-700">${pP}</span></div>
+                        <div><span class="block text-[9px] text-gray-400 font-semibold">中心+廠部</span><div class="flex justify-center items-center mt-0.5">${getTrafficLight(row.combined)}</div></div>
                     </div>
-
                     <div class="pt-1.5 border-t border-gray-100">
                         <span class="block text-[9px] text-gray-400 font-bold uppercase mb-1">未達標與注意明細：</span>
-                        <div>
-                            ${failH}
-                        </div>
+                        <div>${failH}</div>
                     </div>
                 `;
                 cardsGrid.appendChild(card);
@@ -1890,23 +1770,15 @@
             ui('detailCenterSelector').value = centerName;
             populateDeptSelector();
             ui('detailDeptSelector').value = deptName;
-            
             renderDeptMatrix(); 
             renderMeasures();
             showToast(`已篩選顯示： ${centerName} - ${deptName} 指標細節`);
-
-            const measureCard = ui('measureCard');
-            if (measureCard) {
-                measureCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
         }
 
         function changeMeasurePage(e, delta) {
             if(e) e.preventDefault();
             measureCurrentPage += delta;
             renderMeasures();
-            const card = ui('measureCard');
-            if(card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function toggleMeasureShowAll(e) {
@@ -1930,8 +1802,6 @@
             }
             renderMeasures();
             lucide.createIcons();
-            const card = ui('measureCard');
-            if(card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function renderMeasures() {
@@ -1975,7 +1845,6 @@
             
             displayList.forEach(p => {
                 const tagClass = p.type === '中心' ? 'tag-center' : 'tag-plant';
-                
                 const dirTag = p.direction === '↓' 
                     ? '<span class="px-1 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[9px] inline-block">↓ 望小</span>' 
                     : '<span class="px-1 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[9px] inline-block">↑ 望大</span>';
@@ -1987,6 +1856,7 @@
                 const absoluteIndex = allDataItems.indexOf(p);
                 const isChecked = selectedItemIndices.has(absoluteIndex);
 
+                // 🟢 高精度達成率百分比轉譯
                 let displayRate = "—";
                 if (!isPlaceholder(p.rate)) {
                     let rawNum = typeof p.rate === "number" ? p.rate : parseFloat(String(p.rate).replace(/%/g, ''));
@@ -2054,7 +1924,6 @@
                 card.className = `bg-white border rounded-lg p-3.5 flex flex-col space-y-2.5 hover:shadow-sm transition ${isChecked ? 'border-gray-400 bg-gray-50 ring-1 ring-gray-300' : 'border-gray-200'}`;
                 card.innerHTML = `
                     ${cardCheckboxHtml}
-                    
                     <div class="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
                         <div class="flex items-center space-x-1.5">
                             <span class="text-xs font-bold text-gray-600">${escapeHTML(p.month)}</span>
@@ -2065,46 +1934,23 @@
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span>
                         </div>
                     </div>
-
                     <div>
                         <h4 class="text-[11px] text-gray-500 font-bold mb-0.5">${escapeHTML(p.center)} · ${escapeHTML(p.dept)} ${p.section ? '· ' + escapeHTML(p.section) : ''}</h4>
                         <p class="text-xs font-bold text-gray-900 leading-snug">${escapeHTML(p.project)}</p>
                     </div>
-
                     <div class="grid grid-cols-3 gap-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100 text-[10px]">
-                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
-                            <span class="block text-gray-400 font-medium">${CONFIG_PREV_YEAR}實績</span>
-                            <span class="font-bold text-gray-700">${formatTargetOrActualText(p.y25Actual)}</span>
-                        </div>
-                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
-                            <span class="block text-gray-400 font-medium">${CONFIG_TARGET_YEAR}目標</span>
-                            <span class="font-bold text-gray-700">${formatTargetOrActualText(p.y26Target)}</span>
-                        </div>
-                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
-                            <span class="block text-gray-400 font-medium">計算單位</span>
-                            <span class="font-bold text-gray-700">${escapeHTML(p.unit)}</span>
-                        </div>
-                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
-                            <span class="block text-gray-400 font-semibold text-gray-500">累計目標</span>
-                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, p.unit)}</span>
-                        </div>
-                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
-                            <span class="block text-gray-400 font-semibold text-gray-900">累計實績</span>
-                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, p.unit)}</span>
-                        </div>
-                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
-                            <span class="block text-gray-400 font-medium">去年同期</span>
-                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, p.unit)}</span>
-                        </div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center"><span class="block text-gray-400 font-medium">${CONFIG_PREV_YEAR}實績</span><span class="font-bold text-gray-700">${formatTargetOrActualText(p.y25Actual)}</span></div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center"><span class="block text-gray-400 font-medium">${CONFIG_TARGET_YEAR}目標</span><span class="font-bold text-gray-700">${formatTargetOrActualText(p.y26Target)}</span></div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center"><span class="block text-gray-400 font-medium">計算單位</span><span class="font-bold text-gray-700">${escapeHTML(p.unit)}</span></div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center"><span class="block text-gray-400 font-semibold text-gray-500">累計目標</span><span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, p.unit)}</span></div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center"><span class="block text-gray-400 font-semibold text-gray-900">累計實績</span><span class="font-black text-gray-900">${safeDisplay(p.actualAccum, p.unit)}</span></div>
+                        <div class="bg-white p-1.5 rounded border border-gray-100 text-center"><span class="block text-gray-400 font-medium">去年同期</span><span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, p.unit)}</span></div>
                     </div>
-
                     ${p.remark ? `<div class="text-[11px] text-gray-500 bg-gray-50 p-1.5 rounded border border-gray-100"><strong>備註：</strong>${escapeHTML(p.remark)}</div>` : ''}
-
                     <div class="flex items-center justify-between pt-1 text-xs">
                         <span class="text-gray-500 font-semibold">指標達成率</span>
                         <span class="font-black text-sm text-gray-900 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">${displayRate}</span>
                     </div>
-
                     ${cardActionsHtml}
                 `;
                 cardsGrid.appendChild(card);
@@ -2124,16 +1970,14 @@
         function getRateColor(pct) { return pct >= 71 ? 'text-emerald-700' : (pct >= 61 ? 'text-amber-600' : 'text-rose-600'); }
         
         function applyTypeFilter(t) { 
-            typeFilter = t; 
-            measureCurrentPage = 1; 
+            typeFilter = t; measureCurrentPage = 1; 
             document.querySelectorAll('#f-all, #f-center, #f-plant').forEach(b => b.classList.remove('filter-active')); 
             ui('f-'+(t==='all'?'all':(t==='中心'?'center':'plant'))).classList.add('filter-active'); 
             renderMeasures(); 
         }
 
         function applyEvalFilter(ev) {
-            evalFilter = ev;
-            measureCurrentPage = 1;
+            evalFilter = ev; measureCurrentPage = 1;
             document.querySelectorAll('#fe-all, #fe-o, #fe-x, #fe-delta').forEach(b => b.classList.remove('filter-active'));
             let targetId = 'fe-all';
             if (ev === 'O') targetId = 'fe-o';
@@ -2152,7 +1996,6 @@
         function openFormModal(isEdit = false, index = -1) {
             const modal = ui('formModal');
             modal.classList.remove('hidden');
-            
             if (isEdit && index > -1) {
                 ui('modalTitle').innerText = "編輯手動指標";
                 const p = allDataItems[index];
@@ -2221,28 +2064,11 @@
             }
 
             let computedRate = calculateRate(targetAccum, actualAccum, direction);
-
             let evalChar = "X";
-            if (selectEval !== "auto") {
-                evalChar = selectEval;
-            } else {
-                if (typeof computedRate === "number" && !isNaN(computedRate)) {
-                    evalChar = computedRate >= 1.0 ? "O" : "X";
-                }
-            }
+            if (selectEval !== "auto") evalChar = selectEval;
+            else if (typeof computedRate === "number" && !isNaN(computedRate)) evalChar = computedRate >= 1.0 ? "O" : "X";
 
-            const item = {
-                month, center, dept, section, type, project, unit,
-                y25Actual,
-                y26Target,
-                targetAccum,
-                actualAccum,
-                yoyActual,
-                direction,
-                rate: computedRate,
-                eval: evalChar,
-                remark: remark
-            };
+            const item = { month, center, dept, section, type, project, unit, y25Actual, y26Target, targetAccum, actualAccum, yoyActual, direction, rate: computedRate, eval: evalChar, remark };
 
             if (index > -1) {
                 allDataItems[index] = item;
@@ -2257,10 +2083,7 @@
             saveToCloud();
         }
 
-        function closeDeleteConfirmModal() {
-            ui('deleteConfirmModal').classList.add('hidden');
-            pendingDeleteIndex = -1;
-        }
+        function closeDeleteConfirmModal() { ui('deleteConfirmModal').classList.add('hidden'); pendingDeleteIndex = -1; }
 
         function executeDeleteIndicator() {
             if (pendingDeleteIndex === -2) {
@@ -2284,34 +2107,16 @@
         function closeGuideModal() { ui('guideModal').classList.add('hidden'); }
 
         function downloadTemplate() {
-            try {
-                const csvContent = "\uFEFF" + 
-                    `${CONFIG_TARGET_YEAR}年重點績效指標管理平台（系統標準匯入格式）,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n` +
-                    "說明：1. 請保留第三行之欄位名稱。2. 子行群組順序與名稱必須完全符合『當月目標』、『當月實績』、『累計目標』、『累計實績』、『累計評價』及『去年實績』、『去年累計實績』。,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n" +
-                    `MTS/AOP分類,中心,廠部,課別,指標分類,指定報告會議(T/K),重點績效評價項目,MTS/AOP編號,施策項目,↑/↓,基本定義,計算單位,${CONFIG_PREV_YEAR}實績,${CONFIG_TARGET_YEAR}目標,項   目,1月,2月,3月,4月,5月,6月,7月,8月,9月,10月,11月,12月,備註\n` +
-                    "M,管理中心,企管部,企管課,中心,T,O,B3-2-1,數位核心工程與集團AI智慧平台整合計畫,↑,專案進度定期回報,案,13,100%,當月目標,10,10,10,10,10,10,10,10,10,10,10,10,\n" +
-                    ",,企管部,,,,,,,,,,,,,當月實績,10,10,10,9,10,,,,,,,,\n" +
-                    ",,企管部,,,,,,,,,,,,,累計目標,10,20,30,40,50,60,70,80,90,100,110,120,\n" +
-                    ",,企管部,,,,,,,,,,,,,累計實績,10,20,30,39,49,,,,,,,,\n" +
-                    ",,企管部,,,,,,,,,,,,,累計評價,O,O,O,△,O,,,,,,,,\n" +
-                    ",,企管部,,,,,,,,,,,,,去年實績,8,9,10,11,12,10,10,10,10,10,10,10,\n" +
-                    ",,企管部,,,,,,,,,,,,,去年累計實績,8,17,27,38,50,60,70,80,90,100,110,120,\n";
-
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.setAttribute("href", url);
-                link.setAttribute("download", `${CONFIG_TARGET_YEAR}_KPI_Master_Template.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-
-                showToast("範本下載成功！", "success");
-            } catch (err) {
-                console.error(err);
-                showToast("❌ 下載失敗：" + err.message, "error");
-            }
+            const csvContent = "\uFEFF" + `${CONFIG_TARGET_YEAR}年重點績效指標管理平台（系統標準匯入格式）,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n`;
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `${CONFIG_TARGET_YEAR}_KPI_Master_Template.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         function exportMasterDatabase() {
@@ -2319,66 +2124,13 @@
                 showToast("目前資料庫中尚無資料，無法匯出！", "error");
                 return;
             }
-            
-            try {
-                showToast("正在準備匯出總資料庫...", "info");
-
-                const headers = [
-                    "年月", "中心單位", "廠部", "課別單位", "指標分類", 
-                    "具體施策計畫項目", "計算單位", `${CONFIG_PREV_YEAR}實績`, `${CONFIG_TARGET_YEAR}目標`, 
-                    "累計目標", "累計實績", "去年同期累計實績", "望大值/望小值方向", 
-                    "指標達成率", "評價狀態", "備註說明"
-                ];
-
-                const dataRows = allDataItems.map(i => {
-                    let dispRate = i.rate;
-                    if (typeof i.rate === "number") {
-                        dispRate = (i.rate * 100).toFixed(2) + "%";
-                    }
-                    return [
-                        i.month || "",
-                        i.center || "",
-                        i.dept || "",
-                        i.section || "",
-                        i.type || "",
-                        i.project || "",
-                        i.unit || "",
-                        i.y25Actual || "",
-                        i.y26Target || "",
-                        i.targetAccum || "",
-                        i.actualAccum || "",
-                        i.yoyActual || "",
-                        i.direction || "↑",
-                        dispRate || "",
-                        i.eval || "",
-                        i.remark || ""
-                    ];
-                });
-
-                const wsData = [headers, ...dataRows];
-                const wb = XLSX.book_new();
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-                const colWidths = headers.map((h, idx) => {
-                    let maxLen = h.length;
-                    dataRows.forEach(row => {
-                        const valStr = String(row[idx] || '');
-                        if (valStr.length > maxLen) maxLen = Math.min(valStr.length, 30);
-                    });
-                    return { wch: Math.max(maxLen * 2, 12) };
-                });
-                ws['!cols'] = colWidths;
-
-                XLSX.utils.book_append_sheet(wb, ws, "KPI_Master_Database");
-
-                const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-                XLSX.writeFile(wb, `KPI_Master_Database_Export_${dateStr}.xlsx`);
-
-                showToast("✅ 已成功匯出 Excel 總資料庫檔案！", "success");
-            } catch (e) {
-                console.error("匯出詳細錯誤：", e);
-                showToast("❌ 匯出 Excel 失敗");
-            }
+            const headers = ["年月", "中心單位", "廠部", "課別單位", "指標分類", "具體施策計畫項目", "計算單位", "2025實績", "2026目標", "累計目標", "累計實績", "去年同期累計實績", "方向", "指標達成率", "評價狀態", "備註說明"];
+            const dataRows = allDataItems.map(i => [i.month, i.center, i.dept, i.section, i.type, i.project, i.unit, i.y25Actual, i.y26Target, i.targetAccum, i.actualAccum, i.yoyActual, i.direction, typeof i.rate === "number" ? (i.rate * 100).toFixed(2) + "%" : i.rate, i.eval, i.remark]);
+            const ws = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
+            const wb = XLSX.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "KPI_Master_Database");
+            XLSX.writeFile(wb, `KPI_Master_Database_Export.xlsx`);
+            showToast("✅ 已成功匯出總資料庫！", "success");
         }
 
         function confirmClearDatabase() {
@@ -2416,40 +2168,25 @@
                 toastContainer.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[999] flex flex-col gap-2 pointer-events-none max-w-[90vw] sm:max-w-md w-full items-center';
                 document.body.appendChild(toastContainer);
             }
-            
             const toast = document.createElement('div');
             let bgColor = 'bg-f2 text-gray-800 border border-gray-300';
             let icon = 'info';
-            if (type === 'success') {
-                bgColor = 'bg-emerald-700 text-white shadow-emerald-900/20';
-                icon = 'check-circle';
-            } else if (type === 'error') {
-                bgColor = 'bg-rose-700 text-white shadow-rose-900/20';
-                icon = 'alert-triangle';
-            } else if (type === 'warning') {
-                bgColor = 'bg-amber-600 text-white shadow-amber-900/20';
-                icon = 'alert-octagon';
-            }
+            if (type === 'success') { bgColor = 'bg-emerald-700 text-white'; icon = 'check-circle'; }
+            else if (type === 'error') { bgColor = 'bg-rose-700 text-white'; icon = 'alert-triangle'; }
+            else if (type === 'warning') { bgColor = 'bg-amber-600 text-white'; icon = 'alert-octagon'; }
             
             toast.className = `px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold transition-all duration-300 transform -translate-y-5 opacity-0 flex items-center gap-2 pointer-events-auto ${bgColor}`;
             toast.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 flex-shrink-0"></i><span>${message}</span>`;
             toastContainer.appendChild(toast);
             lucide.createIcons();
-            
-            setTimeout(() => {
-                toast.classList.remove('-translate-y-5', 'opacity-0');
-            }, 10);
-            
+            setTimeout(() => toast.classList.remove('-translate-y-5', 'opacity-0'), 10);
             setTimeout(() => {
                 toast.classList.add('-translate-y-5', 'opacity-0');
-                setTimeout(() => { toast.remove(); }, 300);
+                setTimeout(() => toast.remove(), 300);
             }, 3500);
         }
 
-        window.onload = () => { 
-            lucide.createIcons(); 
-            syncFromCloud(true);
-        };
+        window.onload = () => { lucide.createIcons(); syncFromCloud(true); };
     </script>
 </body>
 </html>
