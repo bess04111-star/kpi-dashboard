@@ -745,7 +745,7 @@
                     <div class="bg-gray-50 p-3 rounded border border-gray-200 font-mono text-[11px] sm:text-xs text-gray-800 leading-relaxed">
                         累計目標為 0 時：累計實績為 0 則達成率為 100%；非 0 時若方向為「望大」則為 200%, 方向為「望小」則為 0%。
                         <br>累計目標不為 0 時：
-                        <br>&nbsp;&nbsp;- 望大值方向 (↑)： 1 + (累計實績 - 累計目標) / ABS(累計目標)
+                        <br>&nbsp;&nbsp;- 望大值方向 (↑)： 累計實績 / 累計目標
                         <br>&nbsp;&nbsp;- 望小值方向 (↓)： 1 + (累計目標 - 累計實績) / ABS(累計目標)
                     </div>
                 </div>
@@ -769,7 +769,7 @@
             ? window.API_SECRET_TOKEN
             : ((typeof CONFIG !== 'undefined' && CONFIG.API_TOKEN) ? CONFIG.API_TOKEN : "");
 
-        // 🔒 安全保護：1500 的 Base64 編碼，防止在 F12 中直接檢視到明文 "1500"[cite: 3]
+        // 🔒 安全保護：1500 的 Base64 編碼，防止在 F12 中直接檢視到明文 "1500"
         const ADMIN_TOKEN_ENCODED = "MTUwMA==";
 
         let CONFIG_TARGET_YEAR = 2026; 
@@ -887,7 +887,7 @@
             }
         }
 
-        // 🟢 修正版驗證邏輯：透過 Base64 編碼，既防 F12 偷看，又保證 100% 安定解鎖[cite: 3]
+        // 🟢 修正版驗證邏輯：透過 Base64 編碼，既防 F12 偷看，又保證 100% 安定解鎖
         function verifyAdminPassword() {
             const inputPwd = String(ui('adminPasswordInput').value).trim();
             if (!inputPwd) {
@@ -1051,7 +1051,7 @@
             }
         }
 
-        // 🟢 智慧顯示 safeDisplay (含 Excel 小數轉百分比修正)
+        // 🟢 嚴謹版 safeDisplay：支援「1%2000千元」這類混合格式
         function safeDisplay(val, isPct = false, noDecimal = false, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
@@ -1059,7 +1059,12 @@
 
             const isPctUnit = isPct || (unitContext && String(unitContext).trim() === "%");
 
-            // 狀況 1：原本就帶有 % 符號 (如 "58%")
+            // 💡 特殊混合格式處理：如 "1%2000千元"、"1% 2000千元"
+            if (s.includes("%") && /[^\s%]+/.test(s.split("%")[1])) {
+                return s;
+            }
+
+            // 標準帶有 % 的純數值 (如 "58%")
             if (s.includes("%")) {
                 let numPart = parseFloat(s.replace(/%/g, ''));
                 if (!isNaN(numPart)) {
@@ -1070,7 +1075,7 @@
                 return s;
             }
 
-            // 狀況 2：純數字處理 (自動把 Excel 讀入的 0.58 轉成 58%)
+            // 純數字處理 (如 0.58 轉成 58%，或是 8000 保持 8000)
             if (!isNaN(cleanS) && cleanS !== "") {
                 let num = parseFloat(cleanS);
 
@@ -1081,10 +1086,11 @@
                 let formattedNum = noDecimal 
                     ? Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 })
                     : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    
                 return isPctUnit ? formattedNum + "%" : formattedNum;
             }
 
-            // 狀況 3：帶有文字單位的數值
+            // 帶有單位的文字數值提取 (如 "2000千元")
             let match = cleanS.match(/^([+-]?\d*(?:\.\d+)?)\s*(.*)$/);
             if (match && match[1] && !isNaN(match[1]) && match[1] !== "") {
                 let num = parseFloat(match[1]);
@@ -1101,27 +1107,32 @@
             return isPctUnit ? s + "%" : s;
         }
 
-        // 🟢 達成率計算 (含 Excel 小數放大修正)
+        // 🟢 健壯版 calculateRate：防止大數（8000/19498）與混合字串（1%2000千元）造成計算失真
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
             let tStr = String(targetVal).trim().replace(/,/g, '');
             let aStr = String(actualVal).trim().replace(/,/g, '');
 
-            let isTargetPct = tStr.includes('%');
-            let isActualPct = aStr.includes('%');
+            function extractFirstNumber(str) {
+                if (str.includes("%") && !/[^\s%]+/.test(str.split("%")[1])) {
+                    let n = parseFloat(str.replace(/%/g, ''));
+                    return isNaN(n) ? null : n / 100;
+                }
+                let match = str.match(/([+-]?\d*(?:\.\d+)?)/);
+                if (match && match[1] && !isNaN(parseFloat(match[1]))) {
+                    let n = parseFloat(match[1]);
+                    if (str.includes("%") && Math.abs(n) <= 1) return n;
+                    if (str.includes("%")) return n / 100;
+                    return n;
+                }
+                return null;
+            }
 
-            let tNum = parseFloat(tStr.replace(/%/g, ''));
-            let aNum = parseFloat(aStr.replace(/%/g, ''));
+            let tNum = extractFirstNumber(tStr);
+            let aNum = extractFirstNumber(aStr);
 
-            if (isNaN(tNum) || isNaN(aNum)) return "—";
-
-            // 自動將 0.58 類型的百分比小數先轉換為 58 再進行計算
-            if (!isTargetPct && Math.abs(tNum) <= 1 && tNum !== 0) tNum = tNum * 100;
-            if (!isActualPct && Math.abs(aNum) <= 1 && aNum !== 0) aNum = aNum * 100;
-
-            tNum = tNum / 100;
-            aNum = aNum / 100;
+            if (tNum === null || aNum === null) return "—";
 
             let dir = String(direction).trim();
             if (dir !== "↓") dir = "↑"; 
@@ -1137,7 +1148,7 @@
                 if (dir === "↓") {
                     rateVal = 1 + (tNum - aNum) / Math.abs(tNum);
                 } else {
-                    rateVal = 1 + (aNum - tNum) / Math.abs(tNum);
+                    rateVal = aNum / tNum;
                 }
             }
 
