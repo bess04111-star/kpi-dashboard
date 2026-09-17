@@ -6,7 +6,7 @@
     <title>集團績效指標管理平台</title>
 
     <!-- 1. 優先載入 config.js -->
-    <script src="config.js?v=41.6" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
+    <script src="config.js?v=41.7" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
 
     <!-- 引入專業開發庫 -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,7 +100,7 @@
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
                             <span class="truncate">集團績效指標管理平台</span>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.6 PRO</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.7 PRO</span>
                         </h1>
                     </div>
                 </div>
@@ -940,7 +940,7 @@
             if(ui('lbl_y25Actual')) ui('lbl_y25Actual').innerText = `${CONFIG_PREV_YEAR}實績`;
             if(ui('lbl_y26Target')) ui('lbl_y26Target').innerText = `${CONFIG_TARGET_YEAR}目標`;
             if(ui('m_lbl_y25Actual')) ui('m_lbl_y25Actual').innerText = `${CONFIG_PREV_YEAR}實績`;
-            if(ui('m_lbl_y26Target')) ui('m_lbl_y26Target').innerText = `${CONFIG_PREV_YEAR}目標`;
+            if(ui('m_lbl_y26Target')) ui('m_lbl_y26Target').innerText = `${CONFIG_TARGET_YEAR}目標`;
         }
 
         function formatCleanMonth(rawMonth) {
@@ -1037,13 +1037,14 @@
             }
         }
 
-        // 🟢 safeDisplay 修正：千元/仟元/元直接「無條件捨去小數點」 (例如 19498.5 ➔ 19,498)
+        // 🟢 數值與單位顯示修正：僅適用累計目標、累計實績、去年同期 (包含千元/仟元/元與%全部去單位與整數化)
         function safeDisplay(val, isPct = false, noDecimal = false, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
 
-            const hasComplexText = /[^\d.,%\-\s]/.test(s) && !/^\d+(\.\d+)?\s*(千元|仟元|元)$/.test(s);
-            if (hasComplexText && (s.includes('%') || s.length > 8)) {
+            // 保留原始複合文字（例如 1%2000千元）
+            const hasComplexText = /[^\d.,%\-\s]/.test(s) && !/^\d+(\.\d+)?\s*(千元|仟元|元|%)$/.test(s);
+            if (hasComplexText && s.length > 8) {
                 return s;
             }
 
@@ -1051,22 +1052,31 @@
             const isPercentUnit = isPct || unitStr === "%" || s.includes('%');
             const isIntegerUnit = /千元|仟元|元/.test(unitStr) || /千元|仟元|元/.test(s);
 
+            // 抽取純數字部分
             let cleanNumStr = s.replace(/[^0-9.-]/g, '');
             let num = parseFloat(cleanNumStr);
 
             if (isNaN(num)) return s;
 
-            if (isPercentUnit && Math.abs(num) <= 1 && num !== 0 && !s.includes('%')) {
-                num = num * 100;
+            // 💡 規則 1: 千元/仟元/元 數值 (如 19498.5) 強制呈現四捨五入整數並加千位符，且完全隱藏單位
+            if (isIntegerUnit) {
+                return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
             }
 
-            let formattedNum = "";
-
-            // 💡 若為 千元/仟元/元 單位：無條件捨去小數點 (Math.floor)
-            if (isIntegerUnit || noDecimal) {
-                formattedNum = Math.floor(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
+            // 💡 規則 2: 累計欄位若單位為 % 且包含數字，移除 % 符號並格式化為純數字
+            if (isPercentUnit) {
+                if (Math.abs(num) <= 1 && num !== 0 && !s.includes('%')) {
+                    num = num * 100;
+                }
+                return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
-            else if (Math.abs(num) > 0 && Math.abs(num) < 0.01 && !Number.isInteger(num)) {
+
+            if (noDecimal) {
+                return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
+            }
+
+            // 極小小數處理 (如 0.001345 ➔ 0.0013)
+            if (Math.abs(num) > 0 && Math.abs(num) < 0.01 && !Number.isInteger(num)) {
                 let numStr = num.toString();
                 if (numStr.includes('.')) {
                     let decimals = numStr.split('.')[1];
@@ -1074,33 +1084,16 @@
                     while (firstNonZeroIndex < decimals.length && decimals[firstNonZeroIndex] === '0') {
                         firstNonZeroIndex++;
                     }
-                    formattedNum = num.toFixed(Math.min(firstNonZeroIndex + 2, 6));
-                } else {
-                    formattedNum = num.toString();
+                    return num.toFixed(Math.min(firstNonZeroIndex + 2, 6));
                 }
-            } 
-            else if (isPercentUnit) {
-                formattedNum = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            } 
-            else {
-                formattedNum = Number.isInteger(num) 
-                    ? num.toLocaleString('en-US') 
-                    : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
-            let unitPart = s.replace(/[0-9.,%\-\s]/g, '');
-            if (!unitPart && isIntegerUnit) {
-                const match = unitStr.match(/(千元|仟元|元)/);
-                if (match) unitPart = match[0];
-            }
-
-            if (unitPart) {
-                return `${formattedNum} ${unitPart}`;
-            }
-            return isPercentUnit && !formattedNum.includes('%') ? `${formattedNum}%` : formattedNum;
+            return Number.isInteger(num) 
+                ? num.toLocaleString('en-US') 
+                : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // 🟢 calculateRate 修正：支援輸入 100% / 100% 解析，並穩定輸出 2 位數 % 字串 (如 100.00%)
+        // 🟢 達成率計算修正：確保 100% 呈現為 100.00%（不被轉成純數字 1）
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
@@ -1115,9 +1108,9 @@
 
             if (isNaN(tNum) || isNaN(aNum)) return "—";
 
-            // 若輸入本身帶有 % (如 100.00% 或 100%)，將其正規化為小數進行比例運算
-            if (isTargetPct) tNum = tNum / 100;
-            if (isActualPct) aNum = aNum / 100;
+            // 如果原本輸入為 100% (字面值 100)，避免被重覆除以 100 導致轉成 1
+            if (isTargetPct && Math.abs(tNum) > 1) tNum = tNum / 100;
+            if (isActualPct && Math.abs(aNum) > 1) aNum = aNum / 100;
 
             let dir = String(direction).trim();
             if (dir !== "↓") dir = "↑"; 
@@ -2021,8 +2014,8 @@
                     <td class="p-1.5 border-r border-gray-100 text-center break-words"><span class="${tagClass}">${escapeHTML(p.type)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 font-medium text-gray-900 leading-tight break-words">${escapeHTML(p.project)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${safeDisplay(p.y25Actual, false, false, p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${safeDisplay(p.y26Target, false, false, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${p.y25Actual}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${p.y26Target}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, false, false, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, false, false, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, false, false, p.unit)}</td>
@@ -2070,11 +2063,11 @@
                     <div class="grid grid-cols-3 gap-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100 text-[10px]">
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_PREV_YEAR}實績</span>
-                            <span class="font-bold text-gray-700">${safeDisplay(p.y25Actual, false, false, p.unit)}</span>
+                            <span class="font-bold text-gray-700">${p.y25Actual}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_TARGET_YEAR}目標</span>
-                            <span class="font-bold text-gray-700">${safeDisplay(p.y26Target, false, false, p.unit)}</span>
+                            <span class="font-bold text-gray-700">${p.y26Target}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">計算單位</span>
@@ -2228,8 +2221,8 @@
 
             const item = {
                 month, center, dept, section, type, project, unit,
-                y25Actual: safeDisplay(y25Actual, false, false, unit),
-                y26Target: safeDisplay(y26Target, false, false, unit),
+                y25Actual,
+                y26Target,
                 targetAccum: safeDisplay(targetAccum, false, false, unit),
                 actualAccum: safeDisplay(actualAccum, false, false, unit),
                 yoyActual: safeDisplay(yoyActual, false, false, unit),
