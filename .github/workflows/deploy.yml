@@ -29,10 +29,14 @@ jobs:
       - name: 📥 檢出程式碼 (Checkout)
         uses: actions/checkout@v4
 
-      - name: ⚙️ 自動生成 config.js
+      - name: ⚙️ 自動生成 config.js（注入 GOOGLE_API_URL 與 API_SECRET_TOKEN）
         run: |
-          echo "const CONFIG = { GAS_API_URL: '${{ secrets.GAS_API_URL }}' };" > config.js
-          echo "✅  建立成功！"
+          echo "const CONFIG = {" > config.js
+          echo "    GAS_API_URL: '${{ secrets.GOOGLE_API_URL }}'," >> config.js
+          echo "    API_TOKEN: '${{ secrets.API_SECRET_TOKEN }}'" >> config.js
+          echo "};" >> config.js
+          echo "✅ config.js 生成成功！內容架構如下："
+          cat config.js | sed 's/${{ secrets.API_SECRET_TOKEN }}/***HIDDEN***/g' # 隱藏敏感情資防洩漏
 
       - name: 🔧 設定 GitHub Pages 資源環境
         uses: actions/configure-pages@v5
@@ -40,7 +44,6 @@ jobs:
       - name: 📦 上傳靜態檔案構建 (Upload Artifact)
         uses: actions/upload-pages-artifact@v3
         with:
-          # 預設打包專案根目錄的所有內容
           path: '.'
 
       - name: 🚀 部署至 GitHub Pages
