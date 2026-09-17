@@ -6,7 +6,7 @@
     <title>集團績效指標管理平台</title>
 
     <!-- 1. 優先載入 config.js -->
-    <script src="config.js?v=42.2" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
+    <script src="config.js?v=42.3" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
 
     <!-- 引入專業開發庫 -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,7 +100,7 @@
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
                             <span class="truncate">集團績效指標管理平台</span>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v42.2 PRO</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v42.3 PRO</span>
                         </h1>
                     </div>
                 </div>
@@ -1020,7 +1020,7 @@
             }
         }
 
-        // 🟢 完整保留多行換行文字與單位的顯示器
+        // 🟢 完整保留多行換行文字與單位的顯示器（適用於實績、目標等欄位）
         function formatTargetOrActualText(val) {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
@@ -2161,6 +2161,7 @@
                     btnText.innerText = "清空雲端與地端資料庫";
                     btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100";
                     showToast("資料庫已完全清空！", "success");
+                    title: "資料庫已完全清空！"
                 }
             });
         }
