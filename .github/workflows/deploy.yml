@@ -1,0 +1,26 @@
+name: Deploy KPI Dashboard to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main     # 💡 若您的預設分支名稱是 master，請改為 master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      - name: Generate config.js from Secrets
+        run: |
+          echo "window.GOOGLE_API_URL = '${{ secrets.GOOGLE_API_URL }}';" > config.js
+          echo "window.API_SECRET_TOKEN = '${{ secrets.API_SECRET_TOKEN }}';" >> config.js
+          echo "✅雲端匯入完成！"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
