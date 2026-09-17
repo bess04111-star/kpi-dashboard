@@ -6,7 +6,7 @@
     <title>集團績效指標管理平台</title>
 
     <!-- 1. 優先載入 config.js -->
-    <script src="config.js?v=42.1" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
+    <script src="config.js?v=42.2" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
 
     <!-- 引入專業開發庫 -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,7 +100,7 @@
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
                             <span class="truncate">集團績效指標管理平台</span>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v42.1 PRO</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v42.2 PRO</span>
                         </h1>
                     </div>
                 </div>
@@ -745,8 +745,8 @@
                     <div class="bg-gray-50 p-3 rounded border border-gray-200 font-mono text-[11px] sm:text-xs text-gray-800 leading-relaxed">
                         累計目標為 0 時：累計實績為 0 則達成率為 100%；非 0 時若方向為「望大」則為 200%, 方向為「望小」則為 0%。
                         <br>累計目標不為 0 時：
-                        <br>&nbsp;&nbsp;- 望大值方向 (↑)： 累計實績 / 累計目標
-                        <br>&nbsp;&nbsp;- 望小值方向 (↓)： 1 + (累計目標 - 累計實績) / ABS(累計目標)
+                        <br>&nbsp;&nbsp;- 望大值方向 (↑)： 累計實績 / 累計目標（四捨五入取整數）
+                        <br>&nbsp;&nbsp;- 望小值方向 (↓)： 1 + (累計目標 - 累計實績) / ABS(累計目標)（四捨五入取整數）
                     </div>
                 </div>
             </div>
@@ -1020,12 +1020,15 @@
             }
         }
 
-        // 🟢 智慧格式化 2025實績：若為小數且小於 1，自動乘 100 轉回百分比顯示格式
+        // 🟢 完整保留多行換行文字與單位的顯示器
         function formatTargetOrActualText(val) {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
             
-            // 如果是純小數（如從 Excel 讀出來的 0.01562），自動補正為 1.562%
+            if (s.includes('\n')) {
+                return escapeHTML(s);
+            }
+            
             let num = parseFloat(s);
             if (!isNaN(num) && num > 0 && num < 1 && !s.includes('%') && !s.includes('案') && !s.includes('仟元')) {
                 return (num * 100).toFixed(3) + "%";
@@ -1037,7 +1040,6 @@
             return escapeHTML(s);
         }
 
-        // 🟢 高精度數值解析器：完美解析百分比與小數
         function parseCleanNumber(val) {
             if (isPlaceholder(val)) return NaN;
             let s = String(val).trim().replace(/,/g, '');
@@ -1077,7 +1079,7 @@
                 : cleanNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // 🟢 高精度達成率計算函式
+        // 🟢 高精度達成率計算函式：直接計算並四捨五入為整數百分比
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
@@ -1097,7 +1099,7 @@
                 if (dir === "↓") {
                     rateVal = 1 + (tNum - aNum) / Math.abs(tNum);
                 } else {
-                    rateVal = aNum / tNum; // 純浮點數精準相除
+                    rateVal = aNum / tNum; 
                 }
             }
             return rateVal; 
@@ -1189,7 +1191,6 @@
             });
         }
 
-        // 🟢 強制完整讀取顯示字串 (w) 或直接抓值
         function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1856,13 +1857,13 @@
                 const absoluteIndex = allDataItems.indexOf(p);
                 const isChecked = selectedItemIndices.has(absoluteIndex);
 
-                // 🟢 高精度達成率百分比轉譯
+                // 🟢 達成率強制四捨五入取整數顯示（無小數點）
                 let displayRate = "—";
                 if (!isPlaceholder(p.rate)) {
                     let rawNum = typeof p.rate === "number" ? p.rate : parseFloat(String(p.rate).replace(/%/g, ''));
                     if (!isNaN(rawNum)) {
                         let pctVal = rawNum <= 2.0 && rawNum > 0 ? rawNum * 100 : rawNum;
-                        displayRate = pctVal.toFixed(2) + "%";
+                        displayRate = Math.round(pctVal) + "%";
                     } else {
                         displayRate = escapeHTML(p.rate);
                     }
@@ -2125,7 +2126,11 @@
                 return;
             }
             const headers = ["年月", "中心單位", "廠部", "課別單位", "指標分類", "具體施策計畫項目", "計算單位", "2025實績", "2026目標", "累計目標", "累計實績", "去年同期累計實績", "方向", "指標達成率", "評價狀態", "備註說明"];
-            const dataRows = allDataItems.map(i => [i.month, i.center, i.dept, i.section, i.type, i.project, i.unit, i.y25Actual, i.y26Target, i.targetAccum, i.actualAccum, i.yoyActual, i.direction, typeof i.rate === "number" ? (i.rate * 100).toFixed(2) + "%" : i.rate, i.eval, i.remark]);
+            const dataRows = allDataItems.map(i => [
+                i.month, i.center, i.dept, i.section, i.type, i.project, i.unit, i.y25Actual, i.y26Target, i.targetAccum, i.actualAccum, i.yoyActual, i.direction, 
+                typeof i.rate === "number" ? Math.round(i.rate * 100) + "%" : i.rate, 
+                i.eval, i.remark
+            ]);
             const ws = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
             const wb = XLSX.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "KPI_Master_Database");
