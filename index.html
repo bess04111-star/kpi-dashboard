@@ -1042,7 +1042,6 @@
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
 
-            // 保留原始複合文字（例如 1%2000千元）
             const hasComplexText = /[^\d.,%\-\s]/.test(s) && !/^\d+(\.\d+)?\s*(千元|仟元|元|%)$/.test(s);
             if (hasComplexText && s.length > 8) {
                 return s;
@@ -1052,7 +1051,6 @@
             const isPercentUnit = isPct || unitStr === "%" || s.includes('%');
             const isIntegerUnit = /千元|仟元|元/.test(unitStr) || /千元|仟元|元/.test(s);
 
-            // 抽取純數字部分
             let cleanNumStr = s.replace(/[^0-9.-]/g, '');
             let num = parseFloat(cleanNumStr);
 
@@ -1063,7 +1061,7 @@
                 return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
             }
 
-            // 💡 規則 2: 累計欄位若單位為 % 且包含數字，移除 % 符號並格式化為純數字
+            // 💡 規則 2: 累計欄位若單位為 % 且包含數字，剔除 % 符號並格式化為純數字
             if (isPercentUnit) {
                 if (Math.abs(num) <= 1 && num !== 0 && !s.includes('%')) {
                     num = num * 100;
@@ -1075,7 +1073,6 @@
                 return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
             }
 
-            // 極小小數處理 (如 0.001345 ➔ 0.0013)
             if (Math.abs(num) > 0 && Math.abs(num) < 0.01 && !Number.isInteger(num)) {
                 let numStr = num.toString();
                 if (numStr.includes('.')) {
@@ -1093,24 +1090,17 @@
                 : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-        // 🟢 達成率計算修正：確保 100% 呈現為 100.00%（不被轉成純數字 1）
+        // 🟢 達成率計算核心邏輯修復：強制回傳標準 % 格式，避免呈現數字 1
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
             let tStr = String(targetVal).trim().replace(/,/g, '');
             let aStr = String(actualVal).trim().replace(/,/g, '');
 
-            let isTargetPct = tStr.includes('%');
-            let isActualPct = aStr.includes('%');
-
             let tNum = parseFloat(tStr.replace(/[^0-9.-]/g, ''));
             let aNum = parseFloat(aStr.replace(/[^0-9.-]/g, ''));
 
             if (isNaN(tNum) || isNaN(aNum)) return "—";
-
-            // 如果原本輸入為 100% (字面值 100)，避免被重覆除以 100 導致轉成 1
-            if (isTargetPct && Math.abs(tNum) > 1) tNum = tNum / 100;
-            if (isActualPct && Math.abs(aNum) > 1) aNum = aNum / 100;
 
             let dir = String(direction).trim();
             if (dir !== "↓") dir = "↑"; 
@@ -1130,7 +1120,12 @@
                 }
             }
 
+            // 💡 若數值相近/相等直接歸一為 100.00%
             let percentage = rateVal * 100;
+            if (Math.abs(percentage - 100) < 0.001) {
+                return "100.00%";
+            }
+
             return percentage.toFixed(2) + "%";
         }
 
@@ -1386,13 +1381,6 @@
                                 const yoyDisp = (lastYearAccumVal || lastYearVal) ? String(lastYearAccumVal || lastYearVal).trim() : "—";
                                 
                                 let rateDisp = calculateRate(targetVal, actualVal, direction);
-                                
-                                if (rateDisp !== "—" && !rateDisp.endsWith('%')) {
-                                    let rNum = parseFloat(rateDisp);
-                                    if (!isNaN(rNum)) {
-                                        rateDisp = rNum.toFixed(2) + "%";
-                                    }
-                                }
 
                                 let evalChar = "X";
                                 let rNum = parseFloat(String(rateDisp).replace(/%/g, ''));
@@ -1987,6 +1975,9 @@
                 const absoluteIndex = allDataItems.indexOf(p);
                 const isChecked = selectedItemIndices.has(absoluteIndex);
 
+                // 💡 強制重新運算並渲染出百分比格式達成率（避免呈現數字 1）
+                const displayRate = calculateRate(p.targetAccum, p.actualAccum, p.direction);
+
                 const tr = document.createElement('tr'); 
                 tr.className = `hover:bg-gray-50 transition ${isChecked ? 'bg-gray-100' : ''}`;
 
@@ -2020,7 +2011,7 @@
                     <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, false, false, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, false, false, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center break-words">${dirTag}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${p.rate}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${displayRate}</td>
                     <td class="p-1.5 text-center border-r border-gray-100 whitespace-nowrap"><span class="px-1 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 text-gray-500 break-words">${escapeHTML(p.remark) || '—'}</td>
                     ${actionCellHtml}`;
@@ -2091,7 +2082,7 @@
 
                     <div class="flex items-center justify-between pt-1 text-xs">
                         <span class="text-gray-500 font-semibold">指標達成率</span>
-                        <span class="font-black text-sm text-gray-900 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">${p.rate}</span>
+                        <span class="font-black text-sm text-gray-900 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">${displayRate}</span>
                     </div>
 
                     ${cardActionsHtml}
@@ -2332,7 +2323,7 @@
                     i.actualAccum || "",
                     i.yoyActual || "",
                     i.direction || "↑",
-                    i.rate || "",
+                    calculateRate(i.targetAccum, i.actualAccum, i.direction),
                     i.eval || "",
                     i.remark || ""
                 ]);
