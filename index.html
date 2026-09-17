@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>集團 KPI 智慧互動總資料庫系統 PRO (全裝置響應式版)</title>
+
+    <!-- 1. 優先載入 config.js (加入防快取參數，確保隨時抓取最新 GitHub Secrets) -->
+    <script src="config.js?v=41.3" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
+
     <!-- 引入專業開發庫（含雙 CDN 備援機制，確保 Excel 匯入匯出 100% 成功） -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -755,14 +759,16 @@
         </div>
     </div>
 
-    <!-- 1. 載入動態生成的 config.js (若 GitHub Actions 注入成功則啟用) -->
-    <script src="config.js" onerror="console.warn('⚠️ 未發現 config.js 設定檔，雲端同步功能停用。')"></script>
-
-    <!-- 2. 主程式邏輯與防呆機制 -->
+    <!-- 主程式邏輯與防呆機制 -->
     <script>
-        // 安全讀取由 GitHub Actions 注入或本機宣告的 CONFIG 物件
-        const GAS_API_URL = (typeof CONFIG !== 'undefined' && CONFIG.GAS_API_URL) ? CONFIG.GAS_API_URL : "";
-        const API_SECRET_TOKEN = (typeof CONFIG !== 'undefined' && CONFIG.API_TOKEN) ? CONFIG.API_TOKEN : "";
+        // 🛡️ 雙向相容讀取：同時支援 window 全域宣告與 CONFIG 物件宣告
+        const GAS_API_URL = (typeof window !== 'undefined' && window.GOOGLE_API_URL)
+            ? window.GOOGLE_API_URL
+            : ((typeof CONFIG !== 'undefined' && CONFIG.GAS_API_URL) ? CONFIG.GAS_API_URL : "");
+
+        const API_SECRET_TOKEN = (typeof window !== 'undefined' && window.API_SECRET_TOKEN)
+            ? window.API_SECRET_TOKEN
+            : ((typeof CONFIG !== 'undefined' && CONFIG.API_TOKEN) ? CONFIG.API_TOKEN : "");
 
         const ADMIN_PASSWORD_HASH = "MTUwMA==";
 
@@ -970,6 +976,8 @@
 
         // 🛡️ 增強版雲端同步（防止 JSON 解析 HTML 崩潰與詳細 Log 紀錄）
         async function syncFromCloud(isAuto = false) {
+            console.log("🔍 [除錯日誌] 目前讀取到的 API 網址：", GAS_API_URL);
+
             if (!GAS_API_URL) {
                 if (!isAuto) showToast("⚠️ 未偵測到有效的網址，已讀取本機資料。", "warning");
                 return loadLocalCache();
@@ -989,8 +997,8 @@
                 const contentType = response.headers.get("content-type") || "";
                 if (contentType.includes("text/html")) {
                     const htmlText = await response.text();
-                    console.error("❌ GAS 回傳了 HTML 頁面（可能權限未開放或網址錯誤）：", htmlText.substring(0, 150));
-                    throw new Error("伺服器回傳了網頁而非 JSON 資料，請確認 GAS 權限已開啟為「所有人」。");
+                    console.error("❌網址或權限錯誤）：", htmlText.substring(0, 150));
+                    throw new Error("伺服器錯誤。");
                 }
 
                 const data = await response.json();
@@ -2350,7 +2358,7 @@
                     isClearConfirmPending = false;
                     btnText.innerText = "清空雲端與地端資料庫";
                     btn.className = "flex items-center space-x-2 w-full px-4 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 transition border-t border-gray-100";
-                    showToast("🧹 資料庫已完全清空！", "success");
+                    showToast("資料庫已完全清空！", "success");
                 }
             });
         }
