@@ -29,12 +29,19 @@ jobs:
       - name: 📥 檢出程式碼 (Checkout)
         uses: actions/checkout@v4
 
-      - name: ⚙️ 自動生成 config.js（注入 GOOGLE_API_URL 與 API_SECRET_TOKEN）
+      - name: ⚙️ 自動生成 config.js（防字串衝突安全版）
         run: |
-          echo "window.GOOGLE_API_URL = '${{ secrets.GOOGLE_API_URL }}';" > config.js
-          echo "window.API_SECRET_TOKEN = '${{ secrets.API_SECRET_TOKEN }}';" >> config.js
-          echo "✅ config.js 生成成功！內容架構如下："
-          cat config.js | sed 's/${{ secrets.API_SECRET_TOKEN }}/***HIDDEN***/g'
+          node -e "
+            const fs = require('fs');
+            const url = process.env.GOOGLE_API_URL || '';
+            const token = process.env.API_SECRET_TOKEN || '';
+            const content = \`window.GOOGLE_API_URL = \${JSON.stringify(url)};\nwindow.API_SECRET_TOKEN = \${JSON.stringify(token)};\`;
+            fs.writeFileSync('config.js', content);
+          "
+          echo "✅ js 安全生成成功！"
+        env:
+          GOOGLE_API_URL: ${{ secrets.GOOGLE_API_URL }}
+          API_SECRET_TOKEN: ${{ secrets.API_SECRET_TOKEN }}
 
       - name: 🔧 設定 GitHub Pages 資源環境
         uses: actions/configure-pages@v5
