@@ -6,7 +6,7 @@
     <title>集團績效指標管理平台</title>
 
     <!-- 1. 優先載入 config.js (加入防快取參數，確保隨時抓取最新 GitHub Secrets) -->
-    <script src="config.js?v=41.3" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
+    <script src="config.js?v=41.4" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
 
     <!-- 引入專業開發庫（含雙 CDN 備援機制，確保 Excel 匯入匯出 100% 成功） -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,7 +100,7 @@
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
                             <span class="truncate">集團績效指標管理平台</span>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.3 PRO</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.4 PRO</span>
                         </h1>
                     </div>
                 </div>
@@ -186,7 +186,7 @@
                         </div>
                         <div class="flex items-center gap-1.5 bg-white px-2.5 py-1 border border-gray-300 rounded-lg shadow-sm">
                             <span class="text-xs font-bold text-gray-700 whitespace-nowrap">檢視月份：</span>
-                            <input type="text" id="singleMonthInput" placeholder="0" oninput="handleSingleMonthChange()" onblur="validateSingleMonthInput()" class="w-16 text-center text-xs font-bold text-gray-800 border border-gray-200 rounded py-0.5 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400">
+                            <input type="text" id="singleMonthInput" placeholder="0" onkeydown="if(event.key==='Enter') validateSingleMonthInput()" onblur="validateSingleMonthInput()" class="w-16 text-center text-xs font-bold text-gray-800 border border-gray-200 rounded py-0.5 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400">
                             <span class="text-xs font-bold text-gray-700">月</span>
                             <span class="text-[10px] text-gray-400 font-medium pl-1">(輸入 1、1-2 或 0 為全年度)</span>
                         </div>
@@ -769,7 +769,8 @@
             ? window.API_SECRET_TOKEN
             : ((typeof CONFIG !== 'undefined' && CONFIG.API_TOKEN) ? CONFIG.API_TOKEN : "");
 
-        const ADMIN_PASSWORD_HASH = "MTUwMA==";
+        // ✅ 安全升級：1500 的 SHA-256 哈希值
+        const ADMIN_PASSWORD_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
 
         let CONFIG_TARGET_YEAR = 2026; 
         let CONFIG_PREV_YEAR = CONFIG_TARGET_YEAR - 1;
@@ -781,8 +782,8 @@
         let summaryData = {}; 
         
         let selectedYear = `${CONFIG_TARGET_YEAR}`; 
-        let monthStartFilter = 0; 
-        let monthEndFilter = 0;
+        let monthStartFilter = -1; // -1 代表尚未初始設定
+        let monthEndFilter = -1;
 
         let matrixCenter = "all";
         let detailCenter = "all"; 
@@ -825,14 +826,6 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
-        }
-
-        function hashPassword(str) {
-            try {
-                return btoa(String(str).trim());
-            } catch (e) {
-                return "";
-            }
         }
 
         function loadLocalCache() {
@@ -894,14 +887,17 @@
             }
         }
 
-        function verifyAdminPassword() {
+        async function verifyAdminPassword() {
             const inputPwd = String(ui('adminPasswordInput').value).trim();
             if (!inputPwd) {
                 showToast("請輸入密碼！", "error");
                 return;
             }
 
-            const inputHash = hashPassword(inputPwd);
+            const msgUint8 = new TextEncoder().encode(inputPwd);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const inputHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
             if (inputHash === ADMIN_PASSWORD_HASH) {
                 isAdminAuthenticated = true;
@@ -973,7 +969,7 @@
             return s.replace(/\D/g, '');
         }
 
-        // 🛡️ 增強版雲端同步（極速防 404 重定向與 CORS 異常版）
+        // 🛡️ 增強版雲端同步
         async function syncFromCloud(isAuto = false) {
             console.log("🔍 [除錯日誌] 目前讀取到的 API 網址：", GAS_API_URL);
 
@@ -1055,11 +1051,13 @@
             }
         }
 
-        // 🟢 升級版 safeDisplay：原樣保留非數字內容，不強制乘以 100 或補 %
-        function safeDisplay(val, isPct = false, noDecimal = false) {
+        // 🟢 智慧顯示 safeDisplay
+        function safeDisplay(val, isPct = false, noDecimal = false, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
             let cleanS = s.replace(/,/g, ''); 
+
+            const isPctUnit = isPct || (unitContext && String(unitContext).trim() === "%");
 
             if (s.includes("%")) {
                 return s;
@@ -1067,25 +1065,26 @@
 
             if (!isNaN(cleanS) && cleanS !== "") {
                 let num = parseFloat(cleanS);
-                if (noDecimal) {
-                    return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
-                }
-                return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                let formattedNum = noDecimal 
+                    ? Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 })
+                    : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                return isPctUnit ? formattedNum + "%" : formattedNum;
             }
 
             let match = cleanS.match(/^([+-]?\d*(?:\.\d+)?)\s*(.*)$/);
             if (match && match[1] && !isNaN(match[1]) && match[1] !== "") {
                 let num = parseFloat(match[1]);
-                let unitPart = match[2] ? " " + match[2] : "";
-                if (noDecimal) {
-                    return Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 }) + unitPart;
-                }
-                return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + unitPart;
+                let unitPart = match[2] ? " " + match[2] : (isPctUnit ? "%" : "");
+                let formattedNum = noDecimal 
+                    ? Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 })
+                    : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                return formattedNum + unitPart;
             }
 
-            return s;
+            return isPctUnit ? s + "%" : s;
         }
 
+        // 🟢 達成率計算
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
@@ -1397,11 +1396,11 @@
                                 
                                 const newItem = {
                                     month: monthStr, center, dept, section, type, project, unit,
-                                    y25Actual: safeDisplay(rawY25Actual, false, true), 
-                                    y26Target: safeDisplay(y26Target, false), 
-                                    targetAccum: safeDisplay(targetDisp, false), 
-                                    actualAccum: safeDisplay(actualDisp, false), 
-                                    yoyActual: safeDisplay(yoyDisp, false), 
+                                    y25Actual: safeDisplay(rawY25Actual, false, true, unit), 
+                                    y26Target: safeDisplay(y26Target, false, false, unit), 
+                                    targetAccum: safeDisplay(targetDisp, false, false, unit), 
+                                    actualAccum: safeDisplay(actualDisp, false, false, unit), 
+                                    yoyActual: safeDisplay(yoyDisp, false, false, unit), 
                                     direction: direction, rate: rateDisp, eval: evalChar,
                                     remark: remark
                                 };
@@ -1451,7 +1450,7 @@
             return { start: 0, end: 0 };
         }
 
-        // 🟢 自動預設最新年份與最新月份
+        // 🟢 預設自動尋找最新數據月份（僅在尚未設定月份時自動寫入）
         function populateTimeSelectors() {
             const validMonths = getMonthsWithActualData();
             const yearSet = new Set();
@@ -1472,7 +1471,7 @@
                     selectedYear = latestYear;
                 }
 
-                if (monthStartFilter === 0 && monthEndFilter === 0 && ui('singleMonthInput')) {
+                if (monthStartFilter === -1 && monthEndFilter === -1 && ui('singleMonthInput')) {
                     monthStartFilter = latestMonth;
                     monthEndFilter = latestMonth;
                     ui('singleMonthInput').value = `${latestMonth}`;
@@ -1483,20 +1482,17 @@
                 } else if (years.length === 0) {
                     selectedYear = `${CONFIG_TARGET_YEAR}`;
                 }
+                if (monthStartFilter === -1) {
+                    monthStartFilter = 0;
+                    monthEndFilter = 0;
+                    if (ui('singleMonthInput')) ui('singleMonthInput').value = '0';
+                }
             }
 
             let yearOptions = years.map(y => `<option value="${y}">📅 ${y} 年</option>`).join('');
             if (years.length === 0) yearOptions = `<option value="${CONFIG_TARGET_YEAR}">📅 ${CONFIG_TARGET_YEAR} 年</option>`;
             ui('globalYearSelector').innerHTML = yearOptions;
             ui('globalYearSelector').value = selectedYear;
-        }
-
-        function handleSingleMonthChange() {
-            const raw = ui('singleMonthInput').value;
-            const { start, end } = parseMonthInput(raw);
-            monthStartFilter = start;
-            monthEndFilter = end;
-            refreshDatabaseState();
         }
 
         function validateSingleMonthInput() {
@@ -1998,11 +1994,11 @@
                     <td class="p-1.5 border-r border-gray-100 text-center break-words"><span class="${tagClass}">${escapeHTML(p.type)}</span></td>
                     <td class="p-1.5 border-r border-gray-100 font-medium text-gray-900 leading-tight break-words">${escapeHTML(p.project)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${escapeHTML(p.unit)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${safeDisplay(p.y25Actual, false, true)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${safeDisplay(p.y26Target, false)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, false)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, false)}</td>
-                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, false)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 font-medium break-words">${safeDisplay(p.y25Actual, false, true, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-500 break-words">${safeDisplay(p.y26Target, false, false, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-semibold text-gray-700 break-words">${safeDisplay(p.targetAccum, false, false, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 break-words">${safeDisplay(p.actualAccum, false, false, p.unit)}</td>
+                    <td class="p-1.5 border-r border-gray-100 text-center text-gray-400 break-words">${safeDisplay(p.yoyActual, false, false, p.unit)}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center break-words">${dirTag}</td>
                     <td class="p-1.5 border-r border-gray-100 text-center font-black text-gray-900 bg-gray-50 break-words">${safeDisplay(p.rate, true)}</td>
                     <td class="p-1.5 text-center border-r border-gray-100 whitespace-nowrap"><span class="px-1 py-0.5 rounded-full text-[10px] font-bold ${evalTagClass}">${escapeHTML(p.eval)}</span></td>
@@ -2047,11 +2043,11 @@
                     <div class="grid grid-cols-3 gap-1.5 bg-gray-50 p-2 rounded-lg border border-gray-100 text-[10px]">
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_PREV_YEAR}實績</span>
-                            <span class="font-bold text-gray-700">${safeDisplay(p.y25Actual, false, true)}</span>
+                            <span class="font-bold text-gray-700">${safeDisplay(p.y25Actual, false, true, p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">${CONFIG_TARGET_YEAR}目標</span>
-                            <span class="font-bold text-gray-700">${safeDisplay(p.y26Target, false)}</span>
+                            <span class="font-bold text-gray-700">${safeDisplay(p.y26Target, false, false, p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">計算單位</span>
@@ -2059,15 +2055,15 @@
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-semibold text-gray-500">累計目標</span>
-                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, false)}</span>
+                            <span class="font-bold text-gray-800">${safeDisplay(p.targetAccum, false, false, p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-semibold text-gray-900">累計實績</span>
-                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, false)}</span>
+                            <span class="font-black text-gray-900">${safeDisplay(p.actualAccum, false, false, p.unit)}</span>
                         </div>
                         <div class="bg-white p-1.5 rounded border border-gray-100 text-center">
                             <span class="block text-gray-400 font-medium">去年同期</span>
-                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, false)}</span>
+                            <span class="font-bold text-gray-500">${safeDisplay(p.yoyActual, false, false, p.unit)}</span>
                         </div>
                     </div>
 
@@ -2205,11 +2201,11 @@
 
             const item = {
                 month, center, dept, section, type, project, unit,
-                y25Actual: safeDisplay(y25Actual, false, true),
-                y26Target: safeDisplay(y26Target, false),
-                targetAccum: safeDisplay(targetAccum, false),
-                actualAccum: safeDisplay(actualAccum, false),
-                yoyActual: safeDisplay(yoyActual, false),
+                y25Actual: safeDisplay(y25Actual, false, true, unit),
+                y26Target: safeDisplay(y26Target, false, false, unit),
+                targetAccum: safeDisplay(targetAccum, false, false, unit),
+                actualAccum: safeDisplay(actualAccum, false, false, unit),
+                yoyActual: safeDisplay(yoyActual, false, false, unit),
                 direction,
                 rate: computedRate,
                 eval: evalChar,
