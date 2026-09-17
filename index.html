@@ -6,7 +6,7 @@
     <title>集團績效指標管理平台</title>
 
     <!-- 1. 優先載入 config.js -->
-    <script src="config.js?v=41.5" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
+    <script src="config.js?v=41.6" onerror="console.warn('⚠️雲端同步功能停用。')"></script>
 
     <!-- 引入專業開發庫 -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -100,7 +100,7 @@
                     <div class="min-w-0">
                         <h1 class="text-sm sm:text-lg lg:text-xl font-bold tracking-tight text-gray-900 flex items-center gap-1.5 leading-tight truncate">
                             <span class="truncate">集團績效指標管理平台</span>
-                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.5 PRO</span>
+                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] px-1.5 py-0.5 rounded font-bold flex-shrink-0">v41.6 PRO</span>
                         </h1>
                     </div>
                 </div>
@@ -921,7 +921,7 @@
         function logoutAdmin() {
             isAdminAuthenticated = false;
             if (ui('logoutBtn')) ui('logoutBtn').classList.add('hidden');
-            showToast("🔒 已退出編輯模式。", "info");
+            showToast("已退出編輯模式。", "info");
         }
 
         function triggerImportWithAuth() {
@@ -1037,54 +1037,53 @@
             }
         }
 
-        // 🟢【核心升級】數值與字串極致相容格式化
+        // 🟢 數值與單位顯示修正：單位含「千元/仟元/元」強制顯示整數，單位含「%」保留 2 位小數
         function safeDisplay(val, isPct = false, noDecimal = false, unitContext = "") {
             if (isPlaceholder(val)) return "—";
             let s = String(val).trim();
 
-            // 需求 1：如果字串包含複雜文字/單位組合 (例如 "1%2000千元" 或非單純數字)，完整原樣保留並呈現
-            const hasComplexText = /[^\d.,%\-\s]/.test(s) && !/^\d+(\.\d+)?\s*千元$/.test(s);
+            // 保留原始複合文字（例如 1%2000千元）
+            const hasComplexText = /[^\d.,%\-\s]/.test(s) && !/^\d+(\.\d+)?\s*(千元|仟元|元)$/.test(s);
             if (hasComplexText && (s.includes('%') || s.length > 8)) {
-                return s; // 保留原始完全抓取內容如：1%2000千元
+                return s;
             }
 
             const unitStr = String(unitContext || "").trim();
             const isPercentUnit = isPct || unitStr === "%" || s.includes('%');
-            const isKThousandUnit = unitStr.includes("千元") || s.includes("千元");
+            const isIntegerUnit = /千元|仟元|元/.test(unitStr) || /千元|仟元|元/.test(s);
 
-            // 抽取純粹的數字部分
+            // 抽取數字部分
             let cleanNumStr = s.replace(/[^0-9.-]/g, '');
             let num = parseFloat(cleanNumStr);
 
             if (isNaN(num)) return s;
 
-            // 處理 Excel 匯入的 0.58 轉成 58%
+            // Excel 比率小數處理 (如 0.58 轉 58%)
             if (isPercentUnit && Math.abs(num) <= 1 && num !== 0 && !s.includes('%')) {
                 num = num * 100;
             }
 
-            // 需求 4：判斷極小小數（如 0.001345 ➔ 取至非零最後有效數字 0.0013）
             let formattedNum = "";
-            if (Math.abs(num) > 0 && Math.abs(num) < 0.01 && !Number.isInteger(num)) {
+            
+            // 單位含「千元/仟元/元」或指定無小數 ➔ 強制取整數，不留小數點
+            if (isIntegerUnit || noDecimal) {
+                formattedNum = Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
+            }
+            // 極小小數處理 (如 0.001345 ➔ 0.0013)
+            else if (Math.abs(num) > 0 && Math.abs(num) < 0.01 && !Number.isInteger(num)) {
                 let numStr = num.toString();
                 if (numStr.includes('.')) {
-                    let parts = numStr.split('.');
-                    let decimals = parts[1];
+                    let decimals = numStr.split('.')[1];
                     let firstNonZeroIndex = 0;
                     while (firstNonZeroIndex < decimals.length && decimals[firstNonZeroIndex] === '0') {
                         firstNonZeroIndex++;
                     }
-                    let keepDecimals = firstNonZeroIndex + 2; // 保留至非零後兩位
-                    formattedNum = num.toFixed(Math.min(keepDecimals, 6));
+                    formattedNum = num.toFixed(Math.min(firstNonZeroIndex + 2, 6));
                 } else {
                     formattedNum = num.toString();
                 }
             } 
-            // 需求 5：單位有千元 ➔ 數值直接取整數、不帶小數點，加千位符
-            else if (isKThousandUnit || noDecimal) {
-                formattedNum = Math.round(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
-            } 
-            // 需求 3：單位是 % ➔ 累計目標與累計實績呈現 % 並取小數點兩位
+            // 百分比單位 % ➔ 保留 2 位小數
             else if (isPercentUnit) {
                 formattedNum = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             } 
@@ -1094,10 +1093,11 @@
                     : num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
 
-            // 補齊單位標籤
+            // 提取並組合單位文字
             let unitPart = s.replace(/[0-9.,%\-\s]/g, '');
-            if (!unitPart && isKThousandUnit && !formattedNum.includes("千元")) {
-                unitPart = "千元";
+            if (!unitPart && isIntegerUnit) {
+                const match = unitStr.match(/(千元|仟元|元)/);
+                if (match) unitPart = match[0];
             }
 
             if (unitPart) {
@@ -1106,7 +1106,7 @@
             return isPercentUnit && !formattedNum.includes('%') ? `${formattedNum}%` : formattedNum;
         }
 
-        // 🟢 需求 2：達成率一律取小數點 2 位 (例如 243.73%)
+        // 🟢 達成率計算修正：強制輸出帶有 % 的字串並保留 2 位小數 (例如 243.73%)
         function calculateRate(targetVal, actualVal, direction) {
             if (isPlaceholder(targetVal) || isPlaceholder(actualVal)) return "—";
             
@@ -1183,7 +1183,7 @@
                     bulkBar.classList.add('hidden');
                     bulkBar.classList.remove('flex');
                     clearAllSelections();
-                    showToast("💾 已退出編輯模式。");
+                    showToast("已退出編輯模式。");
                 }
                 renderMeasures();
                 lucide.createIcons();
@@ -1238,7 +1238,7 @@
                 }
                 pendingDeleteIndex = -2; 
                 ui('deleteConfirmDetails').innerHTML = `
-                    <div class="font-bold text-rose-700 text-sm">⚠️ 已選取 ${selectedItemIndices.size} 筆項目</div>
+                    <div class="font-bold text-rose-700 text-sm">F已選取 ${selectedItemIndices.size} 筆項目</div>
                     <div class="text-xs text-gray-600 mt-1">確認刪除後將同步更新雲端資料庫，是否確定移除？</div>
                 `;
                 ui('deleteConfirmModal').classList.remove('hidden');
@@ -1398,11 +1398,20 @@
                                 const yoyDisp = (lastYearAccumVal || lastYearVal) ? String(lastYearAccumVal || lastYearVal).trim() : "—";
                                 
                                 let rateDisp = calculateRate(targetVal, actualVal, direction);
+                                
+                                if (rateDisp !== "—" && !rateDisp.endsWith('%')) {
+                                    let rNum = parseFloat(rateDisp);
+                                    if (!isNaN(rNum)) {
+                                        rateDisp = rNum.toFixed(2) + "%";
+                                    }
+                                }
+
                                 let evalChar = "X";
-                                
-                                let rNum = parseFloat(rateDisp.replace(/%/g, ''));
-                                if (!isNaN(rNum)) evalChar = rNum >= 100 ? "O" : "X";
-                                
+                                let rNum = parseFloat(String(rateDisp).replace(/%/g, ''));
+                                if (!isNaN(rNum)) {
+                                    evalChar = rNum >= 100 ? "O" : "X";
+                                }
+
                                 if (evalVal !== undefined && evalVal !== null && String(evalVal).trim() !== "") {
                                     const sEval = String(evalVal).trim().toUpperCase();
                                     if (sEval === "O" || sEval === "✔" || sEval === "OK") {
@@ -1423,7 +1432,9 @@
                                     targetAccum: safeDisplay(targetDisp, false, false, unit), 
                                     actualAccum: safeDisplay(actualDisp, false, false, unit), 
                                     yoyActual: safeDisplay(yoyDisp, false, false, unit), 
-                                    direction: direction, rate: rateDisp, eval: evalChar,
+                                    direction: direction, 
+                                    rate: rateDisp, 
+                                    eval: evalChar,
                                     remark: remark
                                 };
                                 
